@@ -1,4 +1,4 @@
-# SpaceHaat
+# SpaceWallah
 
 Premium SaaS platform to discover and compare workspaces across India.
 
