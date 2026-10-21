@@ -14,7 +14,7 @@ export function OfficeSpaceCityPage({ data }: { data: CityPageData }) {
           <PopularLocalitiesRail
             catalogCityId={data.catalogCityId}
             citySlug={data.city.slug}
-            hrefPrefix="/office-space"
+            hrefPrefix="/managed-office"
             fallbackLocations={data.popularLocations.map((loc) => ({
               name: loc.name,
               slug: loc.slug,

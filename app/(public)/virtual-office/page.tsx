@@ -1,11 +1,8 @@
 import { generateMetadataForPublicRoute } from "@/lib/generate-public-seo-metadata";
-import { VirtualOfficeHomepage } from "@/modules/verticals/virtual-office-homepage";
-import { getVerticalLandingContent } from "@/services/verticals";
+import { VoHomePage } from "@/modules/virtual-office/homepage/vo-home-page";
 
 export const generateMetadata = generateMetadataForPublicRoute;
 
-export default async function VirtualOfficePage() {
-  const data = await getVerticalLandingContent("virtual-office");
-
-  return <VirtualOfficeHomepage data={data} />;
+export default function VirtualOfficePage() {
+  return <VoHomePage />;
 }

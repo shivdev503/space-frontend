@@ -54,7 +54,7 @@ export function buildUserEnquiryBody(input: BuildUserEnquiryInput): Record<strin
     microlocation: micro,
     location,
     mx_Space_Type: input.mxSpaceType.trim() || "General",
-    mx_Page_Url: input.pageUrl.trim() || "https://www.spacehaat.com",
+    mx_Page_Url: input.pageUrl.trim() || "https://www.spacewallah.com",
     mx_BudgetPrice: (input.budget ?? "").toString().trim(),
     mx_Move_In_Date: (input.moveInDate ?? "").toString().trim(),
   };

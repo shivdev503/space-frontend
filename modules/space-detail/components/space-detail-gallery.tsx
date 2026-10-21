@@ -37,6 +37,20 @@ function uniqueImageEntries(
   return list;
 }
 
+/** Photo-tour rows: one wide photo, then a pair, repeating (Airbnb "Show all photos" layout). */
+function tourRows(entries: ImageEntry[]): Array<Array<{ entry: ImageEntry; index: number }>> {
+  const rows: Array<Array<{ entry: ImageEntry; index: number }>> = [];
+  let i = 0;
+  let wide = true;
+  while (i < entries.length) {
+    const size = wide ? 1 : Math.min(2, entries.length - i);
+    rows.push(entries.slice(i, i + size).map((entry, k) => ({ entry, index: i + k })));
+    i += size;
+    wide = !wide;
+  }
+  return rows;
+}
+
 function filterStyleForIndex(
   originalIndex: number,
   imageCount: number,
@@ -62,9 +76,13 @@ export function SpaceDetailGallery({
   const preview = useMemo(() => allEntries.slice(0, 5), [allEntries]);
   const [index, setIndex] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [tourOpen, setTourOpen] = useState(false);
+  const [tourFocusIndex, setTourFocusIndex] = useState<number | null>(null);
   const [portalReady, setPortalReady] = useState(false);
   const railRef = useRef<HTMLDivElement>(null);
   const thumbRailRef = useRef<HTMLDivElement>(null);
+  const tourScrollRef = useRef<HTMLDivElement>(null);
+  const rows = useMemo(() => tourRows(allEntries), [allEntries]);
 
   const styleAt = useCallback(
     (entry: ImageEntry) =>
@@ -72,15 +90,21 @@ export function SpaceDetailGallery({
     [imageAdjustments, images.length],
   );
 
-  const openLightbox = useCallback(
-    (previewIndex: number) => {
-      const entry = preview[previewIndex];
-      if (!entry) return;
-      const fullIndex = allEntries.findIndex((e) => e.src === entry.src);
-      setLightboxIndex(fullIndex >= 0 ? fullIndex : 0);
+  /** Opens the photo tour, scrolled to the clicked preview photo (or the top for "Show all"). */
+  const openTour = useCallback(
+    (previewIndex: number | null) => {
+      const entry = previewIndex === null ? undefined : preview[previewIndex];
+      const fullIndex = entry ? allEntries.findIndex((e) => e.src === entry.src) : 0;
+      setTourFocusIndex(fullIndex > 0 ? fullIndex : null);
+      setTourOpen(true);
     },
     [allEntries, preview],
   );
+
+  const closeTour = useCallback(() => {
+    setTourOpen(false);
+    setTourFocusIndex(null);
+  }, []);
 
   const closeLightbox = useCallback(() => setLightboxIndex(null), []);
 
@@ -110,24 +134,46 @@ export function SpaceDetailGallery({
     return () => el.removeEventListener("scroll", onScroll);
   }, [preview.length]);
 
+  const overlayOpen = tourOpen || lightboxIndex !== null;
+
   useEffect(() => {
-    if (lightboxIndex === null) return;
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeLightbox();
-      if (e.key === "ArrowLeft") goPrev();
-      if (e.key === "ArrowRight") goNext();
-    };
-
+    if (!overlayOpen) return;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", onKey);
-
     return () => {
       document.body.style.overflow = prevOverflow;
-      window.removeEventListener("keydown", onKey);
     };
-  }, [lightboxIndex, closeLightbox, goPrev, goNext]);
+  }, [overlayOpen]);
+
+  useEffect(() => {
+    if (!overlayOpen) return;
+
+    // The slideshow sits above the tour, so Escape closes it first.
+    const onKey = (e: KeyboardEvent) => {
+      if (lightboxIndex !== null) {
+        if (e.key === "Escape") closeLightbox();
+        if (e.key === "ArrowLeft") goPrev();
+        if (e.key === "ArrowRight") goNext();
+        return;
+      }
+      if (e.key === "Escape") closeTour();
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [overlayOpen, lightboxIndex, closeLightbox, closeTour, goPrev, goNext]);
+
+  useEffect(() => {
+    if (!tourOpen) return;
+    const container = tourScrollRef.current;
+    if (!container) return;
+    if (tourFocusIndex === null) {
+      container.scrollTop = 0;
+      return;
+    }
+    const target = container.querySelector<HTMLElement>(`[data-tour-index="${tourFocusIndex}"]`);
+    target?.scrollIntoView({ block: "center" });
+  }, [tourOpen, tourFocusIndex]);
 
   useEffect(() => {
     if (lightboxIndex === null) return;
@@ -167,7 +213,7 @@ export function SpaceDetailGallery({
             <button
               key={`${entry.src}-${i}`}
               type="button"
-              onClick={() => openLightbox(i)}
+              onClick={() => openTour(i === preview.length - 1 && photoCount > 1 ? null : i)}
               className={cn(
                 "group relative block overflow-hidden bg-slate-200 text-left",
                 i === 0 && "lg:row-span-2",
@@ -215,7 +261,7 @@ export function SpaceDetailGallery({
           </div>
           <button
             type="button"
-            onClick={() => openLightbox(index)}
+            onClick={() => openTour(null)}
             className="inline-flex items-center gap-1.5 text-xs font-medium text-ink"
           >
             <Grid3X3 className="h-3.5 w-3.5" aria-hidden />
@@ -224,10 +270,73 @@ export function SpaceDetailGallery({
         </div>
       </div>
 
+      {portalReady && tourOpen
+        ? createPortal(
+            <div
+              className="fixed inset-0 z-[120] flex flex-col bg-white"
+              role="dialog"
+              aria-modal="true"
+              aria-label={`${name} — all photos`}
+            >
+              <div className="shrink-0 border-b border-slate-200/90 bg-white">
+                <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center gap-4 px-4 sm:px-8">
+                  <button
+                    type="button"
+                    onClick={closeTour}
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-ink transition hover:bg-slate-100"
+                    aria-label="Close photos"
+                  >
+                    <X className="h-5 w-5" aria-hidden />
+                  </button>
+                  <p className="min-w-0 flex-1 truncate text-base font-semibold text-ink sm:text-lg">{name}</p>
+                  <p className="shrink-0 text-sm text-muted">
+                    {photoCount} {photoCount === 1 ? "photo" : "photos"}
+                  </p>
+                </div>
+              </div>
+
+              <div ref={tourScrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                <div className="mx-auto flex w-full max-w-[880px] flex-col gap-2 px-4 py-6 sm:gap-3 sm:px-8 sm:py-8">
+                  {rows.map((row) => (
+                    <div
+                      key={row[0].index}
+                      className={cn("grid gap-2 sm:gap-3", row.length === 2 && "sm:grid-cols-2")}
+                    >
+                      {row.map(({ entry, index: photoIndex }) => (
+                        <button
+                          key={`${entry.src}-tour`}
+                          type="button"
+                          data-tour-index={photoIndex}
+                          onClick={() => setLightboxIndex(photoIndex)}
+                          className={cn(
+                            "group relative block w-full overflow-hidden rounded-xl bg-slate-100 sm:rounded-2xl",
+                            row.length === 1 ? "aspect-[3/2]" : "aspect-[4/3]",
+                          )}
+                          aria-label={`Open photo ${photoIndex + 1} of ${photoCount}`}
+                        >
+                          <RemoteImage
+                            src={entry.src}
+                            alt={`${name} — photo ${photoIndex + 1}`}
+                            fill
+                            className="object-cover transition duration-500 group-hover:brightness-[0.92]"
+                            sizes={row.length === 1 ? "(max-width: 880px) 100vw, 880px" : "(max-width: 640px) 100vw, 440px"}
+                            style={styleAt(entry)}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
+
       {portalReady && lightboxIndex !== null && activeSrc && activeEntry
         ? createPortal(
             <div
-              className="fixed inset-0 z-[120] flex flex-col bg-[#020617]/96 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:p-4"
+              className="fixed inset-0 z-[130] flex flex-col bg-[#020617]/96 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:p-4"
               role="dialog"
               aria-modal="true"
               aria-label={`${name} photos`}

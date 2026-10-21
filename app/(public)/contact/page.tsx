@@ -4,8 +4,8 @@ import { ContactPage } from "@/modules/contact/contact-page";
 import { buildMetadata } from "@/utils/metadata";
 
 export const metadata: Metadata = buildMetadata(
-  "Contact Us | SpaceHaat",
-  "Get in touch with SpaceHaat for coworking, coliving, virtual office, and office space guidance across India.",
+  "Contact Us | SpaceWallah",
+  "Get in touch with SpaceWallah for coworking, coliving, virtual office, and managed office guidance across India.",
   "/contact",
 );
 

@@ -29,7 +29,7 @@ export function ColivingDetailMobileBar({ space }: ColivingDetailMobileBarProps)
         <button
           type="button"
           onClick={openQuiz}
-          className="inline-flex shrink-0 items-center justify-center rounded-full bg-[color:var(--color-brand)] px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(76,175,80,0.32)] transition hover:bg-[#43A047]"
+          className="inline-flex shrink-0 items-center justify-center rounded-full bg-[color:var(--color-brand)] px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(18,184,134,0.32)] transition hover:bg-[color:var(--color-accent)]"
         >
           Get free details
         </button>

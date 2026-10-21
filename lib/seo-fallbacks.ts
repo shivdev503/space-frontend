@@ -21,7 +21,7 @@ function pickVertical(pathname: string, slug: string): VerticalKey {
   if (p.startsWith("/coworking") || s === "coworking" || s.startsWith("coworking-")) {
     return "coworking";
   }
-  if (p.startsWith("/office-space") || s === "office-space" || s.startsWith("office-space-")) {
+  if (p.startsWith("/managed-office") || s === "office-space" || s.startsWith("office-space-")) {
     return "office";
   }
   if (p.startsWith("/coliving") || s === "coliving" || s.startsWith("coliving-")) {
@@ -37,7 +37,7 @@ function pickVertical(pathname: string, slug: string): VerticalKey {
 }
 
 /**
- * Shown when `/api/user/seo/:slug` has no document. Uses the real URL path
+ * Shown when `/api/user/newSeo/:slug` has no document. Uses the real URL path
  * (and slug) to pick a vertical-appropriate blurb — never the CMS `home` row
  * unless the request is actually for `/` / `home`.
  */
@@ -51,13 +51,13 @@ export function getFallbackSeoContent(pathname: string, slug: string): SeoConten
 
   if (v === "home") {
     return {
-      title: "Premium workspace discovery across India",
+      title: "Premium Space Discovery across India",
       description:
-        "Compare coworking spaces, virtual offices, managed office options, and coliving/PG homes with SpaceHaat — find locations, plans, and deals that match your team.",
+        "Compare coworking spaces, virtual offices, managed office options, and coliving/PG homes with SpaceWallah — find locations, plans, and deals that match your team.",
       path: "/",
       footer_title: `Why ${APP_NAME}`,
-      footer_description: `<p>SpaceHaat is a premium discovery platform to compare coworking spaces, virtual offices, and office spaces across India. We help you shortlist better-fit options with less noise.</p>`,
-      keywords: "coworking, virtual office, office space, coliving, PG, India, SpaceHaat",
+      footer_description: `<p>SpaceWallah helps you compare verified coworking spaces, managed offices, virtual offices and coliving homes in cities across India, with a free advisor to shortlist, negotiate and get you moved in.</p>`,
+      keywords: "coworking, virtual office, managed office, coliving, PG, India, SpaceWallah",
     };
   }
 
@@ -72,11 +72,11 @@ export function getFallbackSeoContent(pathname: string, slug: string): SeoConten
   }
   if (v === "office") {
     return {
-      title: `Office space across India | ${APP_NAME}`,
+      title: `Managed office across India | ${APP_NAME}`,
       description: office.description,
       path: p,
-      footer_title: `Office space on ${APP_NAME}`,
-      footer_description: `<p>${office.description} Explore managed and unfurnished options with clearer pricing context before you book a site visit.</p>`,
+      footer_title: `Managed office on ${APP_NAME}`,
+      footer_description: `<p>${office.description} Explore managed office options with clearer pricing context before you book a site visit.</p>`,
     };
   }
   if (v === "virtual") {
@@ -101,10 +101,10 @@ export function getFallbackSeoContent(pathname: string, slug: string): SeoConten
     return {
       title: `List and manage your spaces | ${APP_NAME}`,
       description:
-        "Create a host account to list coworking and office inventory, manage leads, and keep your listings up to date.",
+        "Create a host account to list coworking and managed office inventory, manage leads, and keep your listings up to date.",
       path: p,
       footer_title: "Hosts & property managers",
-      footer_description: `<p>List coworking and office space on ${APP_NAME}, track leads, and update availability — all from one place.</p>`,
+      footer_description: `<p>List coworking and managed office listings on ${APP_NAME}, track leads, and update availability — all from one place.</p>`,
     };
   }
   return {

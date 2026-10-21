@@ -85,7 +85,7 @@ export type Testimonial = {
   quote: string;
 };
 
-export type WhySpaceHaatItem = {
+export type WhySpaceWallahItem = {
   id: string;
   title: string;
   description: string;
@@ -110,7 +110,7 @@ export type HomepageData = {
   featuredSpaces: Space[];
   brands: Brand[];
   testimonials: Testimonial[];
-  differentiators: WhySpaceHaatItem[];
+  differentiators: WhySpaceWallahItem[];
   howItWorks: HowItWorksStep[];
   searchOptions: {
     locations: SearchOption[];
@@ -160,7 +160,7 @@ export type VerticalLandingData = {
   hero: VerticalHero;
   cities: City[];
   featuredSpaces: Space[];
-  benefits: WhySpaceHaatItem[];
+  benefits: WhySpaceWallahItem[];
   howItWorks: HowItWorksStep[];
   leadSection: {
     title: string;
@@ -174,7 +174,7 @@ export type VerticalLandingData = {
     columns: string[];
     rows: ComparisonRow[];
   };
-  enterpriseSolutions?: WhySpaceHaatItem[];
+  enterpriseSolutions?: WhySpaceWallahItem[];
   caseStudies?: CaseStudy[];
   brands?: Brand[];
 };

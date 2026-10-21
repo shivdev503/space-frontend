@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { SpaceVertical } from "@/types";
 import { toTitleCase } from "@/utils/format";
+import { verticalPath } from "@/lib/vertical-path";
 
 type BreadcrumbProps = {
   vertical: SpaceVertical;
@@ -12,7 +13,7 @@ type BreadcrumbProps = {
 const verticalLabelMap: Record<SpaceVertical, string> = {
   coworking: "Coworking",
   "virtual-office": "Virtual Office",
-  "office-space": "Office Space",
+  "office-space": "Managed Office",
   coliving: "Coliving Space",
 };
 
@@ -23,11 +24,11 @@ export function Breadcrumb({ vertical, citySlug, locationName }: BreadcrumbProps
         Home
       </Link>
       <span>/</span>
-      <Link href={`/${vertical}`} className="hover:text-ink">
+      <Link href={`/${verticalPath(vertical)}`} className="hover:text-ink">
         {verticalLabelMap[vertical]}
       </Link>
       <span>/</span>
-      <Link href={`/${vertical}/${citySlug}`} className="hover:text-ink">
+      <Link href={`/${verticalPath(vertical)}/${citySlug}`} className="hover:text-ink">
         {toTitleCase(citySlug)}
       </Link>
       <span>/</span>

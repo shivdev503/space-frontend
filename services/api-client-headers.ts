@@ -1,5 +1,5 @@
 /**
- * Shared headers for upstream SpaceHaat API calls.
+ * Shared headers for upstream SpaceWallah API calls.
  *
  * Backend expects **both**:
  * - `x-client-key` — `NEXT_PUBLIC_API_KEY` / `API_KEY`

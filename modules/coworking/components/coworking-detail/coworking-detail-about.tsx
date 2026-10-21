@@ -9,9 +9,11 @@ import {
   CoworkingDetailEyebrow,
   CoworkingDetailSectionTitle,
 } from "@/modules/coworking/components/coworking-detail/coworking-detail-ui";
+import { workspaceDescriptionHtml } from "@/lib/coworking-workspace-content";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import { cn } from "@/utils/cn";
 import { toTitleCase } from "@/utils/format";
+import { toSpaceImageCdnUrl } from "@/lib/space-image-url";
 
 function plainDescription(raw: string): string {
   return raw
@@ -31,17 +33,18 @@ export function CoworkingDetailAbout({ workspace }: { workspace: CoworkingModel.
     workspace.brand?.brand_tag_line?.trim() ||
     workspace.brand?.logo_tag_line?.trim() ||
     "Premium workspace for growing teams";
-  const logo = workspace.brand?.image?.s3_link?.trim();
+  // Brand logos keep their stored path (their `folder_name` doesn't match where the file lives).
+  const logo = toSpaceImageCdnUrl(workspace.brand?.image?.s3_link ?? "");
 
   const paragraphs = useMemo(() => {
-    const text = plainDescription(workspace.description || "");
+    const text = plainDescription(workspaceDescriptionHtml(workspace));
     if (!text) {
       return [
         `${workspace.name} offers flexible coworking on ${toTitleCase(micro)}${city ? `, ${toTitleCase(city)}` : ""} with desks, meeting rooms, and managed office support.`,
       ];
     }
     return text.split(/\n+/).filter(Boolean);
-  }, [workspace.description, workspace.name, micro, city]);
+  }, [workspace, micro, city]);
 
   const canExpand = paragraphs.join(" ").split(/\s+/).length > 45;
 

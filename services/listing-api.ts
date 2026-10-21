@@ -16,7 +16,7 @@
  *
  * Env:
  *   - Base URL is the shared {@link resolveApiBaseUrl} (local:
- *     `http://localhost:8000`, production: `https://api.spacehaat.com` via
+ *     `http://localhost:8000`, production: `https://api.spacewallah.com` via
  *     `API_BASE_URL`). The project intentionally talks to a single backend
  *     origin at a time — there is no listing-specific override.
  *   - `LISTING_API_TIMEOUT_MS` — request timeout override.
@@ -43,7 +43,7 @@ import { ListingModel } from "@/types/listing.model";
 
 // --------- Endpoint paths ---------
 // Paths are joined against {@link resolveListingApiBaseUrl} (defaults to the
-// shared app origin `http://localhost:8000` / `https://api.spacehaat.com`) and
+// shared app origin `http://localhost:8000` / `https://api.spacewallah.com`) and
 // therefore carry the same `/api/…` prefix the rest of this project uses.
 
 export const listingApiPaths = {

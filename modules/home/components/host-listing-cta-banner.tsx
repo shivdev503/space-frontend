@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const BANNER_IMAGE =
-  "https://img.spacehaat.com/images/f227d40da784346e41e08805ae8b5cfb5507e195.webp";
+  "https://img.spacewallah.com/images/3200f8642fc7cd76346234cd7272500bc1773b42.webp";
 
 /**
  * Giggster-style host CTA: crisp 50/50 split (black | photo).
@@ -22,9 +22,9 @@ export function HostListingCtaBanner() {
           <div className="relative order-1 min-h-[16rem] w-full sm:min-h-[18rem] md:order-2 md:min-h-0 md:h-full">
             <Image
               src={BANNER_IMAGE}
-              alt="Professional host in a bright workspace"
+              alt="Professional working on a laptop in a hanging chair by an office window"
               fill
-              className="object-cover object-[center_22%] md:object-[center_26%]"
+              className="object-cover object-[center_38%] md:object-center"
               sizes="(max-width: 768px) 100vw, 50vw"
               priority
             />
@@ -40,7 +40,7 @@ function BannerCopy() {
     <>
       <h2 className="font-display text-[1.85rem] font-bold leading-[1.08] tracking-[-0.035em] text-white sm:text-[2rem] md:text-[2.25rem] lg:text-[2.5rem] xl:text-[2.65rem] xl:leading-[1.05]">
         <span className="block">Earn as a</span>
-        <span className="block">SpaceHaat Host</span>
+        <span className="block">SpaceWallah Host</span>
       </h2>
       <p className="mt-4 text-base font-normal leading-relaxed text-white/95 md:mt-5 md:text-lg lg:text-xl">
         Host what works for you

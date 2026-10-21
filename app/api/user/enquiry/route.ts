@@ -7,7 +7,7 @@ import { enquiryJwtCookieName } from "@/services/enquiry-user-session";
 /**
  * `POST /api/user/enquiry` — proxies to the backend `createEnquiry` handler.
  * Forwards the `token` header from the httpOnly `ENQUIRY_JWT_COOKIE_NAME` cookie
- * (default `spacehaat_user_enquiry_jwt`) so `req.user` is populated upstream.
+ * (default `spacewallah_user_enquiry_jwt`) so `req.user` is populated upstream.
  */
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;

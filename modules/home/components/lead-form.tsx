@@ -66,7 +66,7 @@ export function LeadForm({
     }
 
     const pageUrl =
-      typeof window !== "undefined" ? window.location.href : "https://www.spacehaat.com";
+      typeof window !== "undefined" ? window.location.href : "https://www.spacewallah.com";
 
     try {
       const body = buildUserEnquiryBody({

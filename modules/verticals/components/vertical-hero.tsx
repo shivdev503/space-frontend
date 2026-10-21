@@ -172,7 +172,7 @@ export function VerticalHero({ data }: VerticalHeroProps) {
             <FadeIn delay={0.2}>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button href="#lead-form">{data.hero.ctaLabel}</Button>
-                <Button href="/office-space/gurgaon" variant="secondary">
+                <Button href="/managed-office/gurgaon" variant="secondary">
                   Explore premium offices
                 </Button>
               </div>

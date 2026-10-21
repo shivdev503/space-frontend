@@ -193,7 +193,7 @@ export function ColivingListingLeadQuizModal({
 
       const body = buildUserEnquiryBody({
         name: name.trim(),
-        email: `coliving.lead+${phone.trim()}@spacehaat.com`,
+        email: `coliving.lead+${phone.trim()}@spacewallah.com`,
         phone: phone.trim(),
         interestedIn,
         city: slugifyPgName(pg.city),
@@ -585,7 +585,7 @@ function QuizNav({
         type="button"
         disabled={nextDisabled}
         onClick={onNext}
-        className="inline-flex min-h-[46px] flex-1 items-center justify-center gap-2 rounded-xl border border-[color:var(--color-brand)] bg-[color:var(--color-brand)] px-[18px] py-3.5 text-[14.5px] font-medium text-white transition hover:bg-[#43A047] disabled:cursor-not-allowed disabled:opacity-45"
+        className="inline-flex min-h-[46px] flex-1 items-center justify-center gap-2 rounded-xl border border-[color:var(--color-brand)] bg-[color:var(--color-brand)] px-[18px] py-3.5 text-[14.5px] font-medium text-white transition hover:bg-[color:var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-45"
       >
         {nextLabel}
         <ArrowRight className="h-4 w-4" />

@@ -385,7 +385,7 @@ export function ColivingCityFiltersModal({
                   type="button"
                   onClick={handleApply}
                   disabled={pending}
-                  className="inline-flex flex-1 items-center justify-center rounded-2xl bg-gradient-to-b from-[#4CAF50] to-[#2E7D32] py-3.5 text-sm font-semibold text-white shadow-[0_14px_38px_rgba(76,175,80,0.30)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_48px_rgba(76,175,80,0.34)] active:translate-y-0 disabled:cursor-wait disabled:opacity-80 disabled:hover:translate-y-0"
+                  className="inline-flex flex-1 items-center justify-center rounded-2xl bg-[color:var(--color-brand)] py-3.5 text-sm font-semibold text-white shadow-[0_14px_38px_rgba(18,184,134,0.30)] transition hover:-translate-y-0.5 hover:bg-[color:var(--color-accent)] hover:shadow-[0_18px_48px_rgba(11,59,46,0.30)] active:translate-y-0 disabled:cursor-wait disabled:opacity-80 disabled:hover:translate-y-0"
                 >
                   {pending ? "Loading…" : resultLabel}
                 </button>

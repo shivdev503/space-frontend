@@ -16,6 +16,7 @@ import { loadPgSearchHits, type PgSearchHit } from "@/services/pg-api";
 import { getCatalogCityIdBySlug } from "@/services/catalog-city-id";
 import { SearchOption } from "@/types";
 import { cn } from "@/utils/cn";
+import { verticalPath } from "@/lib/vertical-path";
 
 type SearchBarProps = {
   locations: SearchOption[];
@@ -37,7 +38,7 @@ type SharedSearchState = {
   selectedSpaceSlug: string;
 };
 
-const SEARCH_SYNC_EVENT = "spacehaat:search-sync";
+const SEARCH_SYNC_EVENT = "spacewallah:search-sync";
 
 function resolveLocationSlug(input: string, locations: SearchOption[]) {
   const normalized = input.trim().toLowerCase();
@@ -111,7 +112,7 @@ export function SearchBar({
   const quickOptions = useMemo(() => locations.slice(0, 5), [locations]);
   const workspaceTypes = [
     { id: "coworking", label: "Coworking Space" },
-    { id: "office-space", label: "Office Space" },
+    { id: "office-space", label: "Managed Office" },
     { id: "virtual-office", label: "Virtual Office" },
     { id: "coliving", label: "Coliving Space" },
   ] as const;
@@ -501,7 +502,7 @@ export function SearchBar({
       }
 
       if (selectedSpaceType === "office-space" && selectedSpaceSlug.trim()) {
-        router.push(`/office-space/${selectedSpaceSlug.trim()}`);
+        router.push(`/managed-office/${selectedSpaceSlug.trim()}`);
         if (variant === "homepage") {
           setIsMobileSearchOpen(false);
           setActiveField(null);
@@ -525,7 +526,7 @@ export function SearchBar({
       const locationSlug = resolvedLocationInput
         ? resolveLocationSlug(resolvedLocationInput, locations)
         : "";
-      const destination = locationSlug ? `/${selectedSpaceType}/${locationSlug}` : `/${selectedSpaceType}`;
+      const destination = locationSlug ? `/${verticalPath(selectedSpaceType)}/${locationSlug}` : `/${verticalPath(selectedSpaceType)}`;
       router.push(`${destination}${query.toString() ? `?${query.toString()}` : ""}`);
       if (variant === "homepage") {
         setIsMobileSearchOpen(false);
@@ -738,7 +739,7 @@ export function SearchBar({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.985 }}
                 className={cn(
-                  "inline-flex items-center justify-center gap-2 bg-[#4CAF50] text-base font-semibold text-white transition-colors hover:bg-[#43A047] active:bg-[#388E3C]",
+                  "inline-flex items-center justify-center gap-2 bg-[color:var(--color-brand)] text-base font-semibold text-white transition-colors hover:bg-[color:var(--color-accent)] active:bg-[#0a2d27]",
                   isHeaderVariant
                     ? cn(
                         "rounded-full transition-all duration-300",
@@ -902,7 +903,7 @@ export function SearchBar({
                           ) : null}
                           {!officeHitsLoading && !resolvedLocationSlug.trim() ? (
                             <div className="rounded-xl border border-dashed border-slate-300 px-3 py-5 text-sm text-slate-500">
-                              Choose a city first to load office spaces.
+                              Choose a city first to load managed offices.
                             </div>
                           ) : null}
                           {!officeHitsLoading && resolvedLocationSlug.trim() && officeHits.length > 0 ? (
@@ -1038,7 +1039,7 @@ export function SearchBar({
             aria-expanded={isMobileSearchOpen}
             aria-haspopup="dialog"
           >
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#4CAF50] text-white shadow-[0_10px_28px_rgba(76,175,80,0.35)]">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[color:var(--color-brand)] text-white shadow-[0_10px_28px_rgba(18,184,134,0.35)]">
               <Search className="h-5 w-5" />
             </span>
             <span className="min-w-0 flex-1">
@@ -1096,7 +1097,7 @@ export function SearchBar({
               Location
             </span>
             <input
-              list="spacehaat-locations"
+              list="spacewallah-locations"
               value={location}
               onChange={(event) => setLocation(event.target.value)}
               placeholder="Search Delhi, Bangalore, Gurgaon..."
@@ -1157,7 +1158,7 @@ export function SearchBar({
           ))}
         </div>
       </form>
-      <datalist id="spacehaat-locations">
+      <datalist id="spacewallah-locations">
         {locations.map((option) => (
           <option key={option.value} value={option.label} />
         ))}

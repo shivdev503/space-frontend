@@ -52,11 +52,11 @@ const VERTICALS: {
   },
   {
     id: "office-space",
-    title: "Office Space",
+    title: "Managed Office",
     description: "Private offices and suites sized for how you work today.",
-    href: "/office-space",
+    href: "/managed-office",
     imageSrc:
-      "https://img.spacehaat.com/images/original/29f7c32fae7798c9733f5b891af3e0ded7031a85.jpg",
+      "https://img.spacewallah.com/images/original/29f7c32fae7798c9733f5b891af3e0ded7031a85.jpg",
     imageAlt: "Corporate office setup",
     Icon: Building2,
   },
@@ -66,7 +66,7 @@ const VERTICALS: {
     description: "Professional address and mail handling without a full-time desk.",
     href: "/virtual-office",
     imageSrc:
-      "https://img.spacehaat.com/images/original/475b4b5ecc2f03baf8973403555fb8167ca0c4fb.jpg",
+      "https://img.spacewallah.com/images/original/475b4b5ecc2f03baf8973403555fb8167ca0c4fb.jpg",
     imageAlt: "Remote work and business desk concept",
     Icon: Landmark,
   },

@@ -1,6 +1,6 @@
 import { SpaceVertical } from "@/types";
 
-export const APP_NAME = "SpaceHaat";
+export const APP_NAME = "SpaceWallah";
 
 /** Markets listed under every vertical (header dropdown + footer columns). */
 export const siteCities: ReadonlyArray<{ name: string; slug: string }> = [
@@ -38,9 +38,9 @@ export const verticals: Array<{
   },
   {
     key: "office-space",
-    label: "Office Spaces",
-    href: "/office-space",
-    description: "Managed and unfurnished office options across India.",
+    label: "Managed Office",
+    href: "/managed-office",
+    description: "Fully managed office solutions for growing teams across India.",
   },
   {
     key: "coliving",

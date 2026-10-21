@@ -21,7 +21,7 @@ const PLACEHOLDERS: Record<HostListingKind, string> = {
   coworking:
     "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=900&q=80",
   office:
-    "https://img.spacehaat.com/images/original/29f7c32fae7798c9733f5b891af3e0ded7031a85.jpg",
+    "https://img.spacewallah.com/images/original/29f7c32fae7798c9733f5b891af3e0ded7031a85.jpg",
   coliving:
     "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=80",
 };

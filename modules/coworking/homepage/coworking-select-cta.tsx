@@ -18,7 +18,7 @@ export function CoworkingSelectCta({ cities }: CoworkingSelectCtaProps) {
         <div className="flex flex-col justify-center border-b border-slate-200/90 bg-page px-7 py-14 sm:px-10 lg:border-b-0 lg:border-r lg:px-16 lg:py-[84px]">
           <p className="mb-[18px] flex items-center gap-3.5 text-xs font-bold uppercase tracking-[0.14em] text-[color:var(--color-accent)]">
             <span className="h-0.5 w-[26px] shrink-0 rounded-sm bg-[color:var(--color-brand)]" aria-hidden />
-            SpaceHaat Select
+            SpaceWallah Select
           </p>
           <h2 className="font-display text-[clamp(1.875rem,2.9vw,2.75rem)] font-bold leading-[1.06] tracking-[-0.03em] text-ink">
             Tell us what you need

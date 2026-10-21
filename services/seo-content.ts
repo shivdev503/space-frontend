@@ -12,21 +12,22 @@ async function fetchSeoBySlugInternal(slug: string): Promise<SeoContent | null> 
   if (!upstream) return null;
 
   const tryFetch = async (url: string) => {
+    // Network failures (API down, DNS, timeout) fall back to static SEO instead of erroring the page.
     const res = await fetch(url, {
       cache: "no-store",
       headers: buildApiClientHeaders(),
-    });
-    if (!res.ok) return null;
+    }).catch(() => null);
+    if (!res?.ok) return null;
     const json = (await res.json().catch(() => null)) as unknown;
     return normalizeSeoFromResponse(json);
   };
 
-  const directUrl = `${upstream}/api/user/seo/${encodeURIComponent(slug)}`;
+  const directUrl = `${upstream}/api/user/newSeo/${encodeURIComponent(slug)}`;
   const fromDirect = await tryFetch(directUrl);
   if (fromDirect) return fromDirect;
 
   const appBase = resolveInternalAppBaseUrl();
-  const proxyUrl = `${appBase}/api/user/seo/${encodeURIComponent(slug)}`;
+  const proxyUrl = `${appBase}/api/user/newSeo/${encodeURIComponent(slug)}`;
   if (proxyUrl !== directUrl) {
     return tryFetch(proxyUrl);
   }

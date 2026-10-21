@@ -23,10 +23,10 @@ export default async function AddOfficeSpacePage({ searchParams }: PageProps) {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-ink/60">
-                SpaceHaat Host Panel
+                SpaceWallah Host Panel
               </p>
               <h1 className="mt-3 font-display text-4xl leading-tight text-ink sm:text-5xl">
-                {isEdit ? "Edit Office Space" : "Add Office Space"}
+                {isEdit ? "Edit Managed Office" : "Add Managed Office"}
               </h1>
             </div>
             <div className="flex items-center gap-3">

@@ -7,9 +7,11 @@ import { CoworkingDetailPage } from "@/modules/coworking/coworking-detail-page";
 import { getVerticalCityPageContent } from "@/services/cities";
 import { loadCoworkingWorkspaceDetail, loadCoworkingWorkspacesList } from "@/services/coworking-api";
 import { resolveVerticalSegment } from "@/services/spaces";
+import { workspaceDescriptionText, workspaceSeo } from "@/lib/coworking-workspace-content";
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
 import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
 import { seoFaqsOrFallback } from "@/lib/seo-page-faqs";
+import { buildPageMetadataFromSeo } from "@/lib/seo-metadata";
 import { seoPageTitleOrFallback } from "@/lib/seo-page-title";
 import { getSeoBySlug } from "@/services/seo-content";
 import { formatCurrency, toTitleCase } from "@/utils/format";
@@ -31,9 +33,14 @@ export async function generateMetadata({
 
   const workspace = await loadCoworkingWorkspaceDetail(segment);
   if (workspace) {
-    return buildMetadataWithCmsSeoFallback(`/coworking/${workspace.slug}`, {
+    const pathname = `/coworking/${workspace.slug}`;
+    const spaceSeo = workspaceSeo(workspace);
+    if (spaceSeo) return buildPageMetadataFromSeo(pathname, spaceSeo);
+
+    const summary = workspaceDescriptionText(workspace).slice(0, 160).trim();
+    return buildMetadataWithCmsSeoFallback(pathname, {
       title: `${workspace.name} | Coworking Space`,
-      description: `${workspace.description} Starting from ${formatCurrency(workspace.starting_price ?? 0)} in ${toTitleCase(
+      description: `${summary} Starting from ${formatCurrency(workspace.starting_price ?? 0)} in ${toTitleCase(
         workspace.location?.city?.name || "India",
       )}.`,
     });

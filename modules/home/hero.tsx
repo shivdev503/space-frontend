@@ -33,7 +33,7 @@ export function HomeHero({ searchOptions, featuredSpaces }: HomeHeroProps) {
     <section className="relative min-h-[70vh]">
       <div className="absolute inset-0 overflow-hidden">
         <Image
-          src="/workspace-2.jpg"
+          src="/background-hero.jpg"
           alt="Workspace background"
           fill
           className="object-cover"
@@ -49,12 +49,12 @@ export function HomeHero({ searchOptions, featuredSpaces }: HomeHeroProps) {
         <div className="w-full max-w-5xl text-center">
           <FadeIn>
             <Badge className="border border-[#c9a962]/35 bg-[rgba(22,18,14,0.42)] text-[#f5efe3] shadow-[0_8px_32px_rgba(12,9,7,0.35)] backdrop-blur-md">
-              Premium workspace discovery
+              Premium Space Discovery
             </Badge>
           </FadeIn>
           <FadeIn delay={0.08}>
             <h1 className="mt-5 font-display text-3xl leading-[1.08] tracking-[-0.03em] text-[#faf6ee] drop-shadow-[0_6px_28px_rgba(8,6,5,0.55)] sm:text-4xl lg:text-5xl">
-              Find the Perfect Workspace for Your Business
+              Find Your Perfect Space With Ease
             </h1>
           </FadeIn>
           <div
@@ -73,12 +73,12 @@ export function HomeHero({ searchOptions, featuredSpaces }: HomeHeroProps) {
           <FadeIn delay={0.24}>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-5 text-sm">
               <div className="inline-flex items-center gap-2 rounded-full border border-[#c9a962]/20 bg-[rgba(22,18,14,0.38)] px-4 py-2 text-[#ebe3d4] shadow-[0_12px_36px_rgba(8,6,5,0.28)] backdrop-blur-sm">
-                <Sparkles className="h-4 w-4 text-[#d4af37]" />
-                Verified, premium inventory only
+                <Sparkles className="h-4 w-4 text-[#12B886]" />
+                Verified Space Only
               </div>
               <div className="inline-flex items-center gap-2 rounded-full border border-[#c9a962]/20 bg-[rgba(22,18,14,0.38)] px-4 py-2 text-[#ebe3d4] shadow-[0_12px_36px_rgba(8,6,5,0.28)] backdrop-blur-sm">
-                <BadgeCheck className="h-4 w-4 text-[#d4af37]" />
-                Expert guidance · Zero brokerage
+                <BadgeCheck className="h-4 w-4 text-[#12B886]" />
+                 Zero Brokerage
               </div>
             </div>
           </FadeIn>

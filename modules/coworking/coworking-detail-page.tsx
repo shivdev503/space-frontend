@@ -18,10 +18,11 @@ import {
 } from "@/services/workspace-plan-pricing";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import { toTitleCase } from "@/utils/format";
+import { spaceImageUrl, toSpaceImageCdnUrl } from "@/lib/space-image-url";
 
 function workspaceImages(workspace: CoworkingModel.WorkSpace): string[] {
-  const imgs = workspace.images?.map((img) => img.image?.s3_link).filter(Boolean) ?? [];
-  const hero = workspace.image?.trim();
+  const imgs = workspace.images?.map((img) => spaceImageUrl(img.image)).filter(Boolean) ?? [];
+  const hero = toSpaceImageCdnUrl(workspace.image ?? "");
   if (hero) return [hero, ...imgs].filter(Boolean) as string[];
   return imgs as string[];
 }

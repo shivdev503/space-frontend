@@ -273,13 +273,13 @@ export default function ListYourSpacePage() {
         <div className="mx-auto flex max-w-5xl flex-col items-stretch gap-8 lg:grid lg:max-w-6xl lg:grid-cols-[1.1fr_minmax(0,28rem)] lg:items-start lg:gap-10 xl:gap-12">
           <div className="order-2 lg:order-1">
             <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-ink/50">
-              List with SpaceHaat
+              List with SpaceWallah
             </p>
             <h1 className="mt-3 font-display text-3xl font-semibold leading-[1.15] text-ink sm:text-4xl lg:text-[2.25rem]">
               List your property. Get verified leads. Close faster.
             </h1>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-ink/70 sm:text-[0.95rem]">
-              Create your host account to list Coworking and Office spaces. Manage inventory, track
+              Create your host account to list Coworking and Managed Office spaces. Manage inventory, track
               leads, and update listings anytime.
             </p>
 
@@ -526,19 +526,19 @@ export default function ListYourSpacePage() {
                 <h3 className="text-sm font-semibold text-ink sm:text-base">Need help listing?</h3>
                 <div className="mt-1.5 flex flex-col gap-1 text-sm sm:mt-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-1 sm:gap-y-0.5">
                   <a
-                    href="tel:+917017333425"
+                    href="tel:+919457777791"
                     className="w-fit font-medium leading-snug text-ink whitespace-nowrap hover:text-[color:var(--color-brand)]"
                   >
-                    +91 701 733 3425
+                    +91 945 777 7791
                   </a>
                   <span className="hidden text-ink/40 sm:inline" aria-hidden>
                     ,
                   </span>
                   <a
-                    href="mailto:info@spacehaat.com"
+                    href="mailto:info@spacewallah.com"
                     className="font-medium leading-snug text-ink/80 break-all hover:text-[color:var(--color-brand)] sm:break-normal"
                   >
-                    info@spacehaat.com
+                    info@spacewallah.com
                   </a>
                 </div>
               </div>

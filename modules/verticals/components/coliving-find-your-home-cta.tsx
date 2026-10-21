@@ -79,7 +79,7 @@ export function ColivingFindYourHomeCta() {
             <div className="flex flex-col justify-end lg:items-end lg:pb-1">
               <div className="w-full rounded-2xl border border-white/20 bg-white/[0.1] p-5 shadow-[0_16px_48px_rgba(0,0,0,0.15)] backdrop-blur-xl sm:p-6 lg:max-w-sm lg:rounded-2xl">
                 <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white/65">
-                  Why SpaceHaat Living
+                  Why SpaceWallah Living
                 </p>
                 <ul className="mt-4 flex flex-col gap-3.5">
                   {TRUST_ITEMS.map((item) => {

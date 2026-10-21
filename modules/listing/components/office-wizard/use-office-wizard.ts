@@ -107,7 +107,7 @@ export function buildOfficePayload(state: OfficeWizardState): ListingModel.Offic
   };
 }
 
-const OFFICE_DRAFT_KEY = "spacehaat:listing:office:draft/v2";
+const OFFICE_DRAFT_KEY = "spacewallah:listing:office:draft/v2";
 
 export type UseOfficeWizardOptions = {
   editId?: string | null;
@@ -249,7 +249,7 @@ export function useOfficeWizard(options: UseOfficeWizardOptions = {}) {
       }
       setSuccess(
         editId
-          ? "Your office space was updated successfully."
+          ? "Your managed office was updated successfully."
           : "Office space saved successfully. You can manage it from your dashboard.",
       );
       if (!editId) {

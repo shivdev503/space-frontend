@@ -78,7 +78,7 @@ export function CoworkingDetailPricing({ workspace }: { workspace: CoworkingMode
       <CoworkingDetailEyebrow>Membership plans</CoworkingDetailEyebrow>
       <CoworkingDetailSectionTitle>Flexible pricing for every team</CoworkingDetailSectionTitle>
       <CoworkingDetailSectionSub className="mb-6">
-        Transparent, all-inclusive rates. Pay for what you use — no booking fees, exclusive SpaceHaat
+        Transparent, all-inclusive rates. Pay for what you use — no booking fees, exclusive SpaceWallah
         deals.
       </CoworkingDetailSectionSub>
 

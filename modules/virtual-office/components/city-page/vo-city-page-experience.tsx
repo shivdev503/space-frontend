@@ -1,25 +1,35 @@
 "use client";
 
-import { Container } from "@/components/ui/container";
 import type { VirtualOfficeCatalogCity } from "@/lib/virtual-office-city-catalog";
-import { VoCityBreadcrumb, VoCityMobileBar } from "@/modules/virtual-office/components/city-page/vo-city-chrome";
-import { VoCityFaqSection } from "@/modules/virtual-office/components/city-page/vo-city-faq";
+import { VoCityMobileBar } from "@/modules/virtual-office/components/city-page/vo-city-chrome";
+import {
+  getVoCityAreas,
+  getVoCityFaqs,
+  getVoCityState,
+  getVoCitySummary,
+} from "@/modules/virtual-office/components/city-page/vo-city-content";
+import { voBodyFont, voDisplayFont } from "@/modules/virtual-office/components/city-page/vo-city-fonts";
 import { VoCityHero } from "@/modules/virtual-office/components/city-page/vo-city-hero";
 import { VoCityLeadProvider } from "@/modules/virtual-office/components/city-page/vo-city-lead-context";
-import { VoCityListingsSection } from "@/modules/virtual-office/components/city-page/vo-city-listings";
-import { VoCityStoriesSection } from "@/modules/virtual-office/components/city-page/vo-city-stories-section";
 import {
+  VoCityAdvantageSection,
+  VoCityAreaPriceSection,
   VoCityAudienceSection,
+  VoCityCallbackSection,
   VoCityDocumentsSection,
-  VoCityEnquirySection,
-  VoCityExplainerSection,
-  VoCityLocationsSection,
+  VoCityFaqSection,
+  VoCityFinalCta,
+  VoCityIncludedSection,
   VoCityPlansSection,
-  VoCityStatsSection,
-  VoCityTimelineSection,
-  VoCityWhySection,
+  VoCityRelatedLinks,
+  VoCityReviewsSection,
+  VoCityStatsBar,
+  VoCityStepsSection,
+  VoCityVsRegularSection,
+  VoCityWhySpaceWallahSection,
 } from "@/modules/virtual-office/components/city-page/vo-city-sections";
 import type { CityPageData } from "@/types";
+import { cn } from "@/utils/cn";
 
 type VoCityPageExperienceProps = {
   data: CityPageData;
@@ -28,49 +38,53 @@ type VoCityPageExperienceProps = {
 };
 
 export function VoCityPageExperience({ data, catalog, cityDisplay }: VoCityPageExperienceProps) {
-  const locationNames = catalog.locations.map((l) => l.locality);
+  const citySlug = data.city.slug;
+  const areas = getVoCityAreas(catalog, cityDisplay);
+  const summary = getVoCitySummary(catalog);
+  const state = getVoCityState(citySlug);
+  const faqs = getVoCityFaqs(cityDisplay, summary, state?.state);
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
 
   return (
-    <VoCityLeadProvider citySlug={data.city.slug} cityDisplay={cityDisplay} catalog={catalog}>
-      <div className="min-w-0 overflow-x-hidden bg-[color:var(--color-page-bg)] pb-20 lg:pb-0">
-        <Container className="max-w-[1240px] min-w-0 pt-4 sm:pt-5 lg:pt-6">
-          <VoCityBreadcrumb cityDisplay={cityDisplay} />
+    <VoCityLeadProvider citySlug={citySlug} cityDisplay={cityDisplay} catalog={catalog}>
+      <div
+        className={cn(
+          voBodyFont.variable,
+          voDisplayFont.variable,
+          "min-w-0 overflow-x-hidden bg-white pb-20 font-[family-name:var(--font-vo-body)] text-ink lg:pb-0",
+          "[&_.vo-display]:font-[family-name:var(--font-vo-display)]",
+        )}
+      >
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
-          <VoCityHero
-            citySlug={data.city.slug}
-            cityDisplay={cityDisplay}
-            catalog={catalog}
-            locationNames={locationNames}
-          />
-
-          <VoCityExplainerSection />
-
-          <VoCityWhySection cityDisplay={cityDisplay} />
-
-          <VoCityPlansSection cityDisplay={cityDisplay} catalog={catalog} />
-
-          <VoCityLocationsSection
-            citySlug={data.city.slug}
-            cityDisplay={cityDisplay}
-            catalog={catalog}
-          />
-
-          <VoCityTimelineSection />
-
-          <VoCityAudienceSection cityDisplay={cityDisplay} />
-
-          <VoCityDocumentsSection />
-
-          <VoCityStatsSection cityDisplay={cityDisplay} />
-
-          <VoCityStoriesSection cityDisplay={cityDisplay} />
-
-          <VoCityListingsSection data={data} />
-
-          <VoCityEnquirySection cityDisplay={cityDisplay} />
-
-          <VoCityFaqSection cityDisplay={cityDisplay} faqs={data.faqs} />
-        </Container>
+        <VoCityHero citySlug={citySlug} cityDisplay={cityDisplay} areas={areas} summary={summary} />
+        <VoCityStatsBar cityDisplay={cityDisplay} summary={summary} areaCount={areas.length} />
+        <VoCityAreaPriceSection cityDisplay={cityDisplay} areas={areas} />
+        <VoCityPlansSection cityDisplay={cityDisplay} summary={summary} />
+        <VoCityWhySpaceWallahSection />
+        <VoCityIncludedSection cityDisplay={cityDisplay} />
+        <VoCityDocumentsSection cityDisplay={cityDisplay} />
+        <VoCityStepsSection cityDisplay={cityDisplay} />
+        <VoCityVsRegularSection cityDisplay={cityDisplay} summary={summary} />
+        <VoCityAdvantageSection cityDisplay={cityDisplay} state={state} />
+        <VoCityAudienceSection cityDisplay={cityDisplay} />
+        <VoCityReviewsSection />
+        <VoCityCallbackSection citySlug={citySlug} cityDisplay={cityDisplay} />
+        <VoCityFaqSection cityDisplay={cityDisplay} faqs={faqs} />
+        <VoCityFinalCta
+          title={`Get your ${cityDisplay} business address this week`}
+          subtitle={`Prices from ${summary.lowestLabel} a month. Documents in 48 hours. Zero brokerage.`}
+        />
+        <VoCityRelatedLinks citySlug={citySlug} cityDisplay={cityDisplay} areas={areas} />
 
         <VoCityMobileBar catalog={catalog} />
       </div>

@@ -7,6 +7,8 @@ import {
   withResolvedStartingPrice,
 } from "@/services/workspace-plan-pricing";
 import { toTitleCase } from "@/utils/format";
+import { workspaceDescriptionHtml } from "@/lib/coworking-workspace-content";
+import { spaceImageUrl, toSpaceImageCdnUrl } from "@/lib/space-image-url";
 
 function emptySeo(title: string, description: string): CoworkingModel.SeoMeta {
   return {
@@ -309,10 +311,10 @@ export function buildWorkspaceGalleryMedia(ws: CoworkingModel.WorkSpace): {
   const hero = ws.image?.trim();
   if (hero) {
     const match = sortedRows.find((r) => r.image?.s3_link?.trim() === hero);
-    add(hero, match?.image);
+    add(match ? spaceImageUrl(match.image) : toSpaceImageCdnUrl(hero), match?.image);
   }
   for (const row of sortedRows) {
-    add(row.image?.s3_link ?? "", row.image);
+    add(spaceImageUrl(row.image), row.image);
   }
 
   if (images.length === 0) {
@@ -399,7 +401,7 @@ function apiWorkspaceToSpace(ws: CoworkingModel.WorkSpace, citySlug: string, ver
     plans: appPlans.length ? appPlans : [{ name: "From", price: starting, unit: planUnit }],
     amenities: amenityNames.length ? amenityNames : ["WiFi"],
     highlights: amenityNames.slice(0, 8),
-    description: ws.description ?? "",
+    description: workspaceDescriptionHtml(ws),
     rating: ws.ratings ? Number.parseFloat(ws.ratings) || 0 : 0,
     isFeatured: false,
     createdAt: new Date().toISOString(),

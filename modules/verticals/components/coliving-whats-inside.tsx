@@ -161,7 +161,7 @@ export function ColivingWhatsInside() {
             </h2>
 
             <p className="mt-4 max-w-xl text-base leading-relaxed text-muted sm:mt-5 sm:text-lg">
-              Every SpaceHaat Living home arrives with the basics handled and the upgrades thought through. So your
+              Every SpaceWallah Living home arrives with the basics handled and the upgrades thought through. So your
               first night feels like your hundredth.
             </p>
 

@@ -35,7 +35,7 @@ function ChatMockup({ className }: { className?: string }) {
         className,
       )}
       role="region"
-      aria-label="Example chat with a SpaceHaat Living concierge"
+      aria-label="Example chat with a SpaceWallah Living concierge"
     >
       <div className="flex max-h-[min(32rem,70vh)] flex-col gap-5 overflow-y-auto pr-1 sm:gap-6">
         {/* Aditi 1 */}
@@ -45,7 +45,7 @@ function ChatMockup({ className }: { className?: string }) {
           </div>
           <div className="min-w-0 max-w-[min(100%,20rem)] sm:max-w-[22rem]">
             <div className="rounded-2xl rounded-tl-md bg-[#ede8e0] px-3.5 py-3 text-sm leading-relaxed text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] sm:px-4">
-              Hi! I&apos;m Aditi from the SpaceHaat Living desk. Tell me your city, budget, and move-in date
+              Hi! I&apos;m Aditi from the SpaceWallah Living desk. Tell me your city, budget, and move-in date
               I&apos;ll shortlist verified homes before we book any tours.
             </div>
             <p className="mt-1.5 text-[0.7rem] leading-snug text-muted">Aditi · 2:21 PM</p>
@@ -119,7 +119,7 @@ export function ColivingSelectLiving() {
           <div className="min-w-0">
             <p className="inline-flex flex-wrap items-center gap-2.5 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-muted sm:text-xs">
               <span className="h-px w-7 shrink-0 bg-gradient-to-r from-transparent via-slate-400/80 to-slate-400/80" aria-hidden />
-              <span className="text-brand">SpaceHaat Select</span>
+              <span className="text-brand">SpaceWallah Select</span>
               <span className="font-normal text-slate-400/90">·</span>
               <span>Living</span>
             </p>
@@ -146,7 +146,7 @@ export function ColivingSelectLiving() {
                 <ArrowRight className="h-4 w-4 shrink-0 opacity-95" aria-hidden />
               </Link>
               <Link
-                href="#why-spacehaat-living"
+                href="#why-spacewallah-living"
                 className="inline-flex w-full items-center justify-center rounded-full border border-slate-300/90 bg-white/70 px-6 py-3.5 text-center text-sm font-semibold text-ink shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-sm transition hover:border-slate-400 hover:bg-white sm:w-auto"
               >
                 How Select works

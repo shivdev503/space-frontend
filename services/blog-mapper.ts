@@ -257,7 +257,7 @@ export function normalizeBlogListItem(raw: unknown): BlogPost | null {
     excerpt,
     coverImage: pickCoverImage(row),
     coverImageAlt: pickFirst(row, ALT_KEYS) || title,
-    author: pickFirst(row, AUTHOR_KEYS) || "SpaceHaat Editorial",
+    author: pickFirst(row, AUTHOR_KEYS) || "SpaceWallah Editorial",
     authorRole: pickFirst(row, AUTHOR_ROLE_KEYS) || "Workspace advisors",
     publishedAt: parseDate(pickFirst(row, DATE_KEYS)),
     readMinutes,

@@ -6,8 +6,8 @@ import { buildMetadata } from "@/utils/metadata";
 export const revalidate = 300;
 
 export const metadata: Metadata = buildMetadata(
-  "Blog | Workspace insights by SpaceHaat",
-  "Read premium guides on coworking, coliving, virtual office, and office space across India.",
+  "Blog | Workspace insights by SpaceWallah",
+  "Read premium guides on coworking, coliving, virtual office, and managed office across India.",
   "/blog",
 );
 

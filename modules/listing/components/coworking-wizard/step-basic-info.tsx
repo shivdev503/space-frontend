@@ -50,7 +50,7 @@ export function CoworkingStepBasicInfo({ wizard, catalog, catalogLoading, catalo
           <TextInput
             value={state.name}
             onChange={(v) => set("name", v)}
-            placeholder="e.g. SpaceHaat Cyber City"
+            placeholder="e.g. SpaceWallah Cyber City"
             disabled={disabled}
           />
         </Field>

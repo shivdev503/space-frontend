@@ -32,7 +32,7 @@ export function OfficeSpaceHomepage({ data }: OfficeSpaceHomepageProps) {
             <CityCard
               key={city.id}
               city={city}
-              basePath="/office-space"
+              basePath="/managed-office"
               variant="compact"
             />
           ))}
@@ -42,7 +42,7 @@ export function OfficeSpaceHomepage({ data }: OfficeSpaceHomepageProps) {
       {data.enterpriseSolutions ? (
         <SectionWrapper className="pt-4 sm:pt-6">
           <SectionHeading
-            title="Premium office spaces across India for teams that need polish and scale."
+            title="Premium managed offices across India for teams that need polish and scale."
           />
           <div className="mt-10">
             <BenefitCards items={data.enterpriseSolutions} showDescription={false} />
@@ -52,7 +52,7 @@ export function OfficeSpaceHomepage({ data }: OfficeSpaceHomepageProps) {
 
       <SectionWrapper>
         <SectionHeading
-          title="Explore Premium Office Spaces"
+          title="Explore Premium Managed Offices"
         />
         <SpaceRail spaces={data.featuredSpaces} />
       </SectionWrapper>
@@ -60,7 +60,7 @@ export function OfficeSpaceHomepage({ data }: OfficeSpaceHomepageProps) {
       {data.caseStudies ? (
         <SectionWrapper>
           <SectionHeading
-            title="How teams use SpaceHaat to evaluate premium office options."
+            title="How teams use SpaceWallah to evaluate premium managed office options."
           />
           <div className="mt-10 grid gap-5 lg:grid-cols-3">
             {data.caseStudies.map((study) => (
@@ -72,7 +72,7 @@ export function OfficeSpaceHomepage({ data }: OfficeSpaceHomepageProps) {
 
       <SectionWrapper className="bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)]">
         <SectionHeading
-          title="Built for premium, scalable office requirements."
+          title="Built for premium, scalable managed office requirements."
         />
         <div className="mt-10">
           <BenefitCards items={data.benefits} showDescription={false} />

@@ -230,7 +230,7 @@ export function buildCoworkingPayload(
 
 // --- The hook -----------------------------------------------------------
 
-const COWORKING_DRAFT_KEY = "spacehaat:listing:coworking:draft/v2";
+const COWORKING_DRAFT_KEY = "spacewallah:listing:coworking:draft/v2";
 
 export type UseCoworkingWizardOptions = {
   /** When set, load that listing for editing (GET `/api/admin/userworkSpace/:id`). */

@@ -20,20 +20,17 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(resolveAppUrl()),
   title: {
-    default: `${APP_NAME} | Premium Workspace Discovery`,
+    default: `${APP_NAME} | Premium Space Discovery`,
     template: `%s | ${APP_NAME}`,
   },
   description:
-    "Discover coworking spaces, virtual offices, and office spaces across India with a premium lead-generation experience.",
+    "Discover coworking spaces, virtual offices, and managed offices across India with a premium lead-generation experience.",
   manifest: "/site.webmanifest",
   icons: {
     icon: [
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+      { url: "/spacewallah-app-icon.svg", sizes: "any", type: "image/svg+xml" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [{ url: "/spacewallah-app-icon.svg", sizes: "1024x1024", type: "image/svg+xml" }],
   },
 };
 

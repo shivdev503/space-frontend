@@ -13,7 +13,7 @@ type FallbackMeta = {
 };
 
 /**
- * Prefer CMS SEO (`/api/user/seo/:slug`) when available; otherwise use static fallback metadata.
+ * Prefer CMS SEO (`/api/user/newSeo/:slug`) when available; otherwise use static fallback metadata.
  * Slug is derived from the public pathname (same convention as `getResolvedSeoForRequest`).
  */
 export async function buildMetadataWithCmsSeoFallback(

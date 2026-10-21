@@ -32,7 +32,7 @@ function isCoworkingOrColivingCityOrLocalityPath(pathname: string): boolean {
 
 async function fetchSeoForSlug(slug: string, pathname: string): Promise<SeoContent> {
   try {
-    const res = await fetch(`/api/user/seo/${encodeURIComponent(slug)}`, { cache: "no-store" });
+    const res = await fetch(`/api/user/newSeo/${encodeURIComponent(slug)}`, { cache: "no-store" });
     if (res.ok) {
       const json = (await res.json().catch(() => null)) as unknown;
       const fromApi = normalizeSeoFromResponse(json);

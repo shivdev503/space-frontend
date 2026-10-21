@@ -1,11 +1,11 @@
 import { BadgePercent, Building2, ShieldCheck, Sparkles } from "lucide-react";
 
-import { WhySpaceHaatItem } from "@/types";
+import { WhySpaceWallahItem } from "@/types";
 
 const icons = [Sparkles, ShieldCheck, BadgePercent, Building2];
 
 type BenefitCardsProps = {
-  items: WhySpaceHaatItem[];
+  items: WhySpaceWallahItem[];
   tone?: "light" | "dark";
   showDescription?: boolean;
 };

@@ -119,7 +119,7 @@ export function ColivingListingMobileChrome({
         <div className="lf-topbar">
           <div className="lf-logo">
             <span className="lf-logo-dot" />
-            spacehaat
+            SpaceWallah
           </div>
           <div
             style={{
@@ -143,7 +143,7 @@ export function ColivingListingMobileChrome({
       <div className="lf-topbar">
         <div className="lf-logo">
           <span className="lf-logo-dot" />
-          spacehaat
+          SpaceWallah
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Link href="/add/dashboard" className="lf-save" style={{ textDecoration: "none" }}>

@@ -12,7 +12,7 @@ import {
  *   POST `{base}admin/upload` (multipart/form-data, field `file`)
  *   → `{ data: [{ id, s3_link }] }`
  *
- * This proxy authenticates via the `spacehaat_listing_token` cookie and
+ * This proxy authenticates via the `spacewallah_listing_token` cookie and
  * forwards the raw file bytes to the upstream. We rebuild a fresh
  * `FormData` to avoid ReadableStream reuse issues between Next's request
  * parsing and the outgoing fetch.

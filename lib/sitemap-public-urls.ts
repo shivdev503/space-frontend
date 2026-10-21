@@ -4,6 +4,7 @@ import { resolveAppUrl } from "@/services/env-config";
 import { listHomepageCitiesFromAvailable } from "@/services/homepage-available-cities";
 import { listCitiesByVertical, listSpaces } from "@/services/mock-db";
 import type { SpaceVertical } from "@/types";
+import { verticalPath } from "@/lib/vertical-path";
 
 const VERTICALS: SpaceVertical[] = ["coworking", "virtual-office", "office-space", "coliving"];
 
@@ -45,7 +46,7 @@ export function buildMainPagesSitemapEntries(lastmod: Date): SitemapUrlEntry[] {
     { loc: `${b}/`, lastmod, changefreq: "daily", priority: 1 },
     { loc: `${b}/coworking`, lastmod, changefreq: "weekly", priority: 0.8 },
     { loc: `${b}/virtual-office`, lastmod, changefreq: "weekly", priority: 0.8 },
-    { loc: `${b}/office-space`, lastmod, changefreq: "weekly", priority: 0.8 },
+    { loc: `${b}/managed-office`, lastmod, changefreq: "weekly", priority: 0.8 },
     { loc: `${b}/coliving`, lastmod, changefreq: "weekly", priority: 0.8 },
     { loc: `${b}/list-your-space`, lastmod, changefreq: "monthly", priority: 0.5 },
   ];
@@ -71,7 +72,7 @@ export function collectCityPagesSitemapUrls(): string[] {
   for (const vertical of VERTICALS) {
     for (const city of listHomepageCitiesFromAvailable(vertical)) {
       const seg = normalizeCitySegment(vertical, city.slug);
-      out.push(toAbsoluteUrl(`/${vertical}/${encodeURIComponent(seg)}`));
+      out.push(toAbsoluteUrl(`/${verticalPath(vertical)}/${encodeURIComponent(seg)}`));
     }
   }
   return dedupeSort(out);
@@ -90,7 +91,7 @@ export function collectLocalityPagesSitemapUrls(): string[] {
       );
       for (const loc of locations) {
         out.push(
-          toAbsoluteUrl(`/${vertical}/${encodeURIComponent(citySeg)}/${encodeURIComponent(loc)}`),
+          toAbsoluteUrl(`/${verticalPath(vertical)}/${encodeURIComponent(citySeg)}/${encodeURIComponent(loc)}`),
         );
       }
     }
@@ -123,7 +124,7 @@ function collectVerticalSpaceDetailUrls(vertical: SpaceVertical): string[] {
     if (!slug) continue;
     const asCityKey = normalizeCitySegment(vertical, slug);
     if (citySlugs.has(asCityKey)) continue;
-    out.push(toAbsoluteUrl(`/${vertical}/${encodeURIComponent(slug)}`));
+    out.push(toAbsoluteUrl(`/${verticalPath(vertical)}/${encodeURIComponent(slug)}`));
   }
 
   return dedupeSort(out);

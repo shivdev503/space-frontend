@@ -108,7 +108,7 @@ export function OfficeWizard({ userName, editId = null }: Props) {
       busy={wizard.busy}
       error={wizard.submitError}
       success={wizard.success}
-      submitLabel={wizard.editId ? "Update office space" : "Save office space"}
+      submitLabel={wizard.editId ? "Update managed office" : "Save managed office"}
       onResetDraft={wizard.editId ? undefined : wizard.resetDraft}
     />
   );

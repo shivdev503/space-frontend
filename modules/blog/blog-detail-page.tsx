@@ -92,7 +92,7 @@ export function BlogDetailPage({
 
         <div className="mt-12 rounded-[1.35rem] border border-[color:var(--color-brand)]/20 bg-[linear-gradient(125deg,#16351a_0%,#2e7d32_100%)] p-7 text-white sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/75">
-            Explore on SpaceHaat
+            Explore on SpaceWallah
           </p>
           <h2 className="mt-3 font-display text-2xl font-semibold leading-tight sm:text-[1.75rem]">
             Ready to explore {BLOG_VERTICAL_LABELS[post.vertical].toLowerCase()} options?

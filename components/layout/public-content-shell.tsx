@@ -16,7 +16,8 @@ export function PublicContentShell({ children }: { children: ReactNode }) {
   return (
     <div
       className={cn(
-        "min-h-screen overflow-x-hidden bg-[color:var(--color-page-bg)]",
+        // `clip`, not `hidden`: hidden creates a scroll container and breaks `position: sticky` below.
+        "min-h-screen overflow-x-clip bg-[color:var(--color-page-bg)]",
         !isHomepage && "pt-20",
       )}
     >

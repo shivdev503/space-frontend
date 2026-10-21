@@ -10,7 +10,7 @@ export type ResolvedSeo = {
   seo: SeoContent;
   /** Normalized request path for canonical URLs, JSON-LD, and fallbacks. */
   pathname: string;
-  /** True when `GET /api/user/seo/:slug` returned a usable document. */
+  /** True when `GET /api/user/newSeo/:slug` returned a usable document. */
   fromApi: boolean;
 };
 

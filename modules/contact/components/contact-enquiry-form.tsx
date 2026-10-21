@@ -69,7 +69,7 @@ export function ContactEnquiryForm() {
       CONTACT_VERTICAL_OPTIONS.find((o) => o.value === vertical)?.label ?? "General enquiry";
     const interestedIn = `${verticalLabel}${city ? ` — ${city}` : ""}: ${message}`;
     const pageUrl =
-      typeof window !== "undefined" ? window.location.href : "https://www.spacehaat.com";
+      typeof window !== "undefined" ? window.location.href : "https://www.spacewallah.com";
 
     try {
       const body = buildUserEnquiryBody({

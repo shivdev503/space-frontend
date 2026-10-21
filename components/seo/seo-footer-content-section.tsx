@@ -8,7 +8,7 @@ const editorProse = cn(
   "[&_h1]:mb-3 [&_h1]:mt-0 [&_h1]:font-display [&_h1]:text-2xl [&_h1]:font-semibold",
   "[&_h2]:mb-2 [&_h2]:mt-6 [&_h2]:font-display [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:first:mt-0",
   "[&_h3]:mb-2 [&_h3]:mt-4 [&_h3]:text-lg [&_h3]:font-semibold",
-  "[&_a]:font-medium [&_a]:!text-[#4caf50] [&_a]:underline-offset-2 [&_a]:transition hover:[&_a]:underline hover:[&_a]:!text-[#4caf50]",
+  "[&_a]:font-medium [&_a]:!text-[#12B886] [&_a]:underline-offset-2 [&_a]:transition hover:[&_a]:underline hover:[&_a]:!text-[#0B3B2E]",
   "[&_ul]:my-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ul]:text-ink/85",
   "[&_ol]:my-3 [&_ol]:ml-5 [&_ol]:list-decimal",
   "[&_li]:my-1",

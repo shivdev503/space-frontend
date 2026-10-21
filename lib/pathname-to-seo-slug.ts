@@ -8,6 +8,8 @@ export function pathnameToSeoSlug(pathname: string): string {
   if (path === "/" || path === "") return "home";
   return path
     .replace(/^\/+/g, "")
+    // `/managed-office` replaced `/office-space`; CMS SEO entries keep the old slug prefix.
+    .replace(/^managed-office(?=\/|$)/, "office-space")
     .replace(/\/+$/g, "")
     .replace(/\//g, "-");
 }

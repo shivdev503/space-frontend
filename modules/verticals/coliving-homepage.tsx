@@ -9,7 +9,7 @@ import { ColivingFindYourHomeCta } from "@/modules/verticals/components/coliving
 import { ColivingResidentStories } from "@/modules/verticals/components/coliving-resident-stories";
 import { ColivingSelectLiving } from "@/modules/verticals/components/coliving-select-living";
 import { ColivingWhatsInside } from "@/modules/verticals/components/coliving-whats-inside";
-import { ColivingWhySpacehaatLiving } from "@/modules/verticals/components/coliving-why-spacehaat-living";
+import { ColivingWhySpaceWallahLiving } from "@/modules/verticals/components/coliving-why-spacewallah-living";
 import { listHomepageCitiesFromAvailable } from "@/services/homepage-available-cities";
 import { listSpaces } from "@/services/mock-db";
 import { VerticalLandingData } from "@/types";
@@ -34,7 +34,7 @@ export function ColivingHomepage({ data, featuredPgs = [] }: ColivingHomepagePro
         <CityRail cities={homepageCities} basePath="/coliving" />
       </SectionWrapper>
 
-      <ColivingWhySpacehaatLiving />
+      <ColivingWhySpaceWallahLiving />
 
       <SectionWrapper>
         <SectionHeading title="Featured coliving space listings" />

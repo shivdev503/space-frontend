@@ -1,12 +1,13 @@
 /** Internal links and copy for the global footer (SEO + navigation). */
 
+import { verticalPath as toVerticalPath } from "@/lib/vertical-path";
 import { siteCities } from "@/utils/constants";
 
 /** Bottom bar: keyword phrases split for semantic links (SEO signals). */
 export const footerBottomKeywordLinks = [
   { label: "Coworking Spaces in India", href: "/coworking" },
   { label: "Virtual Office India", href: "/virtual-office" },
-  { label: "Office Space for Rent", href: "/office-space" },
+  { label: "Managed Office", href: "/managed-office" },
   { label: "Coliving Space in India", href: "/coliving" },
   { label: "Coworking Space Gurugram", href: "/coworking/gurgaon" },
   { label: "Coworking Space Bangalore", href: "/coworking/bangalore" },
@@ -14,7 +15,7 @@ export const footerBottomKeywordLinks = [
 ] as const;
 
 export const footerBottomTagline =
-  "India's Premium Coworking & Office Space Discovery Platform";
+  "India's Premium Coworking & Managed Office Discovery Platform";
 
 function cityLinks(
   verticalPath: string,
@@ -22,7 +23,7 @@ function cityLinks(
 ): { label: string; href: string }[] {
   return siteCities.map((city) => ({
     label: labelFor(city.name),
-    href: `/${verticalPath}/${city.slug}`,
+    href: `/${toVerticalPath(verticalPath)}/${city.slug}`,
   }));
 }
 
@@ -43,12 +44,12 @@ export const footerVerticalColumns = [
     links: cityLinks("coliving", (city) => `Coliving Space in ${city}`),
   },
   {
-    title: "Office Space",
-    ariaLabel: "Office space by city",
-    links: cityLinks("office-space", (city) => `Office Space for Rent in ${city}`),
+    title: "Managed Office",
+    ariaLabel: "Managed office by city",
+    links: cityLinks("office-space", (city) => `Managed Office in ${city}`),
   },
 ] as const;
 
 /** Kept for backwards compatibility / plain-text reuse. */
 export const footerSeoKeywords =
-  "Coworking Spaces in India | Virtual Office India | Office Space for Rent | Coliving Space in India | Coworking Space Gurugram | Coworking Space Bangalore | Coworking Space Mumbai";
+  "Coworking Spaces in India | Virtual Office India | Managed Office | Coliving Space in India | Coworking Space Gurugram | Coworking Space Bangalore | Coworking Space Mumbai";

@@ -3,7 +3,7 @@
  * Set this cookie after your phone / Firebase (or other) `validate` flow.
  */
 
-export const DEFAULT_ENQUIRY_JWT_COOKIE = "spacehaat_user_enquiry_jwt";
+export const DEFAULT_ENQUIRY_JWT_COOKIE = "spacewallah_user_enquiry_jwt";
 
 export function enquiryJwtCookieName(): string {
   const n = process.env.ENQUIRY_JWT_COOKIE_NAME?.trim();

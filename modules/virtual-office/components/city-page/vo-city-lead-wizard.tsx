@@ -75,7 +75,7 @@ export function VoCityLeadWizard({
     }
 
     setPending(true);
-    const pageUrl = typeof window !== "undefined" ? window.location.href : "https://www.spacehaat.com";
+    const pageUrl = typeof window !== "undefined" ? window.location.href : "https://www.spacewallah.com";
     const requirement = [
       `Need: ${needLabel(need)}`,
       `Business: ${bizType}`,
@@ -88,7 +88,7 @@ export function VoCityLeadWizard({
         name: name.trim(),
         email:
           email.trim() ||
-          `vo-lead-${toPhone10(phone) ?? "user"}@clients.spacehaat.com`,
+          `vo-lead-${toPhone10(phone) ?? "user"}@clients.spacewallah.com`,
         phone,
         interestedIn: requirement,
         city: citySlug,
@@ -180,7 +180,7 @@ export function VoCityLeadWizard({
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="mt-3.5 w-full rounded-xl bg-[color:var(--color-brand)] py-3 text-sm font-semibold text-white hover:bg-[#3B8E3F]"
+                className="mt-3.5 w-full rounded-xl bg-[color:var(--color-brand)] py-3 text-sm font-semibold text-white hover:bg-[color:var(--color-accent)]"
               >
                 Next →
               </button>
@@ -243,7 +243,7 @@ export function VoCityLeadWizard({
                 <button
                   type="button"
                   onClick={() => setStep(3)}
-                  className="flex-1 rounded-xl bg-[color:var(--color-brand)] py-3 text-sm font-semibold text-white hover:bg-[#3B8E3F]"
+                  className="flex-1 rounded-xl bg-[color:var(--color-brand)] py-3 text-sm font-semibold text-white hover:bg-[color:var(--color-accent)]"
                 >
                   Next →
                 </button>
@@ -275,7 +275,7 @@ export function VoCityLeadWizard({
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 70173 33425"
+                placeholder="+91 94577 77791"
                 className="mb-2.5 w-full rounded-lg border border-[#EAE7E0] bg-white px-3 py-2.5 text-sm text-ink outline-none transition focus:border-[color:var(--color-brand)]"
               />
               <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.05em] text-muted">
@@ -300,7 +300,7 @@ export function VoCityLeadWizard({
                 <button
                   type="submit"
                   disabled={pending}
-                  className="flex-1 rounded-xl bg-[color:var(--color-brand)] py-3.5 text-sm font-semibold text-white hover:bg-[#3B8E3F] disabled:opacity-60"
+                  className="flex-1 rounded-xl bg-[color:var(--color-brand)] py-3.5 text-sm font-semibold text-white hover:bg-[color:var(--color-accent)] disabled:opacity-60"
                 >
                   {pending ? "Submitting…" : "Get Verified Options"}
                 </button>

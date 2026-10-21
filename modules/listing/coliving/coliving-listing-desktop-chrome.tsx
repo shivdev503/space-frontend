@@ -298,7 +298,7 @@ function DesktopTop({ stepLabel, isEdit, propertyName, hideExit }: DesktopTopPro
         <div className="lfd-top-l">
           <Link href="/add/dashboard" className="lfd-logo">
             <span className="lf-logo-dot" />
-            spacehaat
+            SpaceWallah
           </Link>
           <nav className="lfd-crumb" aria-label="Breadcrumb">
             <Link href="/add/dashboard">Host</Link>

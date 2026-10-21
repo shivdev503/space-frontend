@@ -6,6 +6,8 @@
  * Nested under a namespace so names like `City` / `Brand` do not clash with app types in `index.ts`.
  */
 
+import type { SeoContent } from "@/types/seo.model";
+
 export namespace CoworkingModel {
   export interface SeoMeta {
     description: string;
@@ -121,6 +123,8 @@ export namespace CoworkingModel {
     name: string;
     real_name: string;
     s3_link: string;
+    /** Storage folder (e.g. `images`) — CDN URL is `img.spacewallah.com/{folder_name}/{name}`. */
+    folder_name?: string;
     title: string;
     alt?: string;
     brightness?: number;
@@ -190,6 +194,8 @@ export namespace CoworkingModel {
     country_dbname: string;
     currency_code: string;
     description: string;
+    /** Rewritten listing copy (HTML) — preferred over `description` when present. */
+    new_description?: string;
     email: string;
     website_Url: string;
     location: Location;
@@ -219,6 +225,8 @@ export namespace CoworkingModel {
     brand: Brand;
     hours_of_operation: Record<string, WorkingHours>;
     seo: SeoMeta;
+    /** Current per-space SEO (same shape as CMS SEO) — preferred over `seo`. */
+    new_seo?: SeoContent;
     virtualSeo?: SeoMeta;
     space_type?: string;
     options: {

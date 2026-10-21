@@ -3,6 +3,7 @@ import { Armchair, Clock, TrainFront, Users } from "lucide-react";
 import {
   filterCoworkingPlansForStartingPrice,
 } from "@/services/workspace-plan-pricing";
+import { workspaceDescriptionText } from "@/lib/coworking-workspace-content";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 
 function highlightItems(workspace: CoworkingModel.WorkSpace) {
@@ -13,7 +14,7 @@ function highlightItems(workspace: CoworkingModel.WorkSpace) {
   const nearMetro =
     workspace.location?.metro_detail?.is_near_metro ||
     amenities.includes("metro") ||
-    workspace.description?.toLowerCase().includes("metro");
+    workspaceDescriptionText(workspace).toLowerCase().includes("metro");
 
   return [
     {

@@ -14,6 +14,7 @@ import { getVerticalCityPageContent } from "@/services/cities";
 import { loadPgDetail, loadPgList } from "@/services/pg-api";
 import { getSeoBySlug } from "@/services/seo-content";
 import { toTitleCase } from "@/utils/format";
+import { pgDescriptionText } from "@/services/pg-mapper";
 
 type PageProps = {
   params: Promise<{ segment: string }>;
@@ -40,7 +41,7 @@ export async function generateMetadata({
     const pg = pgRes.data;
     return buildMetadataWithCmsSeoFallback(`/coliving/${pgRes.slug}`, {
       title: `${pg.name} | ${pg.locality}, ${pg.city}`,
-      description: pg.description?.slice(0, 160) || "Explore coliving and PG rooms across top cities in India.",
+      description: pgDescriptionText(pg).slice(0, 160) || "Explore coliving and PG rooms across top cities in India.",
     });
   }
 

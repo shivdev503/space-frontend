@@ -3,6 +3,7 @@ import { extractPgCoordinates, extractPgNearbyPlaces } from "@/lib/pg-nearby";
 import { resolvePgListingSlug, slugifyPgName } from "@/lib/pg-slug";
 import type { Space } from "@/types";
 import type { PgDetail, PgDetailResponse, PgImage, PgPriorityMap } from "@/types/pg.model";
+import { isBlockedImageUrl, toSpaceImageCdnUrl } from "@/lib/space-image-url";
 
 function isRecord(v: unknown): v is Record<string, unknown> {
   return v != null && typeof v === "object" && !Array.isArray(v);
@@ -133,8 +134,33 @@ export function normalizePgDetailResponse(res: PgDetailResponse): PgDetailRespon
 export function pgImagesSorted(images: PgImage[]): string[] {
   return [...images]
     .sort((a, b) => a.order - b.order)
-    .map((img) => img.image.trim())
+    .map((img) => toSpaceImageCdnUrl(img.image))
+    .filter((url) => url && !isBlockedImageUrl(url));
+}
+
+/**
+ * Listing copy as plain-text paragraphs: `new_description` (HTML) when present,
+ * else the legacy plain-text `description`.
+ */
+export function pgDescriptionParagraphs(pg: Pick<PgDetail, "description" | "new_description">): string[] {
+  const html = pg.new_description?.trim();
+  const raw = html
+    ? html
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/<\/(p|div|li|h[1-6])>/gi, "\n")
+        .replace(/<[^>]+>/g, "")
+        .replace(/&nbsp;/g, " ")
+        .replace(/&amp;/g, "&")
+    : pg.description ?? "";
+  return raw
+    .split(/\n+/)
+    .map((line) => line.replace(/\s+/g, " ").trim())
     .filter(Boolean);
+}
+
+/** {@link pgDescriptionParagraphs} joined into one line (meta descriptions, cards). */
+export function pgDescriptionText(pg: Pick<PgDetail, "description" | "new_description">): string {
+  return pgDescriptionParagraphs(pg).join(" ");
 }
 
 export function pgStartingRent(pg: PgDetail): number {
@@ -170,7 +196,7 @@ export function pgDetailToSpace(pg: PgDetail, id: string, slug: string): Space {
       })),
     amenities: [...pg.commonAmenities, ...pg.roomAmenities],
     highlights: pg.food.included ? [`Meals: ${pg.food.meals.join(", ")}`] : [],
-    description: pg.description,
+    description: pgDescriptionText(pg),
     rating: pg.rating,
     isFeatured: pg.verified,
     createdAt: pg.availableFrom ?? new Date().toISOString(),

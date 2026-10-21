@@ -265,7 +265,7 @@ export function PgListingFilters({ filters, onChange, onApply, hideCityField }: 
         <button
           type="button"
           onClick={apply}
-          className="ml-auto inline-flex items-center justify-center rounded-full bg-[color:var(--color-brand)] px-6 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(76,175,80,0.28)] transition hover:bg-[#43A047]"
+          className="ml-auto inline-flex items-center justify-center rounded-full bg-[color:var(--color-brand)] px-6 py-2.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(18,184,134,0.28)] transition hover:bg-[color:var(--color-accent)]"
         >
           Apply filters
         </button>

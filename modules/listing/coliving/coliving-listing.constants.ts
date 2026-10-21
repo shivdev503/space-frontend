@@ -50,7 +50,7 @@ export const COLIVING_LISTING_STEPS = [
   },
 ] as const;
 
-export const COLIVING_DRAFT_STORAGE_KEY = "spacehaat:coliving-listing-draft-v2";
+export const COLIVING_DRAFT_STORAGE_KEY = "spacewallah:coliving-listing-draft-v2";
 
 export const COLIVING_HOUSE_RULES = [
   "No Smoking",

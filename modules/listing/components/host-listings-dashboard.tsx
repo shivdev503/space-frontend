@@ -156,7 +156,7 @@ export function HostListingsDashboard({ hostName, listings, loadError }: Props) 
             <div>
               <p className="host-dash__eyebrow">
                 <Sparkles size={12} className="text-[#7ee081]" aria-hidden />
-                SpaceHaat Host Panel
+                SpaceWallah Host Panel
               </p>
               <h1 className="host-dash__title">
                 {firstName ? (

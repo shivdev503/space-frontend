@@ -13,6 +13,7 @@ import { SpaceDetailLeafletMap } from "@/modules/space-detail/components/space-d
 import type { SpaceDetailLocationHighlight } from "@/modules/space-detail/components/space-detail-location-highlights";
 import { SpaceDetailLocationHighlights } from "@/modules/space-detail/components/space-detail-location-highlights";
 import { SpaceDetailNearbyStripDynamic } from "@/modules/space-detail/components/space-detail-nearby-strip-dynamic";
+import { workspaceDescriptionText } from "@/lib/coworking-workspace-content";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import { toTitleCase } from "@/utils/format";
 
@@ -22,7 +23,7 @@ function nearMetro(workspace: CoworkingModel.WorkSpace): boolean {
   if (workspace.location?.metro_detail?.is_near_metro) return true;
   const hay = [
     ...(workspace.amenties ?? []).map((a) => a.name),
-    workspace.description,
+    workspaceDescriptionText(workspace),
   ]
     .join(" ")
     .toLowerCase();

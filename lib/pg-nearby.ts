@@ -174,11 +174,22 @@ function overpassPlaceName(tags: Record<string, string>): string {
   );
 }
 
-/** Client-side fallback: OpenStreetMap POIs near listing coordinates. */
-export async function fetchNearbyPlacesFromOverpass(
+/** Public Overpass mirrors, tried in order — any single one can be down or slow. */
+const OVERPASS_ENDPOINTS = [
+  "https://overpass.kumi.systems/api/interpreter",
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.private.coffee/api/interpreter",
+];
+const OVERPASS_TIMEOUT_MS = 8000;
+
+/**
+ * Server-side: OpenStreetMap POIs near listing coordinates (stations, malls, markets).
+ * Returns null when every mirror failed, so callers can tell "no places" from "lookup failed".
+ */
+export async function queryOverpassNearby(
   center: MapCoordinates,
   limit = 4,
-): Promise<PgNearbyPlace[]> {
+): Promise<PgNearbyPlace[] | null> {
   const { lat, lng } = center;
   const query = `[out:json][timeout:20];
 (
@@ -190,42 +201,75 @@ export async function fetchNearbyPlacesFromOverpass(
   node["amenity"="supermarket"](around:2000,${lat},${lng});
 );
 out body 24;`;
+  const body = new URLSearchParams({ data: query }).toString();
 
-  try {
-    const body = new URLSearchParams({ data: query });
-    const res = await fetch("https://overpass-api.de/api/interpreter", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: body.toString(),
-    });
-    if (!res.ok) return [];
-
-    const data = (await res.json()) as {
-      elements?: { lat?: number; lon?: number; tags?: Record<string, string> }[];
-    };
-
-    const ranked =
-      data.elements
-        ?.map((el) => {
-          const elLat = num(el.lat);
-          const elLng = num(el.lon);
-          if (elLat == null || elLng == null || !el.tags) return null;
-          const meters = haversineMeters(center, { lat: elLat, lng: elLng });
-          return {
-            name: overpassPlaceName(el.tags),
-            dist: formatNearbyTravel(meters),
-            meters,
-          };
-        })
-        .filter((row): row is { name: string; dist: string; meters: number } => row != null)
-        .sort((a, b) => a.meters - b.meters) ?? [];
-
-    const out: PgNearbyPlace[] = [];
-    for (const row of ranked) {
-      pushUnique(out, row.name, row.dist);
-      if (out.length >= limit) break;
+  for (const endpoint of OVERPASS_ENDPOINTS) {
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "User-Agent": "SpaceWallah/1.0 (+https://spacewallah.com)",
+        },
+        body,
+        cache: "no-store",
+        signal: AbortSignal.timeout(OVERPASS_TIMEOUT_MS),
+      });
+      if (!res.ok) continue;
+      const data = (await res.json()) as {
+        elements?: { lat?: number; lon?: number; tags?: Record<string, string> }[];
+      };
+      return rankOverpassPlaces(center, data.elements ?? [], limit);
+    } catch {
+      // try the next mirror
     }
-    return out;
+  }
+  return null;
+}
+
+function rankOverpassPlaces(
+  center: MapCoordinates,
+  elements: { lat?: number; lon?: number; tags?: Record<string, string> }[],
+  limit: number,
+): PgNearbyPlace[] {
+  const ranked = elements
+    .map((el) => {
+      const elLat = num(el.lat);
+      const elLng = num(el.lon);
+      if (elLat == null || elLng == null || !el.tags) return null;
+      const meters = haversineMeters(center, { lat: elLat, lng: elLng });
+      return {
+        name: overpassPlaceName(el.tags),
+        dist: formatNearbyTravel(meters),
+        meters,
+      };
+    })
+    .filter((row): row is { name: string; dist: string; meters: number } => row != null)
+    .sort((a, b) => a.meters - b.meters);
+
+  const out: PgNearbyPlace[] = [];
+  for (const row of ranked) {
+    pushUnique(out, row.name, row.dist);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+/** Browser: nearby places via our `/api/nearby` route (same origin — no CORS, cached server-side). */
+export async function fetchNearbyPlacesFromOverpass(
+  center: MapCoordinates,
+  limit = 4,
+): Promise<PgNearbyPlace[]> {
+  try {
+    const params = new URLSearchParams({
+      lat: String(center.lat),
+      lng: String(center.lng),
+      limit: String(limit),
+    });
+    const res = await fetch(`/api/nearby?${params.toString()}`);
+    if (!res.ok) return [];
+    const data = (await res.json()) as { places?: PgNearbyPlace[] };
+    return Array.isArray(data.places) ? data.places : [];
   } catch {
     return [];
   }

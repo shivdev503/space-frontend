@@ -55,7 +55,7 @@ export function CoworkingHomepage({ data }: CoworkingHomepageProps) {
           layout="row"
           eyebrow="Featured Spaces"
           title="Explore Premium Spaces"
-          description="Hand-picked spaces toured and verified by SpaceHaat consultants."
+          description="Hand-picked spaces toured and verified by SpaceWallah consultants."
           actionHref="/coworking/gurgaon"
           actionLabel="Browse all spaces →"
         />

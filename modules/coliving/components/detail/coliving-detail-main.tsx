@@ -4,7 +4,7 @@ import { Wifi } from "lucide-react";
 import { useState } from "react";
 
 import { buildMapsLink, type MapCoordinates } from "@/lib/coliving-map";
-import { pgStartingRent } from "@/services/pg-mapper";
+import { pgDescriptionParagraphs, pgStartingRent } from "@/services/pg-mapper";
 import type { PgDetail } from "@/types/pg.model";
 
 import {
@@ -152,7 +152,11 @@ export function ColivingDetailMain({ pg }: ColivingDetailMainProps) {
           <h2 className="font-display text-[1.65rem] font-semibold leading-[1.12] tracking-tight text-ink sm:text-[1.85rem] lg:text-[2.125rem]">
             A quiet {pg.type.toLowerCase()} in <ColivingAccent>{pg.locality}</ColivingAccent>
           </h2>
-          <p className="mt-4 text-[0.9375rem] leading-relaxed text-ink/90 sm:text-base">{pg.description}</p>
+          {pgDescriptionParagraphs(pg).map((paragraph, i) => (
+            <p key={i} className="mt-4 text-[0.9375rem] leading-relaxed text-ink/90 sm:text-base">
+              {paragraph}
+            </p>
+          ))}
         </div>
 
         <div className="mt-8">

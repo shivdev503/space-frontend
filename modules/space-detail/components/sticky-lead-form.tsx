@@ -62,8 +62,8 @@ function FieldShell({
       <div
         className={cn(
           "group relative flex items-center gap-3 rounded-2xl border bg-white px-4 transition",
-          error ? "border-rose-300" : "border-slate-200 focus-within:border-[#4CAF50]",
-          "focus-within:ring-4 focus-within:ring-[rgba(76,175,80,0.18)]",
+          error ? "border-rose-300" : "border-slate-200 focus-within:border-[color:var(--color-brand)]",
+          "focus-within:ring-4 focus-within:ring-[rgba(18,184,134,0.18)]",
         )}
       >
         <Icon className={cn("h-4 w-4 shrink-0", error ? "text-rose-500" : "text-slate-500")} />
@@ -92,10 +92,10 @@ function CtaButton({
       disabled={disabled}
       className={cn(
         "inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-sm font-semibold text-white",
-        "bg-gradient-to-b from-[#4CAF50] to-[#2E7D32] shadow-[0_14px_38px_rgba(76,175,80,0.30)]",
-        "transition hover:-translate-y-0.5 hover:shadow-[0_18px_52px_rgba(76,175,80,0.36)] active:translate-y-0",
-        "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(76,175,80,0.22)]",
-        "disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-[0_14px_38px_rgba(76,175,80,0.30)]",
+        "bg-[color:var(--color-brand)] shadow-[0_14px_38px_rgba(18,184,134,0.30)]",
+        "transition hover:-translate-y-0.5 hover:bg-[color:var(--color-accent)] hover:shadow-[0_18px_52px_rgba(11,59,46,0.30)] active:translate-y-0",
+        "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(18,184,134,0.22)]",
+        "disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-[0_14px_38px_rgba(18,184,134,0.30)]",
       )}
     >
       {children}
@@ -175,7 +175,7 @@ export function StickyLeadForm({
       }
 
       const pageUrl =
-        typeof window !== "undefined" ? window.location.href : "https://www.spacehaat.com";
+        typeof window !== "undefined" ? window.location.href : "https://www.spacewallah.com";
       const body = buildUserEnquiryBody({
         name: name.trim(),
         email: email.trim(),

@@ -11,8 +11,10 @@ function trimUrl(value: string): string {
 
 /** Default leads path appended to `resolveApiBaseUrl()` when no explicit leads URL is set. */
 const LEADS_SUBMIT_PATH = "/api/leads";
-const DEFAULT_APP_ORIGIN_DEV = "http://localhost:3000";
-const DEFAULT_API_ORIGIN_DEV = "http://localhost:8000";
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+/** Used only when no URL env var is set — localhost in dev, the live domains in production builds. */
+const DEFAULT_APP_ORIGIN_DEV = IS_PRODUCTION ? "https://spacewallah.com" : "http://localhost:3000";
+const DEFAULT_API_ORIGIN_DEV = IS_PRODUCTION ? "https://api.spacewallah.com" : "http://localhost:8000";
 const DEFAULT_COWORKING_TIMEOUT_MS = 3500;
 const DEFAULT_LEADS_TIMEOUT_MS = 8000;
 const DEFAULT_LISTING_TIMEOUT_MS = 15000;
@@ -37,7 +39,7 @@ export function resolveAppUrl(): string {
 
 /**
  * Base URL to reach this Next app from server code (e.g. SEO fetch → same-origin proxy).
- * Mirrors {@link resolveAppUrl} for Vercel / APP_URL; needed when falling back to `/api/user/seo/*` proxy.
+ * Mirrors {@link resolveAppUrl} for Vercel / APP_URL; needed when falling back to `/api/user/newSeo/*` proxy.
  */
 export function resolveInternalAppBaseUrl(): string {
   const vercel = process.env.VERCEL_URL?.trim();
@@ -72,7 +74,7 @@ function resolveClientApiBase(): string {
 
 /**
  * Shared backend origin for coworking, leads, and any future API calls.
- * Local: `http://localhost:8000` — production: `https://api.spacehaat.com` (no trailing slash).
+ * Local: `http://localhost:8000` — production: `https://api.spacewallah.com` (no trailing slash).
  */
 export function resolveApiBaseUrl(): string {
   const origin = typeof window === "undefined" ? resolveServerApiBase() : resolveClientApiBase();

@@ -98,6 +98,8 @@ export interface PgDetail {
   contactPhone?: string;
   contactSchedule: string;
   description: string;
+  /** Rewritten listing copy (HTML) — preferred over `description` when present. */
+  new_description?: string;
   verified: boolean;
   status: string;
   rooms: PgRoom[];

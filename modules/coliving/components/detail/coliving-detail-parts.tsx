@@ -39,7 +39,7 @@ const ColivingLeafletMap = dynamic(
 );
 
 const FOOD_IMAGE =
-  "https://img.spacehaat.com/images/65d31396ce62fdcf2bdf6f5f1622ef5775b05269.webp";
+  "https://img.spacewallah.com/images/65d31396ce62fdcf2bdf6f5f1622ef5775b05269.webp";
 
 export function ColivingHostSection({
   hostName,
@@ -267,7 +267,7 @@ export function ColivingRoomCard({
           className={cn(
             "inline-flex flex-1 items-center justify-center rounded-full py-3 text-sm font-semibold transition",
             recommended
-              ? "bg-[color:var(--color-brand)] text-white hover:bg-[#43A047]"
+              ? "bg-[color:var(--color-brand)] text-white hover:bg-[color:var(--color-accent)]"
               : "border border-slate-200/90 bg-white text-ink hover:bg-[#f9f8f5]",
           )}
         >

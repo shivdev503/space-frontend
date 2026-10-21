@@ -6,7 +6,7 @@ import { cn } from "@/utils/cn";
 
 /**
  * Small set of form primitives used across both wizards. They share the
- * SpaceHaat look (cream bg, ink-1 borders, rounded-xl inputs) so the steps
+ * SpaceWallah look (cream bg, ink-1 borders, rounded-xl inputs) so the steps
  * stay visually consistent and concise.
  */
 

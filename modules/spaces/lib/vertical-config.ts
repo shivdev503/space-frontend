@@ -19,9 +19,9 @@ export const verticalConfig: Record<
     href: "/virtual-office",
   },
   "office-space": {
-    label: "Office Spaces",
+    label: "Managed Office",
     description: "Managed and traditional office inventory for growing teams.",
-    href: "/office-space",
+    href: "/managed-office",
   },
   coliving: {
     label: "Coliving Space",

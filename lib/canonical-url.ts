@@ -12,7 +12,7 @@ function stripTrailingPathSlashes(path: string): string {
  * Returns the absolute canonical URL for the current page.
  *
  * - **Origin** always comes from `resolveAppUrl()` (APP_URL / NEXT_PUBLIC_APP_URL) so
- *   production uses `https://spacehaat.com` even if the CMS or request host differs.
+ *   production uses `https://spacewallah.com` even if the CMS or request host differs.
  * - **Homepage** is `https://example.com` with no trailing slash.
  * - **CMS `seo.url`**: if absolute, path (and query/hash) are re-rooted to our origin;
  *   if relative, it is joined to the origin. Malformed values fall back to `pathname`.

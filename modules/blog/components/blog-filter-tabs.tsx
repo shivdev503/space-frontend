@@ -8,7 +8,7 @@ const FILTERS: { id: BlogVerticalFilter; label: string }[] = [
   { id: "coworking", label: "Coworking" },
   { id: "coliving", label: "Coliving Space" },
   { id: "virtual-office", label: "Virtual Office" },
-  { id: "office-space", label: "Office Space" },
+  { id: "office-space", label: "Managed Office" },
 ];
 
 export function BlogFilterTabs({

@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
-import { LeadCTA } from "@/modules/city-pages/components/lead-cta";
 import { PopularLocalitiesRail } from "@/modules/city-pages/components/popular-localities-rail";
 import { Breadcrumb } from "@/modules/location-pages/components/breadcrumb";
 import { FAQSection } from "@/modules/location-pages/components/faq-section";
@@ -9,6 +8,7 @@ import { LocationListingExperience } from "@/modules/location-pages/components/l
 import { getCatalogCityIdBySlug } from "@/services/catalog-city-id";
 import { LocationPageData } from "@/types";
 import { formatCurrency } from "@/utils/format";
+import { verticalPath } from "@/lib/vertical-path";
 
 type VerticalLocationPageProps = {
   data: LocationPageData;
@@ -68,7 +68,7 @@ export function VerticalLocationPage({
               <PopularLocalitiesRail
                 catalogCityId={catalogCityId}
                 citySlug={data.citySlug}
-                hrefPrefix={`/${data.vertical}`}
+                hrefPrefix={`/${verticalPath(data.vertical)}`}
                 spaceType={data.vertical === "coliving" ? "coliving" : "coworking"}
                 fallbackLocations={[]}
               />
@@ -117,19 +117,6 @@ export function VerticalLocationPage({
         </Container>
       </section>
 
-      <section className="pb-14 sm:pb-20">
-        <Container>
-          <LeadCTA
-            title={data.leadCta.title}
-            description={data.leadCta.description}
-            ctaLabel={data.leadCta.ctaLabel}
-            citySlug={data.citySlug}
-            vertical={data.vertical}
-            microlocation={data.locationName}
-          />
-        </Container>
-      </section>
-
       {data.vertical !== "coworking" ? (
         <section className="pb-14 sm:pb-20">
           <Container>
@@ -155,7 +142,7 @@ export function VerticalLocationPage({
                   {data.popularSpaces.map((space) => (
                     <Link
                       key={space.id}
-                      href={`/${space.vertical}/${space.slug}`}
+                      href={`/${verticalPath(space.vertical)}/${space.slug}`}
                       className="rounded-[1rem] border border-slate-200/80 bg-slate-50 px-4 py-4 transition hover:border-slate-300 hover:bg-white"
                     >
                       <p className="font-semibold text-ink">{space.name}</p>

@@ -48,19 +48,19 @@ export function CoworkingSelectForm({ cities }: CoworkingSelectFormProps) {
     }
 
     const pageUrl =
-      typeof window !== "undefined" ? window.location.href : "https://www.spacehaat.com";
+      typeof window !== "undefined" ? window.location.href : "https://www.spacewallah.com";
 
     try {
       const body = buildUserEnquiryBody({
         name: "Coworking shortlist",
-        email: `cw+${phone10}@spacehaat.com`,
+        email: `cw+${phone10}@spacewallah.com`,
         phone,
         interestedIn: teamSize
           ? `Coworking shortlist · ${teamSize} · ${city}`
           : `Coworking shortlist · ${city}`,
         city,
         pageUrl,
-        mxSpaceType: "Coworking SpaceHaat Select",
+        mxSpaceType: "Coworking SpaceWallah Select",
         noOfPerson: teamSize || "1",
       });
       await submitUserEnquiry(body);

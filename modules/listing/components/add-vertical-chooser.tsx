@@ -40,11 +40,11 @@ const VERTICALS = [
   },
   {
     href: "/add/office-space",
-    title: "Office Space",
+    title: "Managed Office",
     description: "Rent per sq ft, area, furnishing & location.",
     image:
-      "https://img.spacehaat.com/images/original/29f7c32fae7798c9733f5b891af3e0ded7031a85.jpg",
-    imageAlt: "Corporate office space",
+      "https://img.spacewallah.com/images/original/29f7c32fae7798c9733f5b891af3e0ded7031a85.jpg",
+    imageAlt: "Corporate managed office",
     Icon: Building2,
     features: ["Rent & area", "Furnishing", "Gallery"],
     eta: "10 min",

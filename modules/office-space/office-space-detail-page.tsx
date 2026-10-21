@@ -16,7 +16,7 @@ import { formatCurrency, toTitleCase } from "@/utils/format";
 function officeTitle(office: OfficeSpaceModel.OfficeSpace): string {
   const sq = office.other_detail?.area_for_lease_in_sq_ft;
   if (typeof sq === "number" && Number.isFinite(sq) && sq > 0) {
-    return `${sq.toLocaleString("en-IN")} sq. ft. office space for rent`;
+    return `${sq.toLocaleString("en-IN")} sq. ft. managed office`;
   }
   return office.name ?? "Office space";
 }
@@ -180,7 +180,7 @@ export function OfficeSpaceDetailPage({
         <section className="pb-14 sm:pb-20">
           <Container>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--color-brand)]">
-              Similar office spaces
+              Similar managed offices
             </p>
             <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
               More options in {toTitleCase(officeCitySlugish(office))}

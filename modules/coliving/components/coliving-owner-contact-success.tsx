@@ -57,7 +57,7 @@ export function ColivingOwnerContactSuccess({
         <div className="mt-3 flex flex-wrap gap-2">
           <a
             href={telHref}
-            className="inline-flex flex-1 items-center justify-center rounded-xl bg-[color:var(--color-brand)] px-3 py-2.5 text-sm font-semibold text-white hover:bg-[#43A047]"
+            className="inline-flex flex-1 items-center justify-center rounded-xl bg-[color:var(--color-brand)] px-3 py-2.5 text-sm font-semibold text-white hover:bg-[color:var(--color-accent)]"
           >
             Call now
           </a>

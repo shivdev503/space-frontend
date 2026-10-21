@@ -17,7 +17,7 @@ import {
   Testimonial,
   TrustMetric,
   VerticalLandingData,
-  WhySpaceHaatItem,
+  WhySpaceWallahItem,
 } from "@/types";
 import { canonicalCoworkingCitySlug, getCatalogCityIdBySlug } from "@/services/catalog-city-id";
 import { listHomepageCitiesFromAvailable } from "@/services/homepage-available-cities";
@@ -752,7 +752,7 @@ const brands: Brand[] = [
     name: "Bhive",
     category: "Operator",
     image:
-      "https://img.spacehaat.com/images/latest_images_2024/71d43e23a7ae6ebb391a15e699d40b480f477768.webp",
+      "https://img.spacewallah.com/images/latest_images_2024/71d43e23a7ae6ebb391a15e699d40b480f477768.webp",
     url: "/brand/bhive-workspace",
   },
   {
@@ -760,7 +760,7 @@ const brands: Brand[] = [
     name: "Innov8",
     category: "Operator",
     image:
-      "https://img.spacehaat.com/images/latest_images_2024/c4c17f01171e0494e577509eb6463d46e98cba5a.webp",
+      "https://img.spacewallah.com/images/latest_images_2024/c4c17f01171e0494e577509eb6463d46e98cba5a.webp",
     url: "/brand/innov8",
   },
   {
@@ -768,7 +768,7 @@ const brands: Brand[] = [
     name: "WeWork",
     category: "Operator",
     image:
-      "https://img.spacehaat.com/images/latest_images_2024/3a4f25ddb65a1444dc67dc4b0a2b60d6e7648ad0.webp",
+      "https://img.spacewallah.com/images/latest_images_2024/3a4f25ddb65a1444dc67dc4b0a2b60d6e7648ad0.webp",
     url: "/brand/wework",
   },
   {
@@ -776,7 +776,7 @@ const brands: Brand[] = [
     name: "Awfis",
     category: "Operator",
     image:
-      "https://img.spacehaat.com/images/latest_images_2024/418876d12cfd6d663a344bed1ef0b62d36bb38f1.webp",
+      "https://img.spacewallah.com/images/latest_images_2024/418876d12cfd6d663a344bed1ef0b62d36bb38f1.webp",
     url: "/brand/awfis",
   },
   {
@@ -784,7 +784,7 @@ const brands: Brand[] = [
     name: "Indiqube",
     category: "Operator",
     image:
-      "https://img.spacehaat.com/images/latest_images_2024/96d6ad27f63a3fe44e58b3988faf6aa3d35ec7ce.webp",
+      "https://img.spacewallah.com/images/latest_images_2024/96d6ad27f63a3fe44e58b3988faf6aa3d35ec7ce.webp",
     url: "/brand/indiqube",
   },
   {
@@ -792,7 +792,7 @@ const brands: Brand[] = [
     name: "91Springboard",
     category: "Operator",
     image:
-      "https://img.spacehaat.com/images/latest_images_2024/85bede6f564b721526057118f32551c01c4da373.webp",
+      "https://img.spacewallah.com/images/latest_images_2024/85bede6f564b721526057118f32551c01c4da373.webp",
     url: "/brand/91springboard",
   },
   {
@@ -800,7 +800,7 @@ const brands: Brand[] = [
     name: "InstaOffice",
     category: "Operator",
     image:
-      "https://img.spacehaat.com/images/latest_images_2024/3e9de30708805d8e117d8b0914f479ca583a9595.webp",
+      "https://img.spacewallah.com/images/latest_images_2024/3e9de30708805d8e117d8b0914f479ca583a9595.webp",
     url: "/brand/instaoffice",
   },
 ];
@@ -812,7 +812,7 @@ const testimonials: Testimonial[] = [
     role: "Founder",
     company: "NovaStack",
     quote:
-      "SpaceHaat helped us shortlist our Gurgaon office in one afternoon. The quality filter was noticeably better than the marketplaces we had tried before.",
+      "SpaceWallah helped us shortlist our Gurgaon office in one afternoon. The quality filter was noticeably better than the marketplaces we had tried before.",
   },
   {
     id: "testimonial_002",
@@ -832,7 +832,7 @@ const testimonials: Testimonial[] = [
   },
 ];
 
-const differentiators: WhySpaceHaatItem[] = [
+const differentiators: WhySpaceWallahItem[] = [
   {
     id: "why_001",
     title: "Verified spaces",
@@ -1044,7 +1044,7 @@ function buildCityPageTitle(vertical: SpaceVertical, cityName: string) {
     return `Coliving Space in ${cityName}`;
   }
 
-  return `Office Spaces in ${cityName}`;
+  return `Managed Office in ${cityName}`;
 }
 
 function slugToTitle(value: string) {
@@ -1075,10 +1075,10 @@ function buildSeoSection(vertical: SpaceVertical, cityName: string, totalSpaces:
     return {
       title: `Best coworking spaces in ${cityName}`,
       paragraphs: [
-        `${cityName} has become one of the most important workspace markets for startups, agencies, consulting teams, and distributed operators who want flexibility without compromising on quality. The best coworking spaces in ${cityName} combine strong infrastructure, hospitality-grade common areas, and more thoughtful micro-locations that keep teams close to talent, transport, and client movement. On SpaceHaat, the goal is not to overwhelm people with noisy marketplace inventory. Instead, we help visitors discover a more curated view of coworking supply so teams can compare fit, pricing, and experience with more confidence.`,
+        `${cityName} has become one of the most important workspace markets for startups, agencies, consulting teams, and distributed operators who want flexibility without compromising on quality. The best coworking spaces in ${cityName} combine strong infrastructure, hospitality-grade common areas, and more thoughtful micro-locations that keep teams close to talent, transport, and client movement. On SpaceWallah, the goal is not to overwhelm people with noisy marketplace inventory. Instead, we help visitors discover a more curated view of coworking supply so teams can compare fit, pricing, and experience with more confidence.`,
         `When businesses look for coworking spaces in ${cityName}, the most important decision is rarely just the headline price. Teams usually care about whether a space supports the way they actually work. That includes access to meeting rooms, community energy, visitor experience, move-in readiness, and whether the operator can support growth from a few seats to a larger team cluster. A founder-led company may prefer a vibrant floor with networking and event access, while a larger operating team may want stronger privacy, managed cabins, and a quieter workday rhythm. This is why curated discovery matters more than endless listing volume.`,
-        `SpaceHaat currently highlights ${totalSpaces}+ premium and emerging coworking options in ${cityName}, with attention to location quality, amenities, and operator credibility. We also make it easier to browse by budget, team size, space type, and brand so the shortlist process feels faster and more intentional. Instead of navigating cluttered results, teams can focus on a smaller set of high-fit options and move toward a consultation when they are ready.`,
-        `For companies evaluating coworking in ${cityName}, the strongest outcome usually comes from comparing spaces in context. A centrally located premium floor might improve talent experience and client perception, while a more cost-efficient district may unlock better flexibility for expansion. The right answer depends on headcount, budget, brand expectations, and operating style. That is why SpaceHaat is designed as a lead-generation and consultation platform rather than a booking engine. We help teams start with clarity, shortlist faster, and move toward the right workspace decision with less friction.`,
+        `SpaceWallah currently highlights ${totalSpaces}+ premium and emerging coworking options in ${cityName}, with attention to location quality, amenities, and operator credibility. We also make it easier to browse by budget, team size, space type, and brand so the shortlist process feels faster and more intentional. Instead of navigating cluttered results, teams can focus on a smaller set of high-fit options and move toward a consultation when they are ready.`,
+        `For companies evaluating coworking in ${cityName}, the strongest outcome usually comes from comparing spaces in context. A centrally located premium floor might improve talent experience and client perception, while a more cost-efficient district may unlock better flexibility for expansion. The right answer depends on headcount, budget, brand expectations, and operating style. That is why SpaceWallah is designed as a lead-generation and consultation platform rather than a booking engine. We help teams start with clarity, shortlist faster, and move toward the right workspace decision with less friction.`,
       ],
     };
   }
@@ -1089,8 +1089,8 @@ function buildSeoSection(vertical: SpaceVertical, cityName: string, totalSpaces:
       paragraphs: [
         `A virtual office in ${cityName} gives companies a faster way to establish business presence without committing to a physical office lease before they need one. For startups, remote-first teams, consultants, and expanding companies, the right virtual office can unlock a professional address, better compliance support, and smoother documentation workflows. The value is not only about cost efficiency. It is also about credibility, legal readiness, and choosing a provider that feels reliable when it matters most.`,
         `Businesses exploring virtual office services in ${cityName} are often looking for support around GST registration, company registration, business correspondence, and mail handling. Those requirements sound simple on paper, but the quality of the provider makes a real difference. Documentation standards, response time, address quality, and support structure all influence whether the process feels easy or frustrating. A better platform experience should help users compare providers with more clarity instead of burying the important details behind vague listings.`,
-        `SpaceHaat surfaces trusted virtual office options in ${cityName} and organizes them around the things decision-makers usually care about most: address quality, documentation support, service scope, and pricing fit. With ${totalSpaces}+ relevant options in the current city dataset, users can filter by amenities, service type, and brand to identify stronger matches faster. This creates a more professional journey for founders and operations teams that want to move with confidence.`,
-        `The benefit of choosing the right virtual office in ${cityName} goes beyond paperwork. A better address can improve first impressions, simplify official communication, and support a more credible business setup while the company scales. The wrong provider can create delays and uncertainty. That is why SpaceHaat takes a more curated, advisory-led approach to discovery. Instead of acting like a generic directory, the platform is built to help users understand their options, submit their requirement, and move toward a provider that fits their business needs with more trust.`,
+        `SpaceWallah surfaces trusted virtual office options in ${cityName} and organizes them around the things decision-makers usually care about most: address quality, documentation support, service scope, and pricing fit. With ${totalSpaces}+ relevant options in the current city dataset, users can filter by amenities, service type, and brand to identify stronger matches faster. This creates a more professional journey for founders and operations teams that want to move with confidence.`,
+        `The benefit of choosing the right virtual office in ${cityName} goes beyond paperwork. A better address can improve first impressions, simplify official communication, and support a more credible business setup while the company scales. The wrong provider can create delays and uncertainty. That is why SpaceWallah takes a more curated, advisory-led approach to discovery. Instead of acting like a generic directory, the platform is built to help users understand their options, submit their requirement, and move toward a provider that fits their business needs with more trust.`,
       ],
     };
   }
@@ -1100,20 +1100,20 @@ function buildSeoSection(vertical: SpaceVertical, cityName: string, totalSpaces:
       title: `Best coliving space in ${cityName}`,
       paragraphs: [
         `${cityName} has strong demand for coliving and PG inventory from students, early-career professionals, and remote workers who want furnished rooms without long furniture procurement cycles. The best coliving spaces in ${cityName} combine predictable monthly pricing, security, housekeeping, and meal options that reduce day-to-day operational friction compared with traditional rentals.`,
-        `When people search for PG in ${cityName}, the decision is rarely only rent. House rules, meal quality, WiFi reliability, AC availability, visitor policy, and proximity to metro or office hubs all influence fit. Coliving adds a more hospitality-led layer: community programming, shared lounges, and clearer service standards. SpaceHaat helps visitors compare these dimensions with a more curated lens instead of noisy, inconsistent listings.`,
-        `SpaceHaat currently highlights ${totalSpaces}+ coliving and PG-style options in ${cityName} with filters for budget, room type, amenities, and brand where available. The objective is faster shortlisting: fewer low-fit options, clearer monthly context, and a smoother path to expert consultation when someone wants help validating availability and move-in timelines.`,
-        `Choosing coliving or PG in ${cityName} should feel intentional. Some renters prioritize lowest monthly outlay, while others prioritize shorter commute, premium security, or private-room comfort. SpaceHaat is built as a discovery and lead platform: explore curated inventory, understand tradeoffs, and move toward a conversation that helps you pick a safer, better-fit home base.`,
+        `When people search for PG in ${cityName}, the decision is rarely only rent. House rules, meal quality, WiFi reliability, AC availability, visitor policy, and proximity to metro or office hubs all influence fit. Coliving adds a more hospitality-led layer: community programming, shared lounges, and clearer service standards. SpaceWallah helps visitors compare these dimensions with a more curated lens instead of noisy, inconsistent listings.`,
+        `SpaceWallah currently highlights ${totalSpaces}+ coliving and PG-style options in ${cityName} with filters for budget, room type, amenities, and brand where available. The objective is faster shortlisting: fewer low-fit options, clearer monthly context, and a smoother path to expert consultation when someone wants help validating availability and move-in timelines.`,
+        `Choosing coliving or PG in ${cityName} should feel intentional. Some renters prioritize lowest monthly outlay, while others prioritize shorter commute, premium security, or private-room comfort. SpaceWallah is built as a discovery and lead platform: explore curated inventory, understand tradeoffs, and move toward a conversation that helps you pick a safer, better-fit home base.`,
       ],
     };
   }
 
   return {
-    title: `Premium office spaces in ${cityName}`,
+    title: `Premium managed offices in ${cityName}`,
     paragraphs: [
-      `${cityName} continues to attract growth-stage companies, enterprise teams, and operators who need more premium office environments than a simple short-term seat solution. The demand for office space in ${cityName} is shaped by teams that care about brand presence, staff experience, move-in quality, and the ability to scale without rebuilding their workspace strategy every few months. The best office spaces are not just about square footage. They are about operational confidence, location quality, and the kind of environment that supports leadership, hiring, and client interactions.`,
-      `For many businesses, the challenge is not finding office space in ${cityName}; it is identifying which spaces are genuinely worth considering. Listings often blur together, even though the differences in service level, fit-out readiness, reception quality, board-room access, and building profile can be significant. A premium office search should feel more like strategic evaluation than casual browsing. Teams need to compare inventory in a way that respects budget while also accounting for future growth, internal culture, and the expectations that come with a client-facing workspace.`,
-      `SpaceHaat helps structure that evaluation by surfacing curated office inventory in ${cityName} and presenting it through cleaner filters, clearer location context, and stronger quality signals. With ${totalSpaces}+ relevant city listings available in the current dataset, teams can narrow the shortlist by budget, amenity profile, brand, and office type instead of relying on broad, cluttered search experiences. This makes it easier for founders, admin teams, and operations leaders to quickly move from awareness to a more intentional shortlist.`,
-      `The right office in ${cityName} should support where the business is going, not just where it is today. Some teams need fully managed space that reduces operational lift, while others need premium private suites with room to expand. In both cases, the search experience should reduce friction rather than create it. That is why SpaceHaat is designed around lead generation and consultation. We help users explore premium office space in ${cityName}, understand the tradeoffs between options, and move toward a conversation that leads to a better workplace decision.`,
+      `${cityName} continues to attract growth-stage companies, enterprise teams, and operators who need premium managed office environments beyond a simple short-term seat solution. Demand for managed office in ${cityName} is shaped by teams that care about brand presence, staff experience, move-in quality, and the ability to scale without rebuilding their workplace strategy every few months. The best managed offices are not just about square footage. They are about operational confidence, location quality, and the kind of environment that supports leadership, hiring, and client interactions.`,
+      `For many businesses, the challenge is not finding managed office in ${cityName}; it is identifying which options are genuinely worth considering. Listings often blur together, even though the differences in service level, fit-out readiness, reception quality, board-room access, and building profile can be significant. A premium managed office search should feel more like strategic evaluation than casual browsing. Teams need to compare inventory in a way that respects budget while also accounting for future growth, internal culture, and the expectations that come with a client-facing workplace.`,
+      `SpaceWallah helps structure that evaluation by surfacing curated managed office inventory in ${cityName} and presenting it through cleaner filters, clearer location context, and stronger quality signals. With ${totalSpaces}+ relevant city listings available in the current dataset, teams can narrow the shortlist by budget, amenity profile, brand, and office type instead of relying on broad, cluttered search experiences. This makes it easier for founders, admin teams, and operations leaders to quickly move from awareness to a more intentional shortlist.`,
+      `The right managed office in ${cityName} should support where the business is going, not just where it is today. Some teams need fully managed space that reduces operational lift, while others need premium private suites with room to expand. In both cases, the search experience should reduce friction rather than create it. That is why SpaceWallah is designed around lead generation and consultation. We help users explore premium managed office in ${cityName}, understand the tradeoffs between options, and move toward a conversation that leads to a better workplace decision.`,
     ],
   };
 }
@@ -1141,9 +1141,9 @@ function buildFaqs(vertical: SpaceVertical, cityName: string) {
       },
       {
         id: `${vertical}-${cityName}-faq-4`,
-        question: `How can SpaceHaat help me find coworking in ${cityName}?`,
+        question: `How can SpaceWallah help me find coworking in ${cityName}?`,
         answer:
-          `SpaceHaat helps you compare curated options, filter by budget and team size, and submit a requirement for a faster, higher-fit shortlist.`,
+          `SpaceWallah helps you compare curated options, filter by budget and team size, and submit a requirement for a faster, higher-fit shortlist.`,
       },
     ];
   }
@@ -1199,9 +1199,9 @@ function buildFaqs(vertical: SpaceVertical, cityName: string) {
       },
       {
         id: `${vertical}-${cityName}-faq-4`,
-        question: `How can SpaceHaat help me find coliving or PG in ${cityName}?`,
+        question: `How can SpaceWallah help me find coliving or PG in ${cityName}?`,
         answer:
-          `SpaceHaat helps you compare curated options, filter by budget and amenities, and submit a requirement for a faster shortlist with clearer monthly pricing context.`,
+          `SpaceWallah helps you compare curated options, filter by budget and amenities, and submit a requirement for a faster shortlist with clearer monthly pricing context.`,
       },
     ];
   }
@@ -1209,27 +1209,27 @@ function buildFaqs(vertical: SpaceVertical, cityName: string) {
   return [
     {
       id: `${vertical}-${cityName}-faq-1`,
-      question: `What types of office spaces are available in ${cityName}?`,
+      question: `What types of managed office are available in ${cityName}?`,
       answer:
         `Businesses can typically choose between managed offices, private suites, enterprise floors, and more customizable office formats depending on scale and operational needs.`,
     },
     {
       id: `${vertical}-${cityName}-faq-2`,
-      question: `How do companies compare premium office spaces in ${cityName}?`,
+      question: `How do companies compare premium managed offices in ${cityName}?`,
       answer:
         `The strongest comparisons usually include building quality, reception experience, board-room access, office services, and how well the space supports future growth.`,
     },
     {
       id: `${vertical}-${cityName}-faq-3`,
-      question: `Are managed office spaces available for growing teams in ${cityName}?`,
+      question: `Are managed offices available for growing teams in ${cityName}?`,
       answer:
         `Yes. Managed office inventory is often the best fit for teams that want faster occupancy, lower operational effort, and a more polished workplace experience.`,
     },
     {
       id: `${vertical}-${cityName}-faq-4`,
-      question: `How can SpaceHaat help with office space in ${cityName}?`,
+      question: `How can SpaceWallah help with managed office in ${cityName}?`,
       answer:
-        `SpaceHaat helps teams filter curated office options, explore popular micro-markets, and submit a requirement for expert consultation.`,
+        `SpaceWallah helps teams filter curated managed office options, explore popular micro-markets, and submit a requirement for expert consultation.`,
     },
   ];
 }
@@ -1350,7 +1350,7 @@ export const getCityPageData = cache(function getCityPageData(
         vertical === "virtual-office"
           ? `Compare trusted virtual office providers in ${cityName} with clear documentation support. Tell us your need and we will recommend the right plan.`
           : vertical === "coliving"
-            ? `Share your budget, room preference, and move-in date. SpaceHaat advisors shortlist verified coliving and PG options in ${cityName} you can visit with confidence.`
+            ? `Share your budget, room preference, and move-in date. SpaceWallah advisors shortlist verified coliving and PG options in ${cityName} you can visit with confidence.`
             : `Share your team size, budget, and preferred areas. Our advisors compare verified coworking options in ${cityName} and send a clear shortlist you can act on.`,
       ctaLabel:
         vertical === "virtual-office"
@@ -1379,7 +1379,7 @@ function buildLocationPageTitle(
     return `Coliving Space in ${locationName}, ${cityName}`;
   }
 
-  return `Office Space in ${locationName}, ${cityName}`;
+  return `Managed Office in ${locationName}, ${cityName}`;
 }
 
 function buildLocationPageSubtitle(
@@ -1469,7 +1469,7 @@ function buildLocationSeoSection(
       title: `Best coworking spaces in ${locationName}, ${cityName}`,
       paragraphs: [
         `${locationName} has emerged as one of the strongest micro-markets in ${cityName} for teams that want a modern, flexible workspace setup without committing to a traditional long lease too early. Companies exploring coworking in ${locationName} typically prioritize easy commute, business visibility, and a better day-to-day work environment for founders, employees, and client meetings. The right coworking space here can improve team productivity while keeping occupancy decisions more agile.`,
-        `When comparing coworking spaces in ${locationName}, most operators discover that pricing alone is not the best decision metric. Teams should also compare location quality, cabin flexibility, meeting room access, amenities, move-in readiness, and the service level of the operator. SpaceHaat helps simplify this process by surfacing curated options with clearer filters, so decision-makers can shortlist faster and avoid low-fit listings.`,
+        `When comparing coworking spaces in ${locationName}, most operators discover that pricing alone is not the best decision metric. Teams should also compare location quality, cabin flexibility, meeting room access, amenities, move-in readiness, and the service level of the operator. SpaceWallah helps simplify this process by surfacing curated options with clearer filters, so decision-makers can shortlist faster and avoid low-fit listings.`,
         third,
       ],
     };
@@ -1480,7 +1480,7 @@ function buildLocationSeoSection(
       title: `Benefits of virtual office in ${locationName}, ${cityName}`,
       paragraphs: [
         `A virtual office in ${locationName}, ${cityName} gives businesses a practical way to establish a professional address while staying lean on real-estate costs. For startups, remote-first teams, and expanding companies, choosing the right location can improve business credibility and simplify compliance tasks without adding operational complexity.`,
-        `Companies usually evaluate virtual office options in ${locationName} for GST registration support, business address quality, documentation readiness, and mail handling services. The difference between providers can be meaningful, so clearer comparison is essential. SpaceHaat helps users evaluate options by service quality and support level, not just headline pricing.`,
+        `Companies usually evaluate virtual office options in ${locationName} for GST registration support, business address quality, documentation readiness, and mail handling services. The difference between providers can be meaningful, so clearer comparison is essential. SpaceWallah helps users evaluate options by service quality and support level, not just headline pricing.`,
         `This page highlights ${totalSpaces}+ location-specific options and supports quick filtering by budget, amenities, and service type. The objective is to help businesses make faster and safer decisions with better local context and stronger trust signals.`,
       ],
     };
@@ -1491,17 +1491,17 @@ function buildLocationSeoSection(
       title: `Best coliving space in ${locationName}, ${cityName}`,
       paragraphs: [
         `${locationName} is a practical micro-market in ${cityName} for renters who want furnished rooms, clearer monthly pricing, and faster move-in without coordinating furniture, utilities, and vendors independently. Coliving and PG operators in this pocket often compete on meal quality, security, WiFi reliability, and housekeeping discipline — details that matter more than a generic headline rent.`,
-        `When comparing coliving in ${locationName}, it helps to validate lock-in, deposit structure, visitor policy, AC availability, and what is included in the monthly fee. PG seekers may prioritize meal frequency and curfew rules, while working professionals may prioritize quieter floors and private-room upgrades. SpaceHaat presents location-level inventory with filters that make these comparisons easier.`,
+        `When comparing coliving in ${locationName}, it helps to validate lock-in, deposit structure, visitor policy, AC availability, and what is included in the monthly fee. PG seekers may prioritize meal frequency and curfew rules, while working professionals may prioritize quieter floors and private-room upgrades. SpaceWallah presents location-level inventory with filters that make these comparisons easier.`,
         `This page currently surfaces ${totalSpaces}+ relevant listings in ${locationName}. If you want faster confirmation on availability, use the consultation form and our team can help shortlist safer matches with stronger operator credibility.`,
       ],
     };
   }
 
   return {
-    title: `Premium office spaces in ${locationName}, ${cityName}`,
+    title: `Premium managed offices in ${locationName}, ${cityName}`,
     paragraphs: [
-      `${locationName} is one of the most attractive office districts in ${cityName} for teams looking for premium environments, better connectivity, and stronger client-facing infrastructure. Businesses exploring office space in this micro-market usually care about quality of building stock, managed services, and room to scale as operations expand.`,
-      `Comparing office spaces in ${locationName} should include more than rent. Teams should evaluate service quality, reception experience, board-room access, parking, power reliability, and expansion flexibility. SpaceHaat helps structure this decision process through cleaner filters and more curated location-level inventory.`,
+      `${locationName} is one of the most attractive business districts in ${cityName} for teams looking for premium managed offices, better connectivity, and stronger client-facing infrastructure. Businesses exploring managed office in this micro-market usually care about quality of building stock, managed services, and room to scale as operations expand.`,
+      `Comparing managed offices in ${locationName} should include more than rent. Teams should evaluate service quality, reception experience, board-room access, parking, power reliability, and expansion flexibility. SpaceWallah helps structure this decision process through cleaner filters and more curated location-level inventory.`,
       `This location page currently surfaces ${totalSpaces}+ relevant options and is designed to support fast, high-intent shortlisting. By combining hyper-local discovery with consultation-led lead capture, businesses can move from exploration to action with greater confidence.`,
     ],
   };
@@ -1574,9 +1574,9 @@ function buildLocationFaqs(
       },
       {
         id: `${vertical}-${cityName}-${locationName}-faq-3`,
-        question: `How can SpaceHaat help with PG or coliving in ${locationName}?`,
+        question: `How can SpaceWallah help with PG or coliving in ${locationName}?`,
         answer:
-          "SpaceHaat helps you compare curated listings, filter by budget and amenities, and request a faster shortlist with clearer monthly pricing context.",
+          "SpaceWallah helps you compare curated listings, filter by budget and amenities, and request a faster shortlist with clearer monthly pricing context.",
       },
     ];
   }
@@ -1584,7 +1584,7 @@ function buildLocationFaqs(
   return [
     {
       id: `${vertical}-${cityName}-${locationName}-faq-1`,
-      question: `What types of office spaces are available in ${locationName}, ${cityName}?`,
+      question: `What types of managed office are available in ${locationName}, ${cityName}?`,
       answer:
         "You can usually compare managed offices, private suites, and larger enterprise options depending on team size and occupancy plans.",
     },
@@ -1596,9 +1596,9 @@ function buildLocationFaqs(
     },
     {
       id: `${vertical}-${cityName}-${locationName}-faq-3`,
-      question: `How can SpaceHaat help with office selection in ${locationName}?`,
+      question: `How can SpaceWallah help with office selection in ${locationName}?`,
       answer:
-        "SpaceHaat helps compare local inventory with cleaner filters and consultation support for quicker, better-fit decisions.",
+        "SpaceWallah helps compare local inventory with cleaner filters and consultation support for quicker, better-fit decisions.",
     },
   ];
 }
@@ -1814,7 +1814,7 @@ export function buildLocationPageDataFromSpaces(
   };
 }
 
-const coworkingBenefits: WhySpaceHaatItem[] = [
+const coworkingBenefits: WhySpaceWallahItem[] = [
   {
     id: "cw_benefit_001",
     title: "Flexible plans",
@@ -1850,7 +1850,7 @@ const coworkingHowItWorks: HowItWorksStep[] = [
   },
 ];
 
-const virtualOfficeBenefits: WhySpaceHaatItem[] = [
+const virtualOfficeBenefits: WhySpaceWallahItem[] = [
   {
     id: "vo_benefit_001",
     title: "GST registration support",
@@ -1915,7 +1915,7 @@ const virtualOfficeComparisonRows: ComparisonRow[] = [
   },
 ];
 
-const colivingBenefits: WhySpaceHaatItem[] = [
+const colivingBenefits: WhySpaceWallahItem[] = [
   {
     id: "clv_benefit_001",
     title: "Move-in ready rooms",
@@ -1933,7 +1933,7 @@ const colivingBenefits: WhySpaceHaatItem[] = [
   },
 ];
 
-const officeSpaceBenefits: WhySpaceHaatItem[] = [
+const officeSpaceBenefits: WhySpaceWallahItem[] = [
   {
     id: "os_benefit_001",
     title: "Fully managed",
@@ -1951,7 +1951,7 @@ const officeSpaceBenefits: WhySpaceHaatItem[] = [
   },
 ];
 
-const officeEnterpriseSolutions: WhySpaceHaatItem[] = [
+const officeEnterpriseSolutions: WhySpaceWallahItem[] = [
   {
     id: "os_solution_001",
     title: "Managed headquarters",
@@ -1981,7 +1981,7 @@ const officeCaseStudies: CaseStudy[] = [
     id: "os_case_002",
     company: "AstraPay",
     headline: "Shortlisted enterprise-ready Bangalore offices with stronger cost control.",
-    summary: "SpaceHaat helped compare managed office options by service level, location quality, and flexibility.",
+    summary: "SpaceWallah helped compare managed office options by service level, location quality, and flexibility.",
     metric: "18% projected cost efficiency",
   },
   {
@@ -2008,7 +2008,7 @@ export function getVerticalLandingData(vertical: SpaceVertical): VerticalLanding
           "Flexible desks, private cabins and managed offices across top cities.",
         ctaLabel: "Explore Spaces",
         image:
-          "https://img.spacehaat.com/images/latest_images_2024/7fed3a04f52c777052ecb019c42ddaba6c5fb34e.webp",
+          "https://img.spacewallah.com/images/latest_images_2024/7fed3a04f52c777052ecb019c42ddaba6c5fb34e.webp",
         imageLabel: "Bright coworking lounge",
         stats: [
           { label: "Flexible plans", value: "Hot desks to private cabins" },
@@ -2042,7 +2042,7 @@ export function getVerticalLandingData(vertical: SpaceVertical): VerticalLanding
           "Get a GST-compliant virtual office address in top Indian cities with complete documentation support and fast setup.",
         ctaLabel: "Get Virtual Office",
         image:
-          "https://img.spacehaat.com/images/latest_images_2024/1be87877ad43a0a7666804cd6c1052a99b22488d.webp",
+          "https://img.spacewallah.com/images/latest_images_2024/1be87877ad43a0a7666804cd6c1052a99b22488d.webp",
         imageLabel: "Modern open-plan workspace",
         badges: [
           "10,000+ businesses served",
@@ -2141,11 +2141,11 @@ export function getVerticalLandingData(vertical: SpaceVertical): VerticalLanding
   return {
     vertical,
     hero: {
-      eyebrow: "Office Spaces",
-      title: "Premium Office Spaces for Growing Teams",
+      eyebrow: "Managed Office",
+      title: "Premium Managed Offices for Growing Teams",
       subtitle:
-        "Private offices, managed spaces and enterprise solutions for teams that need polish and scale.",
-      ctaLabel: "Find Office Space",
+        "Private suites, managed spaces, and enterprise workplace solutions for teams that need polish and scale.",
+      ctaLabel: "Find Managed Office",
       image:
         "https://images.unsplash.com/photo-1497366412874-3415097a27e7?auto=format&fit=crop&w=1600&q=80",
       imageLabel: "Luxury office interior",
@@ -2167,7 +2167,7 @@ export function getVerticalLandingData(vertical: SpaceVertical): VerticalLanding
       {
         id: "os_step_002",
         title: "Review premium options",
-        description: "Compare managed and traditional office spaces with a stronger quality filter.",
+        description: "Compare managed offices and private suites with a stronger quality filter.",
       },
       {
         id: "os_step_003",
@@ -2178,7 +2178,7 @@ export function getVerticalLandingData(vertical: SpaceVertical): VerticalLanding
     leadSection: {
       title: "Talk to an Expert",
       description:
-        "From managed offices to private floors, we help teams evaluate premium office options with more confidence and less noise.",
+        "From managed offices to private floors, we help teams evaluate premium managed office options with more confidence and less noise.",
       ctaLabel: "Talk to an Expert",
       bullets: ["Managed and enterprise options", "Workspace advisory", "Premium locations"],
     },

@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { RemoteImage as Image } from "@/components/ui/remote-image";
 import Link from "next/link";
 import { Heart, MapPin, Star } from "lucide-react";
 import { useState } from "react";
@@ -13,14 +13,15 @@ import {
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/format";
+import { spaceImageUrl, toSpaceImageCdnUrl } from "@/lib/space-image-url";
 
 const LISTING_IMAGE_FALLBACK =
   "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=72";
 
 function cardImageSrc(workspace: CoworkingModel.WorkSpace): string {
-  const hero = typeof workspace.image === "string" ? workspace.image.trim() : "";
+  const hero = typeof workspace.image === "string" ? toSpaceImageCdnUrl(workspace.image) : "";
   if (hero) return hero;
-  const link = workspace.images?.[0]?.image?.s3_link?.trim();
+  const link = spaceImageUrl(workspace.images?.[0]?.image);
   return link || LISTING_IMAGE_FALLBACK;
 }
 

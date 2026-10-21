@@ -182,7 +182,7 @@ export function CoworkingDetailLeadQuiz({
 
       const body = buildUserEnquiryBody({
         name: name.trim(),
-        email: `coworking.lead+${toPhone10(phone)}@spacehaat.com`,
+        email: `coworking.lead+${toPhone10(phone)}@spacewallah.com`,
         phone,
         interestedIn,
         city: citySlug,
@@ -380,7 +380,7 @@ function CoworkingQuizBody({
         <CircleCheckBig className="h-12 w-12 text-[color:var(--color-brand)]" strokeWidth={1.5} />
         <h3 className="text-xl font-extrabold tracking-[-0.02em] text-ink">You&apos;re all set!</h3>
         <p className="max-w-[34ch] text-[14px] leading-relaxed text-muted">
-          Our SpaceHaat expert will call you shortly to schedule your visit and share the best available rate.
+          Our SpaceWallah expert will call you shortly to schedule your visit and share the best available rate.
         </p>
       </div>
     );
@@ -482,7 +482,7 @@ function CoworkingQuizBody({
             disabled={!nameOk || !phoneOk || submitting}
             className={cn(
               "mt-1 inline-flex w-full items-center justify-center gap-2 rounded-[13px] px-5 py-3.5 text-base font-semibold text-white",
-              "bg-[color:var(--color-brand)] shadow-[0_6px_16px_rgba(76,175,80,0.32)] transition hover:bg-[#3B8E3F]",
+              "bg-[color:var(--color-brand)] shadow-[0_6px_16px_rgba(18,184,134,0.32)] transition hover:bg-[color:var(--color-accent)]",
               "disabled:cursor-not-allowed disabled:opacity-60",
             )}
           >

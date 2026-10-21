@@ -45,7 +45,7 @@ export function FooterMarketingSection() {
     <section
       className="border-t border-slate-200/80"
       style={{ backgroundColor: FOOTER_BG }}
-      aria-label="SpaceHaat workspace links"
+      aria-label="SpaceWallah workspace links"
     >
       <Container className="py-12 sm:py-14 lg:py-16">
         <div className="grid gap-10 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4 lg:gap-8 xl:gap-12">
@@ -64,7 +64,7 @@ export function FooterMarketingSection() {
           <div className="flex flex-col gap-4 text-xs leading-relaxed text-slate-500 sm:gap-5 sm:text-sm">
             <p>
               <span className="text-slate-600">
-                © {year} SpaceHaat. All rights reserved.
+                © {year} SpaceWallah. All rights reserved.
               </span>
               <span className="mx-2 text-slate-400" aria-hidden>
                 |

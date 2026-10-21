@@ -18,7 +18,7 @@ function imageS3Link(row: OfficeSpaceModel.OfficeSpace): string {
 function officeTitle(row: OfficeSpaceModel.OfficeSpace): string {
   const sq = row.other_detail?.area_for_lease_in_sq_ft;
   if (typeof sq === "number" && Number.isFinite(sq) && sq > 0) {
-    return `${sq.toLocaleString("en-IN")} sq. ft. office space for rent`;
+    return `${sq.toLocaleString("en-IN")} sq. ft. managed office`;
   }
   return row.name ?? "Office space";
 }
@@ -47,7 +47,7 @@ export function OfficeSpaceCard({
 
   return (
     <article className={cn("group", className)}>
-      <Link href={`/office-space/${office.slug}`} className="block">
+      <Link href={`/managed-office/${office.slug}`} className="block">
         <div className="relative aspect-[16/11] overflow-hidden rounded-lg bg-slate-100 sm:aspect-square sm:rounded-2xl">
           <Image
             src={imageS3Link(office)}
@@ -67,7 +67,7 @@ export function OfficeSpaceCard({
       <div className="mt-1.5 space-y-0.5 sm:mt-3 sm:space-y-1">
         <div className="flex items-start justify-between gap-3">
           <Link
-            href={`/office-space/${office.slug}`}
+            href={`/managed-office/${office.slug}`}
             className="min-w-0 text-[0.9rem] font-semibold leading-snug text-ink sm:text-[0.98rem]"
           >
             <span className="line-clamp-2">{title}</span>
@@ -91,7 +91,7 @@ export function OfficeSpaceCard({
             <span className="text-muted"> / per month</span>
           </div>
           <Link
-            href={`/office-space/${office.slug}`}
+            href={`/managed-office/${office.slug}`}
             className="shrink-0 text-[0.82rem] font-semibold text-[color:var(--color-brand)] underline-offset-4 transition hover:underline sm:text-[0.88rem]"
           >
             Get Quote

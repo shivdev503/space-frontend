@@ -5,7 +5,6 @@ import {
   Instagram,
   Linkedin,
   Mail,
-  MapPin,
   Phone,
 } from "lucide-react";
 import Link from "next/link";
@@ -14,7 +13,6 @@ import {
   CONTACT_EMAIL,
   CONTACT_EMAIL_HREF,
   CONTACT_HOURS,
-  CONTACT_OFFICE_ADDRESS,
   CONTACT_PHONE_DISPLAY,
   CONTACT_PHONE_HREF,
   CONTACT_SOCIAL_LINKS,
@@ -84,14 +82,8 @@ export function ContactInfoPanel() {
         {CONTACT_HOURS}
       </InfoCard>
 
-      <InfoCard icon={MapPin} title="Office address">
-        <address className="not-italic font-medium leading-relaxed text-ink">
-          {CONTACT_OFFICE_ADDRESS}
-        </address>
-      </InfoCard>
-
       <InfoCard icon={Building2} title="Coverage">
-        Pan-India — coworking, coliving, virtual office, and office space across major cities.
+        Pan-India — coworking, coliving, virtual office, and managed office across major cities.
       </InfoCard>
 
       <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-br from-[#f8faf8] via-white to-white p-5">

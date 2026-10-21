@@ -21,17 +21,17 @@ const FOOTER_PHONE_HREF = CONTACT_PHONE_HREF;
 export const FOOTER_SOCIAL_LINKS = [
   {
     label: "Facebook",
-    href: "https://www.facebook.com/profile.php?id=61591810689712",
+    href: "https://www.facebook.com/",
     Icon: Facebook,
   },
   {
     label: "Instagram",
-    href: "https://www.instagram.com/spacehaat/",
+    href: "https://www.instagram.com/spacewallah/",
     Icon: Instagram,
   },
   {
     label: "LinkedIn",
-    href: "https://www.linkedin.com/company/spacehaat",
+    href: "https://www.linkedin.com/company/spacewallah",
     Icon: Linkedin,
   },
 ] as const;
@@ -40,7 +40,7 @@ const PRIMARY_LINKS = [
   { label: "Coworking Space", href: "/coworking" },
   { label: "Coliving Space", href: "/coliving" },
   { label: "Virtual Office", href: "/virtual-office" },
-  { label: "Office Space", href: "/office-space" },
+  { label: "Managed Office", href: "/managed-office" },
 ] as const;
 
 const COMPANY_LINKS = [
@@ -101,12 +101,12 @@ export function Footer() {
             <Link
               href="/"
               className="inline-flex items-center transition-opacity hover:opacity-85"
-              aria-label="SpaceHaat — home"
+              aria-label="SpaceWallah — home"
             >
               <span className="relative block h-10 w-[11.5rem] sm:h-11 sm:w-[13rem]">
                 <Image
-                  src="/spacehaat-logo.png"
-                  alt="SpaceHaat"
+                  src="/spacewallah-logo-color.svg"
+                  alt="SpaceWallah"
                   fill
                   className="object-contain object-left"
                   sizes="208px"
@@ -120,9 +120,7 @@ export function Footer() {
             </p>
 
             <p className="mt-5 max-w-xl text-[0.9375rem] leading-relaxed text-slate-600 sm:text-base sm:leading-relaxed">
-              SpaceHaat is a premium discovery platform to compare coworking spaces, virtual
-              offices, office spaces, and coliving homes — with verified listings and expert
-              support at zero consultation cost.
+              SpaceWallah helps you compare verified coworking spaces, managed offices, virtual offices and coliving homes in cities across India, with a free advisor to shortlist, negotiate and get you moved in.
             </p>
 
             <nav aria-label="Footer quick links" className="mt-8">

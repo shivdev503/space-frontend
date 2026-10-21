@@ -8,7 +8,7 @@ const HIGHLIGHTS = [
   {
     icon: Headset,
     title: "Expert guidance",
-    description: "Dedicated advisors for coworking, coliving, virtual office, and office space.",
+    description: "Dedicated advisors for coworking, coliving, virtual office, and managed office.",
   },
   {
     icon: ShieldCheck,
@@ -29,7 +29,7 @@ export function ContactPage() {
         <div className="absolute inset-x-0 top-0 -z-10 h-[32rem] bg-[radial-gradient(circle_at_top_left,rgba(76,175,80,0.14),transparent_34%),linear-gradient(180deg,#f8faf8_0%,#ffffff_92%)]" />
         <Container className="max-w-[1100px]">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-brand)]">
-            Contact SpaceHaat
+            Contact SpaceWallah
           </p>
           <h1 className="mt-4 max-w-[16ch] font-display text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-ink sm:text-5xl">
             Let&apos;s find your perfect space

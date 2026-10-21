@@ -1,6 +1,6 @@
 import { canonicalCoworkingCitySlug } from "@/services/catalog-city-id";
 
-const VERTICAL_PREFIXES = ["coworking", "coliving", "office-space", "virtual-office"] as const;
+const VERTICAL_PREFIXES = ["coworking", "coliving", "managed-office", "virtual-office"] as const;
 
 /** Catalog city route slugs — aligned with `AVAILABLE_CITY` names in cities-data. */
 const CATALOG_CITY_NAMES = [

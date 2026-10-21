@@ -8,7 +8,17 @@ import {
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 
 export function CoworkingDetailAmenities({ workspace }: { workspace: CoworkingModel.WorkSpace }) {
-  const amenities = (workspace.amenties ?? []).map((a) => a.name).filter(Boolean);
+  // The API can list the same amenity twice (e.g. "Workshops") — show each name once.
+  const seen = new Set<string>();
+  const amenities = (workspace.amenties ?? [])
+    .map((a) => a.name?.trim())
+    .filter((name): name is string => {
+      if (!name) return false;
+      const key = name.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
   if (!amenities.length) return null;
 
   return (

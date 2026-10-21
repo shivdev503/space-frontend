@@ -70,8 +70,8 @@ export function MobileMenuDrawer({
             <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200/70 px-5 pb-4 pt-[max(1rem,env(safe-area-inset-top))]">
               <Link href="/" onClick={onClose} className="flex items-center">
                 <Image
-                  src="/spacehaat-logo.png"
-                  alt="SpaceHaat"
+                  src="/spacewallah-logo-color.svg"
+                  alt="SpaceWallah"
                   width={168}
                   height={40}
                   className="h-8 w-auto object-contain"
