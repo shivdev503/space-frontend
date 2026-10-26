@@ -26,11 +26,15 @@ export const metadata: Metadata = {
   description:
     "Discover coworking spaces, virtual offices, and managed offices across India with a premium lead-generation experience.",
   manifest: "/site.webmanifest",
+  // app/favicon.ico (16/32/48) is added by Next automatically. Google Search wants a square icon
+  // whose size is a multiple of 48px; iOS ignores SVG touch icons, so both get PNGs.
   icons: {
     icon: [
+      { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/spacewallah-app-icon.svg", sizes: "any", type: "image/svg+xml" },
     ],
-    apple: [{ url: "/spacewallah-app-icon.svg", sizes: "1024x1024", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
 };
 
