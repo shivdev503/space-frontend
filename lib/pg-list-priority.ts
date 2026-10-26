@@ -41,6 +41,21 @@ export function withPgPriorityOnly(params: PgListParams): PgListParams {
   };
 }
 
+/**
+ * City names as stored on PG records. The PG API matches `city` by substring, so a page
+ * label like "Bangalore" finds nothing when listings say "Bengaluru".
+ */
+const PG_API_CITY_NAMES: Record<string, string> = {
+  bangalore: "Bengaluru",
+  gurgaon: "Gurugram",
+};
+
+/** City value to send to `GET /api/user/pgs` for a city page's display name. */
+export function pgApiCityName(cityDisplayName: string): string {
+  const name = cityDisplayName.trim();
+  return PG_API_CITY_NAMES[name.toLowerCase()] ?? name;
+}
+
 export function buildPgColivingCityPageParams(
   catalogCityId: string | undefined,
   cityDisplayName: string,
@@ -48,7 +63,7 @@ export function buildPgColivingCityPageParams(
 ): PgListParams {
   const base: PgListParams = {
     ...listParams,
-    city: cityDisplayName.trim() || listParams.city,
+    city: pgApiCityName(cityDisplayName) || listParams.city,
     sortBy: listParams.sortBy ?? "added_on",
     orderBy: listParams.orderBy ?? -1,
   };
@@ -70,7 +85,7 @@ export function buildPgColivingLocationPageParams(
     sortBy: "added_on",
     orderBy: -1,
     ...overrides,
-    city: cityDisplayName.trim(),
+    city: pgApiCityName(cityDisplayName),
     locality: localityName.trim(),
   };
   if (catalogCityId?.trim()) {

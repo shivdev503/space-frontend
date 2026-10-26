@@ -916,7 +916,8 @@ export function VoCityFaqSection({
                     </span>
                   </button>
                 </h3>
-                {isOpen ? <p className="px-6 pb-6 text-[16px] leading-[1.75] text-muted">{faq.a}</p> : null}
+                {/* Always in the HTML so crawlers can read every answer; closed ones are hidden with CSS. */}
+                <p className={cn("px-6 pb-6 text-[16px] leading-[1.75] text-muted", !isOpen && "hidden")}>{faq.a}</p>
               </div>
             );
           })}

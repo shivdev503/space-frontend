@@ -133,6 +133,18 @@ export function coworkingFiltersToSearchParams(filters: CoworkingListFilterState
   return qs;
 }
 
+/** Listing page size — shared by the server's first page and the client's "Load more". */
+export const COWORKING_LIST_PAGE_SIZE = 24;
+
+/**
+ * Stable key for the listing-relevant query (price + sort). The server renders page 1 for
+ * this key; the client skips its first fetch when the URL still matches.
+ */
+export function coworkingListQueryKey(sp: URLSearchParams): string {
+  const filters = parseCoworkingListFiltersFromSearchParams(sp);
+  return `${coworkingFiltersToSearchParams(filters).toString()}|${sp.has("sortBy") ? "sort" : ""}`;
+}
+
 /** Client-side fallback when upstream ignores price query params. */
 export function applyCoworkingListFiltersClient(
   rows: { starting_price?: number }[],

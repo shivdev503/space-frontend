@@ -29,6 +29,7 @@ export function ColivingLocationPage({
           <Breadcrumb
             vertical={data.vertical}
             citySlug={data.citySlug}
+            cityName={data.city.name}
             locationName={data.locationName}
           />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--color-brand)]">

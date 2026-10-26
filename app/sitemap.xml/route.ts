@@ -1,15 +1,9 @@
-import { buildSitemapIndexXml } from "@/lib/sitemap-xml";
 import { buildRootSitemapIndexEntries } from "@/lib/sitemap-public-urls";
+import { xmlResponse } from "@/lib/sitemap-route-response";
+import { buildSitemapIndexXml } from "@/lib/sitemap-xml";
 
 export const dynamic = "force-static";
 
 export function GET() {
-  const lastmod = new Date();
-  const xml = buildSitemapIndexXml(buildRootSitemapIndexEntries(lastmod), { preserveOrder: true });
-  return new Response(xml, {
-    headers: {
-      "Content-Type": "application/xml; charset=utf-8",
-      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
-    },
-  });
+  return xmlResponse(buildSitemapIndexXml(buildRootSitemapIndexEntries(), { preserveOrder: true }));
 }

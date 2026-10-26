@@ -13,6 +13,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/add", "/api/"],
       },
     ],
-    sitemap: [`${base}/sitemap.xml`, `${base}/sitemap`],
+    sitemap: `${base}/sitemap.xml`,
   };
 }

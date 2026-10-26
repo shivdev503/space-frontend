@@ -109,7 +109,7 @@ function VoHomeHero() {
         <div className="mt-8 grid items-center gap-12 lg:grid-cols-[1fr_0.98fr] lg:gap-14">
           <div className="min-w-0">
             <h1 className="vo-display text-[2.5rem] font-extrabold leading-[1.04] tracking-[-0.04em] text-ink sm:text-[3.25rem] lg:text-[3.1rem] xl:text-[3.4rem]">
-              Virtual Office in India
+              Virtual Office in India{" "}
               <span className="block text-brand">for GST and Company Registration</span>
             </h1>
 

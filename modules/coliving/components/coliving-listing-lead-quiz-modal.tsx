@@ -17,11 +17,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { RemoteImage } from "@/components/ui/remote-image";
 import { buildUserEnquiryBody } from "@/lib/user-enquiry-payload";
 import type { PgOwnerContact } from "@/lib/pg-owner-contact";
+import { roomOccupancy } from "@/lib/pg-room-occupancy";
 import { resolvePgListingSlug, slugifyPgName } from "@/lib/pg-slug";
 import { ColivingOwnerContactSuccess } from "@/modules/coliving/components/coliving-owner-contact-success";
 import { pgStartingRent } from "@/services/pg-mapper";
 import { fetchPgOwnerContact } from "@/services/pg-owner-contact-api";
 import { submitUserEnquiry } from "@/services/user-enquiry-api";
+import { ratingLabel } from "@/lib/rating-label";
 import type { PgDetail } from "@/types/pg.model";
 import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/format";
@@ -60,11 +62,7 @@ function inferRoomIcon(name: string): RoomIcon {
 }
 
 function roomSubtitle(name: string): string {
-  const n = name.toLowerCase();
-  if (n.includes("triple")) return "3 beds, most chosen";
-  if (n.includes("double")) return "2 beds, attached bath";
-  if (n.includes("single") || n.includes("private")) return "1 bed, private bath";
-  return "Fully furnished, attached bath";
+  return roomOccupancy(name) || "Ask about this room";
 }
 
 function buildRoomOptions(pg: PgDetail): RoomOption[] {
@@ -109,7 +107,7 @@ export function ColivingListingLeadQuizModal({
   const roomOptions = useMemo(() => buildRoomOptions(pg), [pg]);
   const minPrice = pg.rentRange.min ?? pgStartingRent(pg);
   const maxPrice = pg.rentRange.max ?? Math.max(...pg.rooms.map((r) => r.rent ?? 0), minPrice);
-  const rating = pg.rating > 0 ? pg.rating.toFixed(2) : "4.86";
+  const rating = ratingLabel(pg.rating, pg.reviews?.length);
   const findKey = spaceListingId?.trim() || resolvePgListingSlug(pg);
 
   const [step, setStep] = useState(1);
@@ -285,10 +283,14 @@ export function ColivingListingLeadQuizModal({
                   )}
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-[12.5px] text-ink/90">
-                  <span>
-                    <span className="text-amber-500">★</span> {rating}, 38 reviews
-                  </span>
-                  <span className="text-slate-300">,</span>
+                  {rating ? (
+                    <>
+                      <span>
+                        <span className="text-amber-500">★</span> {rating}
+                      </span>
+                      <span className="text-slate-300">·</span>
+                    </>
+                  ) : null}
                   <span className="inline-flex items-center gap-1.5 font-medium text-[color:var(--color-brand)]">
                     <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
                     Zero brokerage

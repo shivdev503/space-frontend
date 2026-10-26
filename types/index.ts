@@ -1,3 +1,5 @@
+import type { CoworkingModel } from "@/types/coworking-workspace.model";
+
 export type SpaceVertical = "coworking" | "virtual-office" | "office-space" | "coliving";
 
 export type SpacePlan = {
@@ -198,6 +200,14 @@ export type CityPageFilters = {
   brand?: string;
 };
 
+/** Page 1 of a coworking listing, fetched on the server so listings are in the HTML. */
+export type InitialCoworkingListing = {
+  rows: CoworkingModel.WorkSpace[];
+  totalRecords: number;
+  /** Normalised query string the rows were fetched for (client skips its first fetch on match). */
+  query: string;
+};
+
 export type CityPageData = {
   vertical: SpaceVertical;
   city: City;
@@ -207,6 +217,7 @@ export type CityPageData = {
   subtitle: string;
   totalSpaces: number;
   spaces: Space[];
+  initialCoworkingListing?: InitialCoworkingListing;
   filters: {
     budgets: SearchOption[];
     teamSizes: SearchOption[];
@@ -238,6 +249,7 @@ export type LocationPageData = {
    * Differs from `locationSlug` when the URL uses a slug/key; resolved via micro-locations API.
    */
   workspaceMicroLocationId?: string;
+  initialCoworkingListing?: InitialCoworkingListing;
   citySlug: string;
   locationSlug: string;
   locationName: string;

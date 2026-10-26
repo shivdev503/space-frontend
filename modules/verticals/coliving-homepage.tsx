@@ -36,14 +36,16 @@ export function ColivingHomepage({ data, featuredPgs = [] }: ColivingHomepagePro
 
       <ColivingWhySpaceWallahLiving />
 
-      <SectionWrapper>
-        <SectionHeading title="Featured coliving space listings" />
-        {featuredPgs.length > 0 ? (
-          <ColivingFeaturedRail listings={featuredPgs} />
-        ) : (
-          <SpaceRail spaces={data.featuredSpaces} />
-        )}
-      </SectionWrapper>
+      {featuredPgs.length > 0 || data.featuredSpaces.length > 0 ? (
+        <SectionWrapper>
+          <SectionHeading title="Featured coliving space listings" />
+          {featuredPgs.length > 0 ? (
+            <ColivingFeaturedRail listings={featuredPgs} />
+          ) : (
+            <SpaceRail spaces={data.featuredSpaces} />
+          )}
+        </SectionWrapper>
+      ) : null}
 
       <ColivingWhatsInside />
 

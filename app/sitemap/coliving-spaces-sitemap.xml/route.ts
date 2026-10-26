@@ -1,10 +1,9 @@
-import { collectColivingSpacesSitemapUrls } from "@/lib/sitemap-public-urls";
-import { sitemapXmlResponse } from "@/lib/sitemap-route-response";
-import { loadColivingDetailSitemapUrls } from "@/services/pg-api";
+import { sitemapEntriesResponse } from "@/lib/sitemap-route-response";
+import { collectColivingSpacesSitemapEntries } from "@/lib/sitemap-public-urls";
 
+/** Built from live listings on request; cached for an hour (see sitemap-inventory). */
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  const urls = await loadColivingDetailSitemapUrls();
-  return sitemapXmlResponse(urls.length ? urls : collectColivingSpacesSitemapUrls());
+export function GET() {
+  return sitemapEntriesResponse(collectColivingSpacesSitemapEntries);
 }

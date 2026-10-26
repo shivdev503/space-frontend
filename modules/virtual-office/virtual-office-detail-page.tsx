@@ -1,4 +1,6 @@
+import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { Container } from "@/components/ui/container";
+import { listingTrail } from "@/lib/breadcrumb-trails";
 import { buildMapsLink } from "@/lib/space-detail-map";
 import { VirtualOfficeDetailGallery } from "@/modules/virtual-office/components/virtual-office-detail-gallery";
 import { VirtualOfficeDetailHeader } from "@/modules/virtual-office/components/virtual-office-detail-header";
@@ -36,6 +38,12 @@ export function VirtualOfficeDetailPage({
 
   return (
     <>
+      <Container>
+        <Breadcrumbs
+          className="pt-4 sm:pt-5"
+          items={listingTrail("virtual-office", { name: space.name, cityName: space.city })}
+        />
+      </Container>
       <VirtualOfficeDetailGallery space={space} />
 
       <section className="pb-6">

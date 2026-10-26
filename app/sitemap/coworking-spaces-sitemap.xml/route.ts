@@ -1,8 +1,9 @@
-import { sitemapXmlResponse } from "@/lib/sitemap-route-response";
-import { collectCoworkingSpacesSitemapUrls } from "@/lib/sitemap-public-urls";
+import { sitemapEntriesResponse } from "@/lib/sitemap-route-response";
+import { collectCoworkingSpacesSitemapEntries } from "@/lib/sitemap-public-urls";
 
-export const dynamic = "force-static";
+/** Built from live listings on request; cached for an hour (see sitemap-inventory). */
+export const dynamic = "force-dynamic";
 
 export function GET() {
-  return sitemapXmlResponse(collectCoworkingSpacesSitemapUrls());
+  return sitemapEntriesResponse(collectCoworkingSpacesSitemapEntries);
 }

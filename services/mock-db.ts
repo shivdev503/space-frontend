@@ -19,6 +19,7 @@ import {
   VerticalLandingData,
   WhySpaceWallahItem,
 } from "@/types";
+import { seedListingsEnabled } from "@/lib/seed-listings";
 import { canonicalCoworkingCitySlug, getCatalogCityIdBySlug } from "@/services/catalog-city-id";
 import { listHomepageCitiesFromAvailable } from "@/services/homepage-available-cities";
 
@@ -740,7 +741,8 @@ const seedCities: City[] = [
 ];
 
 const trustMetrics: TrustMetric[] = [
-  { id: "metric_001", value: 1000, suffix: "+", label: "spaces across premium districts" },
+  { id: "metric_001", value: 1000, suffix: "+", label: "Coworking spaces" },
+  { id: "metric_004", value: 10000, suffix: "+", label: "Coliving & PG options" },
   { id: "metric_002", value: 11, suffix: "+", label: "top cities covered" },
   { id: "metric_003", value: 250, suffix: "+", label: "startup and enterprise clients served" },
 ];
@@ -769,7 +771,7 @@ const brands: Brand[] = [
     category: "Operator",
     image:
       "https://img.spacewallah.com/images/latest_images_2024/3a4f25ddb65a1444dc67dc4b0a2b60d6e7648ad0.webp",
-    url: "/brand/wework",
+    // No live centres yet, so no brand page to link to.
   },
   {
     id: "brand_004",
@@ -801,7 +803,7 @@ const brands: Brand[] = [
     category: "Operator",
     image:
       "https://img.spacewallah.com/images/latest_images_2024/3e9de30708805d8e117d8b0914f479ca583a9595.webp",
-    url: "/brand/instaoffice",
+    // No live centres yet, so no brand page to link to.
   },
 ];
 
@@ -913,6 +915,11 @@ const seedLeads: Lead[] = [
 let spaces = [...seedSpaces];
 let leads = [...seedLeads];
 
+/** Sample listings are hidden in production — nothing reads `spaces` directly except admin mutators. */
+function visibleSpaces(): Space[] {
+  return seedListingsEnabled() ? spaces : [];
+}
+
 function matchesBudget(space: Space, budget?: string) {
   if (!budget) return true;
 
@@ -941,7 +948,7 @@ export function listSpaces(filters?: {
   amenity?: string;
   budget?: string;
 }) {
-  return spaces.filter((space) => {
+  return visibleSpaces().filter((space) => {
     if (filters?.vertical && space.vertical !== filters.vertical) return false;
     if (filters?.city && space.city !== filters.city) return false;
     if (filters?.location && space.location !== filters.location) return false;
@@ -2190,12 +2197,12 @@ export function getVerticalLandingData(vertical: SpaceVertical): VerticalLanding
 }
 
 export function getSpaceById(id: string) {
-  return spaces.find((space) => space.id === id) ?? null;
+  return visibleSpaces().find((space) => space.id === id) ?? null;
 }
 
 export function getSpaceBySlug(slug: string, vertical?: SpaceVertical) {
   return (
-    spaces.find(
+    visibleSpaces().find(
       (space) => space.slug === slug && (!vertical || space.vertical === vertical),
     ) ?? null
   );

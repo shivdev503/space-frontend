@@ -12,7 +12,7 @@ export type VoHomeCity = {
 };
 
 const CITIES: Array<{ name: string; slug: string }> = [
-  { name: "Gurugram", slug: "gurugram" },
+  { name: "Gurugram", slug: "gurgaon" },
   { name: "Noida", slug: "noida" },
   { name: "Delhi", slug: "delhi" },
   { name: "Mumbai", slug: "mumbai" },

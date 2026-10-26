@@ -7,7 +7,7 @@ import { ColivingLeadQuizProvider } from "@/modules/coliving/components/detail/c
 import { ColivingDetailMain } from "@/modules/coliving/components/detail/coliving-detail-main";
 import { ColivingDetailMobileBar } from "@/modules/coliving/components/detail/coliving-detail-mobile-bar";
 import { ColivingDetailSimilarGrid } from "@/modules/coliving/components/detail/coliving-detail-similar-grid";
-import { slugifyPgName } from "@/lib/pg-slug";
+import { routeCitySlug } from "@/lib/breadcrumb-trails";
 import { pgDetailToSpace, pgImagesSorted, pgStartingRent } from "@/services/pg-mapper";
 import type { PgDetail, PgDetailResponse } from "@/types/pg.model";
 
@@ -48,6 +48,7 @@ export function ColivingDetailPage({ response, similar }: ColivingDetailPageProp
               spaceListingId={id}
               localityLabel={pg.locality}
               ownerNameFallback={pg.postedBy}
+              reviewCount={pg.reviews.length}
             />
           </div>
         </Container>
@@ -55,11 +56,11 @@ export function ColivingDetailPage({ response, similar }: ColivingDetailPageProp
         <ColivingDetailSimilarGrid
           items={similar}
           city={pg.city}
-          citySlug={slugifyPgName(pg.city)}
+          citySlug={routeCitySlug(pg.city)}
           locality={pg.locality}
           currentName={pg.name}
         />
-        <ColivingDetailMobileBar space={space} />
+        <ColivingDetailMobileBar space={space} reviewCount={pg.reviews.length} />
       </div>
     </ColivingLeadQuizProvider>
   );

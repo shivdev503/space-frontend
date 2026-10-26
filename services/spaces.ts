@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 
-import { canonicalCoworkingCitySlug } from "@/services/catalog-city-id";
-import { loadCoworkingWorkspaceDetail } from "@/services/coworking-api";
+import { seedListingsEnabled } from "@/lib/seed-listings";
+import { canonicalCoworkingCitySlug, getCatalogCityIdBySlug } from "@/services/catalog-city-id";
+import { loadCoworkingWorkspaceDetail, loadCoworkingWorkspacesList } from "@/services/coworking-api";
 import {
   coworkingApiWorkspaceToSpace,
   deriveAppCitySlugFromWorkspace,
@@ -11,24 +12,9 @@ import { getCityPageData, getSpaceBySlug, listSpaces } from "@/services/mock-db"
 import type { Space } from "@/types";
 import { SpaceVertical } from "@/types";
 
-export async function getFeaturedSpaces() {
-  return listSpaces({ featured: true });
-}
-
-export async function getVerticalSpaces(vertical: SpaceVertical) {
-  return listSpaces({ vertical });
-}
-
-export async function getCitySpaces(vertical: SpaceVertical, city: string) {
-  return listSpaces({ vertical, city });
-}
-
-export async function getLocationSpaces(
-  vertical: SpaceVertical,
-  city: string,
-  location: string,
-) {
-  return listSpaces({ vertical, city, location });
+/** Sample listings for a city — empty in production (see {@link seedListingsEnabled}). */
+function seedCitySpaces(vertical: SpaceVertical, city: string): Space[] {
+  return seedListingsEnabled() ? listSpaces({ vertical, city }) : [];
 }
 
 export async function getVerticalSpaceBySlug(vertical: SpaceVertical, slug: string) {
@@ -40,15 +26,27 @@ export async function getVerticalSpaceBySlug(vertical: SpaceVertical, slug: stri
     const ws = await loadCoworkingWorkspaceDetail(slug);
     if (ws) return virtualOfficeApiWorkspaceToSpace(ws, deriveAppCitySlugFromWorkspace(ws));
   }
-  return getSpaceBySlug(slug, vertical);
+  return seedListingsEnabled() ? getSpaceBySlug(slug, vertical) : undefined;
 }
 
+/** Up to 6 other listings in the city — real virtual offices from the API, never demo rows in production. */
 export async function getSimilarSpaces(
   vertical: SpaceVertical,
   city: string,
   excludeSpaceId: string,
-) {
-  return listSpaces({ vertical, city })
+): Promise<Space[]> {
+  if (vertical === "virtual-office") {
+    const cityId = getCatalogCityIdBySlug(city);
+    if (cityId) {
+      const payload = await loadCoworkingWorkspacesList(cityId, 8, undefined, undefined, true);
+      const real = payload.data
+        .filter((ws) => (ws.id || ws._id) !== excludeSpaceId)
+        .slice(0, 6)
+        .map((ws) => virtualOfficeApiWorkspaceToSpace(ws, city));
+      if (real.length > 0 || !seedListingsEnabled()) return real;
+    }
+  }
+  return seedCitySpaces(vertical, city)
     .filter((space) => space.id !== excludeSpaceId)
     .slice(0, 6);
 }
@@ -62,7 +60,7 @@ export async function resolveVerticalSegment(vertical: SpaceVertical, segment: s
       ? canonicalCoworkingCitySlug(segment.trim())
       : segment.trim();
 
-  const spacesByCity = await getCitySpaces(vertical, cityKey);
+  const spacesByCity = seedCitySpaces(vertical, cityKey);
 
   if (spacesByCity.length > 0) {
     return { type: "city" as const, city: cityKey, spaces: spacesByCity };
@@ -87,7 +85,7 @@ export async function resolveVerticalSegment(vertical: SpaceVertical, segment: s
     }
   }
 
-  const space = getSpaceBySlug(segment, vertical);
+  const space = seedListingsEnabled() ? getSpaceBySlug(segment, vertical) : undefined;
   if (!space) notFound();
 
   return { type: "detail" as const, space };

@@ -5,16 +5,22 @@ import { notFound } from "next/navigation";
 import { VerticalCityPage } from "@/modules/city-pages/vertical-city-page";
 import { CoworkingDetailPage } from "@/modules/coworking/coworking-detail-page";
 import { getVerticalCityPageContent } from "@/services/cities";
-import { loadCoworkingWorkspaceDetail, loadCoworkingWorkspacesList } from "@/services/coworking-api";
+import {
+  loadCoworkingWorkspaceDetail,
+  loadCoworkingWorkspacesList,
+  loadInitialCoworkingListing,
+} from "@/services/coworking-api";
+import { coworkingMarketStats } from "@/services/market-stats";
 import { resolveVerticalSegment } from "@/services/spaces";
-import { workspaceDescriptionText, workspaceSeo } from "@/lib/coworking-workspace-content";
+import { workspaceSeo } from "@/lib/coworking-workspace-content";
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
 import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
 import { seoFaqsOrFallback } from "@/lib/seo-page-faqs";
 import { buildPageMetadataFromSeo } from "@/lib/seo-metadata";
 import { seoPageTitleOrFallback } from "@/lib/seo-page-title";
+import { coworkingCitySeo, coworkingListingSeo } from "@/lib/seo-templates";
 import { getSeoBySlug } from "@/services/seo-content";
-import { formatCurrency, toTitleCase } from "@/utils/format";
+import { toTitleCase } from "@/utils/format";
 
 export async function generateMetadata({
   params,
@@ -25,10 +31,11 @@ export async function generateMetadata({
 
   const cityPage = await getVerticalCityPageContent("coworking", segment);
   if (cityPage) {
-    return buildMetadataWithCmsSeoFallback(`/coworking/${cityPage.city.slug}`, {
-      title: cityPage.title,
-      description: cityPage.subtitle,
-    });
+    const stats = await coworkingMarketStats(cityPage.city.slug);
+    return buildMetadataWithCmsSeoFallback(
+      `/coworking/${cityPage.city.slug}`,
+      coworkingCitySeo(cityPage.city.name, stats),
+    );
   }
 
   const workspace = await loadCoworkingWorkspaceDetail(segment);
@@ -37,13 +44,7 @@ export async function generateMetadata({
     const spaceSeo = workspaceSeo(workspace);
     if (spaceSeo) return buildPageMetadataFromSeo(pathname, spaceSeo);
 
-    const summary = workspaceDescriptionText(workspace).slice(0, 160).trim();
-    return buildMetadataWithCmsSeoFallback(pathname, {
-      title: `${workspace.name} | Coworking Space`,
-      description: `${summary} Starting from ${formatCurrency(workspace.starting_price ?? 0)} in ${toTitleCase(
-        workspace.location?.city?.name || "India",
-      )}.`,
-    });
+    return buildMetadataWithCmsSeoFallback(pathname, coworkingListingSeo(workspace));
   }
 
   return buildMetadataWithCmsSeoFallback(`/coworking/${segment}`, {
@@ -54,23 +55,29 @@ export async function generateMetadata({
 
 export default async function CoworkingSegmentPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ segment: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { segment } = await params;
+  const [{ segment }, sp] = await Promise.all([params, searchParams]);
   const result = await resolveVerticalSegment("coworking", segment);
 
   if (result.type === "city") {
     const cityData = await getVerticalCityPageContent("coworking", segment);
     if (!cityData) notFound();
     const pathname = `/coworking/${cityData.city.slug}`;
-    const seo = await getSeoBySlug(pathnameToSeoSlug(pathname));
+    const [seo, initialCoworkingListing] = await Promise.all([
+      getSeoBySlug(pathnameToSeoSlug(pathname)),
+      loadInitialCoworkingListing(cityData.catalogCityId ?? "", sp),
+    ]);
     return (
       <VerticalCityPage
         data={{
           ...cityData,
           title: seoPageTitleOrFallback(seo, cityData.title),
           faqs: seoFaqsOrFallback(seo, cityData.faqs),
+          initialCoworkingListing,
         }}
       />
     );

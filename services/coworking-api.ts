@@ -44,7 +44,14 @@ import {
   getSpaceBySlug,
   listSpaces,
 } from "@/services/mock-db";
-import type { CityPageFilters, Space, SpaceVertical } from "@/types";
+import {
+  applyCoworkingListFiltersClient,
+  COWORKING_LIST_PAGE_SIZE,
+  coworkingFiltersToApiParams,
+  coworkingListQueryKey,
+  parseCoworkingListFiltersFromSearchParams,
+} from "@/lib/coworking-list-filters";
+import type { CityPageFilters, InitialCoworkingListing, Space, SpaceVertical } from "@/types";
 import { CoworkingModel } from "@/types/coworking-workspace.model";
 import { withResolvedStartingPrice as normalizeCoworkingWorkspacePricing } from "@/services/workspace-plan-pricing";
 
@@ -287,6 +294,41 @@ export async function loadCoworkingWorkspacesPageForCity(
     ...listFilters,
     page,
   });
+}
+
+/**
+ * Page 1 of a coworking city/locality listing for server rendering, using the same filters
+ * the client reads from the URL. Undefined when nothing loads, so the client fetches itself.
+ */
+export async function loadInitialCoworkingListing(
+  catalogCityId: string,
+  searchParams: Record<string, string | string[] | undefined>,
+  microLocationId?: string,
+): Promise<InitialCoworkingListing | undefined> {
+  if (!catalogCityId.trim()) return undefined;
+  const sp = new URLSearchParams();
+  for (const [key, value] of Object.entries(searchParams)) {
+    if (typeof value === "string") sp.set(key, value);
+    else if (Array.isArray(value) && value[0] != null) sp.set(key, value[0]);
+  }
+  const filters = parseCoworkingListFiltersFromSearchParams(sp);
+  const apiFilters = coworkingFiltersToApiParams(filters, { includeSortInRequest: sp.has("sortBy") });
+  const payload = await loadCoworkingWorkspacesPageForCity(
+    catalogCityId,
+    COWORKING_LIST_PAGE_SIZE,
+    1,
+    microLocationId,
+    false,
+    apiFilters,
+  );
+  const rows = applyCoworkingListFiltersClient(payload.data ?? [], filters) as CoworkingModel.WorkSpace[];
+  if (rows.length === 0) return undefined;
+  const total = payload.meta?.totalRecords ?? payload.meta?.total;
+  return {
+    rows,
+    totalRecords: typeof total === "number" && Number.isFinite(total) ? total : rows.length,
+    query: coworkingListQueryKey(sp),
+  };
 }
 
 /** Homepage / header search: name filter on the same workspaces list endpoint. */

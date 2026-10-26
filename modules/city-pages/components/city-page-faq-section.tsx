@@ -1,9 +1,13 @@
+import { FaqPageJsonLd } from "@/components/seo/faq-page-json-ld";
 import { Container } from "@/components/ui/container";
 import type { FAQItem } from "@/types";
 
 export function CityPageFaqSection({ pageTitle, faqs }: { pageTitle: string; faqs: FAQItem[] }) {
+  if (!faqs.length) return null;
+
   return (
     <section className="pb-28 sm:pb-20">
+      <FaqPageJsonLd faqs={faqs} />
       <Container>
         <div className="max-w-4xl">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-brand)]">FAQs</p>

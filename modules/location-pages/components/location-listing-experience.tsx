@@ -19,6 +19,7 @@ export function LocationListingExperience({ data }: LocationListingExperiencePro
         locationLabel={data.locationName}
         microLocationId={data.workspaceMicroLocationId}
         seedSpaces={data.spaces}
+        initialListing={data.initialCoworkingListing}
         showPopularLocalities={false}
       />
     );

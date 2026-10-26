@@ -1,3 +1,4 @@
+import { cityTrail } from "@/lib/breadcrumb-trails";
 import { Container } from "@/components/ui/container";
 import { CityPageFaqSection } from "@/modules/city-pages/components/city-page-faq-section";
 import { CityPageHero } from "@/modules/city-pages/components/city-page-hero";
@@ -9,7 +10,7 @@ import type { CityPageData } from "@/types";
 export function CoworkingCityPage({ data }: { data: CityPageData }) {
   return (
     <>
-      <CityPageHero title={data.title}>
+      <CityPageHero title={data.title} breadcrumbs={cityTrail(data.vertical, data.city.name)}>
         {data.catalogCityId ? (
           <PopularLocalitiesRail
             catalogCityId={data.catalogCityId}

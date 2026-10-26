@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react";
 
+import { FaqPageJsonLd } from "@/components/seo/faq-page-json-ld";
 import { Container } from "@/components/ui/container";
 import { FAQItem } from "@/types";
 import { cn } from "@/utils/cn";
@@ -15,6 +16,7 @@ export function FAQSection({ faqs, locationName, className }: FAQSectionProps) {
 
   return (
     <section className={cn("bg-[#f9f8f5] pb-14 pt-4 sm:pb-20 sm:pt-6", className)}>
+      <FaqPageJsonLd faqs={faqs} />
       <Container>
         <div className="max-w-4xl">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-brand)]">

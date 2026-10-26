@@ -1,4 +1,4 @@
-/** Sitemap urlset row. */
+/** Sitemap urlset row. `lastmod` is emitted only when known — never a placeholder "now". */
 export type SitemapUrlEntry = {
   loc: string;
   lastmod?: Date;
@@ -17,7 +17,7 @@ export type SitemapUrlEntry = {
 /** Sitemap index row (child sitemap document). */
 export type SitemapIndexEntry = {
   loc: string;
-  lastmod: Date;
+  lastmod?: Date;
 };
 
 export function escapeXml(text: string): string {
@@ -58,11 +58,13 @@ const SITEMAPINDEX_OPEN = `<?xml version="1.0" encoding="UTF-8"?>
 const SITEMAPINDEX_CLOSE = `</sitemapindex>
 `;
 
-function renderUrlBlock(entry: SitemapUrlEntry, fallbackLastmod: Date): string {
-  const lastmod = formatSitemapLastmod(entry.lastmod ?? fallbackLastmod);
+function renderUrlBlock(entry: SitemapUrlEntry): string {
   let inner = `  <url>
-    <loc>${escapeXml(entry.loc)}</loc>
-    <lastmod>${lastmod}</lastmod>`;
+    <loc>${escapeXml(entry.loc)}</loc>`;
+  if (entry.lastmod) {
+    inner += `
+    <lastmod>${formatSitemapLastmod(entry.lastmod)}</lastmod>`;
+  }
   if (entry.changefreq !== undefined) {
     inner += `
     <changefreq>${entry.changefreq}</changefreq>`;
@@ -77,15 +79,17 @@ function renderUrlBlock(entry: SitemapUrlEntry, fallbackLastmod: Date): string {
 }
 
 function renderSitemapIndexBlock(entry: SitemapIndexEntry): string {
+  const lastmod = entry.lastmod
+    ? `
+    <lastmod>${formatSitemapLastmod(entry.lastmod)}</lastmod>`
+    : "";
   return `  <sitemap>
-    <loc>${escapeXml(entry.loc)}</loc>
-    <lastmod>${formatSitemapLastmod(entry.lastmod)}</lastmod>
+    <loc>${escapeXml(entry.loc)}</loc>${lastmod}
   </sitemap>`;
 }
 
 export function buildUrlsetXml(
   entries: SitemapUrlEntry[],
-  fallbackLastmod = new Date(),
   options?: { sortByLoc?: boolean; minimalNamespace?: boolean },
 ): string {
   const sortByLoc = options?.sortByLoc !== false;
@@ -93,7 +97,7 @@ export function buildUrlsetXml(
     ? [...entries].sort((a, b) => a.loc.localeCompare(b.loc))
     : [...entries];
   const open = options?.minimalNamespace ? URLSET_OPEN_MINIMAL : URLSET_OPEN_FULL;
-  const body = list.map((e) => renderUrlBlock(e, fallbackLastmod)).join("\n");
+  const body = list.map((e) => renderUrlBlock(e)).join("\n");
   return `${open}${body}
 ${URLSET_CLOSE}`;
 }
@@ -109,13 +113,4 @@ export function buildSitemapIndexXml(
   const body = list.map((e) => renderSitemapIndexBlock(e)).join("\n");
   return `${SITEMAPINDEX_OPEN}${body}
 ${SITEMAPINDEX_CLOSE}`;
-}
-
-/** Simple url-only lists (child sitemaps): uniform lastmod, no priority. */
-export function mapLocsToEntries(urls: string[], lastmod = new Date()): SitemapUrlEntry[] {
-  return dedupeSorted(urls).map((loc) => ({ loc, lastmod }));
-}
-
-function dedupeSorted(urls: string[]): string[] {
-  return Array.from(new Set(urls)).sort((a, b) => a.localeCompare(b));
 }

@@ -39,7 +39,7 @@ function BannerCopy() {
   return (
     <>
       <h2 className="font-display text-[1.85rem] font-bold leading-[1.08] tracking-[-0.035em] text-white sm:text-[2rem] md:text-[2.25rem] lg:text-[2.5rem] xl:text-[2.65rem] xl:leading-[1.05]">
-        <span className="block">Earn as a</span>
+        <span className="block">Earn as a</span>{" "}
         <span className="block">SpaceWallah Host</span>
       </h2>
       <p className="mt-4 text-base font-normal leading-relaxed text-white/95 md:mt-5 md:text-lg lg:text-xl">

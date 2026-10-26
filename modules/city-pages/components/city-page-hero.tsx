@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 
+import { type BreadcrumbItem, Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { cn } from "@/utils/cn";
@@ -7,10 +8,12 @@ import { cn } from "@/utils/cn";
 export function CityPageHero({
   eyebrow,
   title,
+  breadcrumbs,
   children,
 }: {
   eyebrow?: string;
   title: string;
+  breadcrumbs?: BreadcrumbItem[];
   children?: ReactNode;
 }) {
   const hasRail = Boolean(children);
@@ -24,6 +27,7 @@ export function CityPageHero({
       <div className="absolute inset-x-0 top-0 -z-10 h-[28rem] bg-[radial-gradient(circle_at_top_left,rgba(48,88,215,0.12),transparent_32%),linear-gradient(180deg,#f8fbff_0%,#ffffff_92%)]" />
       <Container>
         <div className="max-w-4xl">
+          {breadcrumbs ? <Breadcrumbs items={breadcrumbs} className="mb-3 sm:mb-4" /> : null}
           {eyebrow ? (
             <Badge className="bg-[color:var(--color-brand-soft)] text-[color:var(--color-brand)]">
               {eyebrow}

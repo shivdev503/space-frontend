@@ -1,12 +1,23 @@
 import type { SitemapIndexEntry, SitemapUrlEntry } from "@/lib/sitemap-xml";
-import { canonicalCoworkingCitySlug } from "@/services/catalog-city-id";
-import { resolveAppUrl } from "@/services/env-config";
-import { listHomepageCitiesFromAvailable } from "@/services/homepage-available-cities";
-import { listCitiesByVertical, listSpaces } from "@/services/mock-db";
-import type { SpaceVertical } from "@/types";
+import { slugifyPgName } from "@/lib/pg-slug";
 import { verticalPath } from "@/lib/vertical-path";
+import { NON_OPERATOR_BRAND_SLUGS } from "@/services/brand-api";
+import { canonicalCoworkingCitySlug, resolveCatalogIdToSlug } from "@/services/catalog-city-id";
+import { AVAILABLE_CITY_VIRTUAL_OFFICE } from "@/services/cities-data";
+import { resolveAppUrl } from "@/services/env-config";
+import { slugifyMicroLocationName } from "@/services/location-api";
+import { EMPTY_CITY_PAGE_FILTERS, getCityPageData } from "@/services/mock-db";
+import {
+  type InventorySpace,
+  loadColivingInventory,
+  loadCoworkingInventory,
+  loadManagedOfficeInventory,
+  loadVirtualOfficeInventory,
+} from "@/services/sitemap-inventory";
+import type { SpaceVertical } from "@/types";
 
-const VERTICALS: SpaceVertical[] = ["coworking", "virtual-office", "office-space", "coliving"];
+/** Locality pages are listed only where this many live listings exist (thin pages stay out). */
+export const MIN_LISTINGS_FOR_LOCALITY_PAGE = 3;
 
 function baseOrigin(): string {
   return resolveAppUrl().replace(/\/$/, "");
@@ -17,115 +28,205 @@ export function toAbsoluteUrl(pathname: string): string {
   return `${baseOrigin()}${path}`;
 }
 
-function normalizeCitySegment(vertical: SpaceVertical, citySlug: string): string {
-  if (
-    vertical === "coworking" ||
-    vertical === "virtual-office" ||
-    vertical === "office-space" ||
-    vertical === "coliving"
-  ) {
-    return canonicalCoworkingCitySlug(citySlug);
+/** True when `/{vertical}/{slug}` renders a city page (same check the route uses). */
+function isCityPage(vertical: SpaceVertical, citySlug: string): boolean {
+  return getCityPageData(vertical, citySlug, EMPTY_CITY_PAGE_FILTERS) != null;
+}
+
+/**
+ * PG city names → the city page that lists them. The PG API matches `city` by substring,
+ * so `/coliving/delhi` includes "New Delhi" and `/coliving/mumbai` includes "Navi Mumbai".
+ */
+const PG_CITY_TO_ROUTE: Record<string, string> = {
+  bengaluru: "bangalore",
+  "new-delhi": "delhi",
+  "navi-mumbai": "mumbai",
+};
+
+/** Canonical route slug for a listing's city (e.g. catalog "gurugram" → "gurgaon"). */
+function citySlugOf(item: InventorySpace): string | null {
+  const fromCatalog = item.cityId ? resolveCatalogIdToSlug(item.cityId) : null;
+  const raw = fromCatalog ?? (item.cityName ? slugifyPgName(item.cityName) : "");
+  if (!raw) return null;
+  return canonicalCoworkingCitySlug(PG_CITY_TO_ROUTE[raw] ?? raw);
+}
+
+function cityUrl(vertical: SpaceVertical, citySlug: string): string {
+  return toAbsoluteUrl(`/${verticalPath(vertical)}/${encodeURIComponent(citySlug)}`);
+}
+
+/** Latest `updatedAt` among items, if any carries one. */
+function latest(items: InventorySpace[]): Date | undefined {
+  let best: Date | undefined;
+  for (const item of items) {
+    if (item.updatedAt && (!best || item.updatedAt > best)) best = item.updatedAt;
   }
-  return citySlug.trim();
+  return best;
 }
 
-function citySlugSet(vertical: SpaceVertical): Set<string> {
-  return new Set(
-    listHomepageCitiesFromAvailable(vertical).map((c) => normalizeCitySegment(vertical, c.slug)),
-  );
+function sortByLoc(entries: SitemapUrlEntry[]): SitemapUrlEntry[] {
+  const byLoc = new Map<string, SitemapUrlEntry>();
+  for (const entry of entries) {
+    const prev = byLoc.get(entry.loc);
+    if (!prev || (entry.lastmod && (!prev.lastmod || entry.lastmod > prev.lastmod))) {
+      byLoc.set(entry.loc, entry);
+    }
+  }
+  return Array.from(byLoc.values()).sort((a, b) => a.loc.localeCompare(b.loc));
 }
 
-function dedupeSort(urls: string[]): string[] {
-  return Array.from(new Set(urls)).sort((a, b) => a.localeCompare(b));
-}
-
-/** `/sitemap/main-pages-sitemap.xml` — homepage, vertical hubs, list-your-space. */
-export function buildMainPagesSitemapEntries(lastmod: Date): SitemapUrlEntry[] {
+/** `/sitemap/main-pages-sitemap.xml` — homepage, vertical hubs and evergreen pages. */
+export function buildMainPagesSitemapEntries(): SitemapUrlEntry[] {
   const b = baseOrigin();
   return [
-    { loc: `${b}/`, lastmod, changefreq: "daily", priority: 1 },
-    { loc: `${b}/coworking`, lastmod, changefreq: "weekly", priority: 0.8 },
-    { loc: `${b}/virtual-office`, lastmod, changefreq: "weekly", priority: 0.8 },
-    { loc: `${b}/managed-office`, lastmod, changefreq: "weekly", priority: 0.8 },
-    { loc: `${b}/coliving`, lastmod, changefreq: "weekly", priority: 0.8 },
-    { loc: `${b}/list-your-space`, lastmod, changefreq: "monthly", priority: 0.5 },
+    { loc: `${b}/`, changefreq: "daily", priority: 1 },
+    { loc: `${b}/coworking`, changefreq: "weekly", priority: 0.8 },
+    { loc: `${b}/virtual-office`, changefreq: "weekly", priority: 0.8 },
+    { loc: `${b}/managed-office`, changefreq: "weekly", priority: 0.8 },
+    { loc: `${b}/coliving`, changefreq: "weekly", priority: 0.8 },
+    { loc: `${b}/list-your-space`, changefreq: "monthly", priority: 0.5 },
+    { loc: `${b}/contact`, changefreq: "monthly", priority: 0.4 },
   ];
+}
+
+/** Main pages plus one `/brand/{slug}` page per operator with live coworking centres. */
+export async function collectMainPagesSitemapEntries(): Promise<SitemapUrlEntry[]> {
+  const byBrand = new Map<string, InventorySpace[]>();
+  for (const item of await loadCoworkingInventory()) {
+    const brand = item.brandSlug?.toLowerCase();
+    if (!brand || NON_OPERATOR_BRAND_SLUGS.has(brand)) continue;
+    const list = byBrand.get(brand) ?? [];
+    list.push(item);
+    byBrand.set(brand, list);
+  }
+  const brandEntries: SitemapUrlEntry[] = Array.from(byBrand, ([brand, list]) => ({
+    loc: toAbsoluteUrl(`/brand/${encodeURIComponent(brand)}`),
+    lastmod: latest(list),
+  }));
+  return [...buildMainPagesSitemapEntries(), ...sortByLoc(brandEntries)];
 }
 
 /** Root `/sitemap.xml` — sitemap index (child documents under `/sitemap/`). */
-export function buildRootSitemapIndexEntries(lastmod: Date): SitemapIndexEntry[] {
+export function buildRootSitemapIndexEntries(): SitemapIndexEntry[] {
   const b = baseOrigin();
   return [
-    { loc: `${b}/sitemap/main-pages-sitemap.xml`, lastmod },
-    { loc: `${b}/sitemap/city-pages-sitemap.xml`, lastmod },
-    { loc: `${b}/sitemap/locality-pages-sitemap.xml`, lastmod },
-    { loc: `${b}/sitemap/coworking-spaces-sitemap.xml`, lastmod },
-    { loc: `${b}/sitemap/virtual-office-spaces-sitemap.xml`, lastmod },
-    { loc: `${b}/sitemap/office-space-sitemap.xml`, lastmod },
-    { loc: `${b}/sitemap/coliving-spaces-sitemap.xml`, lastmod },
+    { loc: `${b}/sitemap/main-pages-sitemap.xml` },
+    { loc: `${b}/sitemap/city-pages-sitemap.xml` },
+    { loc: `${b}/sitemap/locality-pages-sitemap.xml` },
+    { loc: `${b}/sitemap/coworking-spaces-sitemap.xml` },
+    { loc: `${b}/sitemap/virtual-office-spaces-sitemap.xml` },
+    { loc: `${b}/sitemap/office-space-sitemap.xml` },
+    { loc: `${b}/sitemap/coliving-spaces-sitemap.xml` },
   ];
 }
 
-/** `/{vertical}/{city}` from homepage-available city lists. */
-export function collectCityPagesSitemapUrls(): string[] {
-  const out: string[] = [];
-  for (const vertical of VERTICALS) {
-    for (const city of listHomepageCitiesFromAvailable(vertical)) {
-      const seg = normalizeCitySegment(vertical, city.slug);
-      out.push(toAbsoluteUrl(`/${verticalPath(vertical)}/${encodeURIComponent(seg)}`));
-    }
+/** Group listings by canonical city slug, keeping only cities that have a city page. */
+function groupByCity(vertical: SpaceVertical, items: InventorySpace[]): Map<string, InventorySpace[]> {
+  const byCity = new Map<string, InventorySpace[]>();
+  for (const item of items) {
+    const city = citySlugOf(item);
+    if (!city || !isCityPage(vertical, city)) continue;
+    const list = byCity.get(city) ?? [];
+    list.push(item);
+    byCity.set(city, list);
   }
-  return dedupeSort(out);
+  return byCity;
 }
 
-/** `/{vertical}/{city}/{locality}` from seed inventory (unique location labels per city). */
-export function collectLocalityPagesSitemapUrls(): string[] {
-  const out: string[] = [];
-  for (const vertical of VERTICALS) {
-    for (const city of listCitiesByVertical(vertical)) {
-      const citySeg = normalizeCitySegment(vertical, city.slug);
-      const locations = new Set(
-        listSpaces({ vertical, city: city.slug })
-          .map((s) => s.location?.trim())
-          .filter((loc): loc is string => Boolean(loc)),
-      );
-      for (const loc of locations) {
-        out.push(
-          toAbsoluteUrl(`/${verticalPath(vertical)}/${encodeURIComponent(citySeg)}/${encodeURIComponent(loc)}`),
-        );
+/**
+ * `/{vertical}/{city}` — coworking, managed office and coliving cities with at least one
+ * live listing; every virtual office catalog city (those pages are content pages).
+ */
+export async function collectCityPagesSitemapEntries(): Promise<SitemapUrlEntry[]> {
+  const [coworking, managedOffice, coliving] = await Promise.all([
+    loadCoworkingInventory(),
+    loadManagedOfficeInventory(),
+    loadColivingInventory(),
+  ]);
+
+  const entries: SitemapUrlEntry[] = [];
+  const inventoryByVertical: Array<[SpaceVertical, InventorySpace[]]> = [
+    ["coworking", coworking],
+    ["office-space", managedOffice],
+    ["coliving", coliving],
+  ];
+  for (const [vertical, items] of inventoryByVertical) {
+    for (const [city, list] of groupByCity(vertical, items)) {
+      entries.push({ loc: cityUrl(vertical, city), lastmod: latest(list) });
+    }
+  }
+
+  for (const entry of AVAILABLE_CITY_VIRTUAL_OFFICE) {
+    const city = canonicalCoworkingCitySlug(slugifyPgName(String(entry.name)));
+    if (city && isCityPage("virtual-office", city)) {
+      entries.push({ loc: cityUrl("virtual-office", city) });
+    }
+  }
+
+  return sortByLoc(entries);
+}
+
+/**
+ * `/{vertical}/{city}/{locality}` — coworking and coliving localities with at least
+ * {@link MIN_LISTINGS_FOR_LOCALITY_PAGE} live listings.
+ */
+export async function collectLocalityPagesSitemapEntries(): Promise<SitemapUrlEntry[]> {
+  const [coworking, coliving] = await Promise.all([loadCoworkingInventory(), loadColivingInventory()]);
+
+  const entries: SitemapUrlEntry[] = [];
+  const inventoryByVertical: Array<[SpaceVertical, InventorySpace[]]> = [
+    ["coworking", coworking],
+    ["coliving", coliving],
+  ];
+  for (const [vertical, items] of inventoryByVertical) {
+    for (const [city, list] of groupByCity(vertical, items)) {
+      const byLocality = new Map<string, InventorySpace[]>();
+      for (const item of list) {
+        const locality = item.localityName ? slugifyMicroLocationName(item.localityName) : "";
+        if (!locality) continue;
+        const group = byLocality.get(locality) ?? [];
+        group.push(item);
+        byLocality.set(locality, group);
+      }
+      for (const [locality, group] of byLocality) {
+        if (group.length < MIN_LISTINGS_FOR_LOCALITY_PAGE) continue;
+        entries.push({
+          loc: toAbsoluteUrl(
+            `/${verticalPath(vertical)}/${encodeURIComponent(city)}/${encodeURIComponent(locality)}`,
+          ),
+          lastmod: latest(group),
+        });
       }
     }
   }
-  return dedupeSort(out);
+
+  return sortByLoc(entries);
 }
 
-export function collectCoworkingSpacesSitemapUrls(): string[] {
-  return collectVerticalSpaceDetailUrls("coworking");
+/** `/{vertical}/{slug}` for each live listing; slugs that collide with a city page are skipped. */
+function detailEntries(vertical: SpaceVertical, items: InventorySpace[]): SitemapUrlEntry[] {
+  return sortByLoc(
+    items
+      .filter((item) => !isCityPage(vertical, item.slug))
+      .map((item) => ({
+        loc: toAbsoluteUrl(`/${verticalPath(vertical)}/${encodeURIComponent(item.slug)}`),
+        lastmod: item.updatedAt,
+      })),
+  );
 }
 
-export function collectVirtualOfficeSpacesSitemapUrls(): string[] {
-  return collectVerticalSpaceDetailUrls("virtual-office");
+export async function collectCoworkingSpacesSitemapEntries(): Promise<SitemapUrlEntry[]> {
+  return detailEntries("coworking", await loadCoworkingInventory());
 }
 
-export function collectOfficeSpaceSitemapUrls(): string[] {
-  return collectVerticalSpaceDetailUrls("office-space");
+export async function collectVirtualOfficeSpacesSitemapEntries(): Promise<SitemapUrlEntry[]> {
+  return detailEntries("virtual-office", await loadVirtualOfficeInventory());
 }
 
-export function collectColivingSpacesSitemapUrls(): string[] {
-  return collectVerticalSpaceDetailUrls("coliving");
+export async function collectOfficeSpaceSitemapEntries(): Promise<SitemapUrlEntry[]> {
+  return detailEntries("office-space", await loadManagedOfficeInventory());
 }
 
-function collectVerticalSpaceDetailUrls(vertical: SpaceVertical): string[] {
-  const citySlugs = citySlugSet(vertical);
-  const out: string[] = [];
-
-  for (const space of listSpaces({ vertical })) {
-    const slug = space.slug?.trim();
-    if (!slug) continue;
-    const asCityKey = normalizeCitySegment(vertical, slug);
-    if (citySlugs.has(asCityKey)) continue;
-    out.push(toAbsoluteUrl(`/${verticalPath(vertical)}/${encodeURIComponent(slug)}`));
-  }
-
-  return dedupeSort(out);
+export async function collectColivingSpacesSitemapEntries(): Promise<SitemapUrlEntry[]> {
+  return detailEntries("coliving", await loadColivingInventory());
 }

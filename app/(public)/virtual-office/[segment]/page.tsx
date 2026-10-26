@@ -3,17 +3,20 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
+import { buildPageMetadataFromSeo } from "@/lib/seo-metadata";
+import { virtualOfficeCitySeo, virtualOfficeListingSeo } from "@/lib/seo-templates";
+import {
+  getCityLowestMonthlyPrice,
+  getVirtualOfficeCityCatalogBySlug,
+  getVirtualOfficeCityDisplayName,
+} from "@/lib/virtual-office-city-catalog";
 import { VerticalCityPage } from "@/modules/city-pages/vertical-city-page";
 import { VirtualOfficeDetailPage } from "@/modules/virtual-office/virtual-office-detail-page";
 import { getVerticalCityPageContent } from "@/services/cities";
-import {
-  getSimilarSpaces,
-  getVerticalSpaceBySlug,
-  resolveVerticalSegment,
-} from "@/services/spaces";
-import { getVirtualOfficeStartingMonthlyPrice } from "@/services/virtual-office-pricing";
-import { formatCurrency, toTitleCase } from "@/utils/format";
-
+import { loadCoworkingWorkspaceDetail } from "@/services/coworking-api";
+import { getSimilarSpaces, resolveVerticalSegment } from "@/services/spaces";
+import type { SeoContent } from "@/types/seo.model";
+import { toTitleCase } from "@/utils/format";
 
 export async function generateMetadata({
   params,
@@ -24,20 +27,23 @@ export async function generateMetadata({
   const cityPage = await getVerticalCityPageContent("virtual-office", segment);
 
   if (cityPage) {
-    return buildMetadataWithCmsSeoFallback(`/virtual-office/${cityPage.city.slug}`, {
-      title: cityPage.title,
-      description: cityPage.subtitle,
-    });
+    const catalog = getVirtualOfficeCityCatalogBySlug(cityPage.city.slug);
+    const cityName = getVirtualOfficeCityDisplayName(cityPage.city.slug, catalog?.name ?? cityPage.city.name);
+    return buildMetadataWithCmsSeoFallback(
+      `/virtual-office/${cityPage.city.slug}`,
+      virtualOfficeCitySeo(cityName, catalog ? getCityLowestMonthlyPrice(catalog) : null),
+    );
   }
 
-  const space = await getVerticalSpaceBySlug("virtual-office", segment);
-
-  if (space) {
-    const voStart = getVirtualOfficeStartingMonthlyPrice(space);
-    return buildMetadataWithCmsSeoFallback(`/virtual-office/${space.slug}`, {
-      title: `${space.name} | Virtual Office`,
-      description: `${space.description} Business Address from ${formatCurrency(voStart)}/month in ${toTitleCase(space.city)}.`,
-    });
+  const workspace = await loadCoworkingWorkspaceDetail(segment);
+  if (workspace) {
+    const pathname = `/virtual-office/${workspace.slug}`;
+    // Per-space virtual office SEO from the API, when it is filled in.
+    const virtualSeo = workspace.virtualSeo;
+    if (virtualSeo?.title?.trim() && virtualSeo.status !== false) {
+      return buildPageMetadataFromSeo(pathname, virtualSeo as unknown as SeoContent);
+    }
+    return buildMetadataWithCmsSeoFallback(pathname, virtualOfficeListingSeo(workspace));
   }
 
   return buildMetadataWithCmsSeoFallback(`/virtual-office/${segment}`, {

@@ -40,9 +40,11 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // Browser extensions (Grammarly, ColorZilla, password managers) add attributes to <html>/<body>
+    // before React hydrates; ignore those attribute differences on these two tags only.
+    <html lang="en" suppressHydrationWarning>
       {isGtmEnabled() ? <GoogleTagManager gtmId={GTM_ID} /> : null}
-      <body className={inter.variable}>
+      <body className={inter.variable} suppressHydrationWarning>
         {isGtmEnabled() ? (
           <noscript>
             <iframe

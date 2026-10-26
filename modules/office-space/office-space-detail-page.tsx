@@ -1,6 +1,8 @@
 import { MapPin, Star } from "lucide-react";
 
+import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { Container } from "@/components/ui/container";
+import { listingTrail } from "@/lib/breadcrumb-trails";
 import { buildMapsLink, normalizeMapCoordinates } from "@/lib/space-detail-map";
 import { OfficeSpaceHighlights } from "@/modules/office-space/components/office-space-highlights";
 import { OfficeSpaceCard } from "@/modules/office-space/components/office-space-card";
@@ -68,8 +70,16 @@ export function OfficeSpaceDetailPage({
 
   return (
     <>
-      <section className="pb-8 pt-8 sm:pb-12 sm:pt-12">
+      <section className="pb-8 pt-4 sm:pb-12 sm:pt-5">
         <Container>
+          <Breadcrumbs
+            className="mb-4 sm:mb-6"
+            items={listingTrail("office-space", {
+              name: office.name ?? title,
+              cityName: office.location?.city?.name,
+              cityId: office.location?.city?.id,
+            })}
+          />
           <SpaceDetailGallery
             name={office.name ?? "Office space"}
             images={galleryImages}

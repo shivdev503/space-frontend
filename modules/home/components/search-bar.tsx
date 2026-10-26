@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Building2, MapPin, Search, X } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -40,6 +40,27 @@ type SharedSearchState = {
 
 const SEARCH_SYNC_EVENT = "spacewallah:search-sync";
 
+type SearchSpaceType = SharedSearchState["selectedSpaceType"];
+
+/** Vertical of the current page, so the search defaults to it (coworking elsewhere). */
+function spaceTypeFromPath(pathname: string | null): SearchSpaceType | null {
+  const first = (pathname ?? "").split("/").filter(Boolean)[0];
+  switch (first) {
+    case "coworking":
+    case "brand":
+      return "coworking";
+    case "coliving":
+      return "coliving";
+    case "virtual-office":
+      return "virtual-office";
+    case "managed-office":
+    case "office-space":
+      return "office-space";
+    default:
+      return null;
+  }
+}
+
 function resolveLocationSlug(input: string, locations: SearchOption[]) {
   const normalized = input.trim().toLowerCase();
   const match = locations.find(
@@ -62,6 +83,7 @@ export function SearchBar({
   onExpandedChange,
 }: SearchBarProps) {
   const router = useRouter();
+  const pageSpaceType = spaceTypeFromPath(usePathname());
   const normalizedTeamSizes = teamSizes[0]?.value
     ? [{ label: "Any team size", value: "" }, ...teamSizes]
     : teamSizes;
@@ -76,9 +98,7 @@ export function SearchBar({
   >(null);
   const [selectedLocation, setSelectedLocation] = useState(locations[0]?.label ?? "");
   const [locationInput, setLocationInput] = useState(locations[0]?.label ?? "");
-  const [selectedSpaceType, setSelectedSpaceType] = useState<
-    "coworking" | "office-space" | "virtual-office" | "coliving"
-  >("coworking");
+  const [selectedSpaceType, setSelectedSpaceType] = useState<SearchSpaceType>(pageSpaceType ?? "coworking");
   const [selectedSpaceName, setSelectedSpaceName] = useState("");
   const [spaceNameInput, setSpaceNameInput] = useState("");
   /** Coworking detail slug when user picks a row from API (or mock) list. */
@@ -324,7 +344,9 @@ export function SearchBar({
     const storedState = window.sessionStorage.getItem(SEARCH_SYNC_EVENT);
     if (storedState) {
       try {
-        applySharedState(JSON.parse(storedState) as SharedSearchState);
+        const stored = JSON.parse(storedState) as SharedSearchState;
+        // On a vertical page, that vertical wins over the type saved from another page.
+        applySharedState(pageSpaceType ? { ...stored, selectedSpaceType: pageSpaceType } : stored);
       } catch {
         window.sessionStorage.removeItem(SEARCH_SYNC_EVENT);
       }
@@ -340,6 +362,11 @@ export function SearchBar({
     window.addEventListener(SEARCH_SYNC_EVENT, handleSync as EventListener);
     return () => window.removeEventListener(SEARCH_SYNC_EVENT, handleSync as EventListener);
   }, [hasHydrated, variant]);
+
+  // Follow the vertical when navigating between sections (the header search stays mounted).
+  useEffect(() => {
+    if (pageSpaceType) setSelectedSpaceType(pageSpaceType);
+  }, [pageSpaceType]);
 
   useEffect(() => {
     if (!hasHydrated || (variant !== "homepage" && variant !== "header")) return;

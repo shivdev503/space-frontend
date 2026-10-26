@@ -39,13 +39,19 @@ export function isCoworkingPlanExcludedFromStartingPrice(categoryLabel: string):
   return false;
 }
 
-/** Plans that count toward minimum starting price. */
-export function filterCoworkingPlansForStartingPrice<T extends { category?: unknown }>(
+/** Monthly price unless the plan says otherwise — hourly/daily/yearly prices are not "per month". */
+function isMonthlyPlan(plan: { duration?: unknown }): boolean {
+  const duration = typeof plan.duration === "string" ? plan.duration.trim().toLowerCase() : "";
+  return !duration || duration.startsWith("month");
+}
+
+/** Plans that count toward minimum starting price (monthly coworking plans only). */
+export function filterCoworkingPlansForStartingPrice<T extends { category?: unknown; duration?: unknown }>(
   plans: ReadonlyArray<T> | null | undefined,
 ): T[] {
   if (!plans?.length) return [];
   return plans.filter(
-    (p) => !isCoworkingPlanExcludedFromStartingPrice(coworkingPlanCategoryLabel(p)),
+    (p) => isMonthlyPlan(p) && !isCoworkingPlanExcludedFromStartingPrice(coworkingPlanCategoryLabel(p)),
   );
 }
 

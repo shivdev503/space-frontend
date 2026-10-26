@@ -180,7 +180,7 @@ export function ColivingListingCard({ pg, className }: ColivingListingCardProps)
         <div className="flex items-start justify-between gap-3">
           <p className="min-w-0 truncate text-[0.9375rem] font-semibold leading-snug text-slate-950">
             {pg.name}
-          </p>
+          </p>{" "}
           <div className="inline-flex shrink-0 items-center gap-0.5 text-[0.875rem] text-slate-950">
             {hasRating ? (
               <>
@@ -191,10 +191,11 @@ export function ColivingListingCard({ pg, className }: ColivingListingCardProps)
               <>
                 <Star className="h-3 w-3 fill-slate-950 text-slate-950" />
                 <span className="font-medium">New</span>
+                <span className="sr-only"> listing</span>
               </>
             )}
           </div>
-        </div>
+        </div>{" "}
 
         {locationLine ? (
           <p className="truncate text-[0.9375rem] text-slate-500">{locationLine}</p>

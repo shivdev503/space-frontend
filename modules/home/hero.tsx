@@ -74,7 +74,7 @@ export function HomeHero({ searchOptions, featuredSpaces }: HomeHeroProps) {
             <div className="mt-9 flex flex-wrap items-center justify-center gap-5 text-sm">
               <div className="inline-flex items-center gap-2 rounded-full border border-[#c9a962]/20 bg-[rgba(22,18,14,0.38)] px-4 py-2 text-[#ebe3d4] shadow-[0_12px_36px_rgba(8,6,5,0.28)] backdrop-blur-sm">
                 <Sparkles className="h-4 w-4 text-[#12B886]" />
-                Verified Space Only
+                Verified Spaces Only
               </div>
               <div className="inline-flex items-center gap-2 rounded-full border border-[#c9a962]/20 bg-[rgba(22,18,14,0.38)] px-4 py-2 text-[#ebe3d4] shadow-[0_12px_36px_rgba(8,6,5,0.28)] backdrop-blur-sm">
                 <BadgeCheck className="h-4 w-4 text-[#12B886]" />

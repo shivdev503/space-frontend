@@ -230,7 +230,7 @@ export function ColivingRoomCard({
       </div>
       <h3 className="mt-4 font-display text-lg font-semibold text-ink">{title}</h3>
       {specs ? <p className="mt-0.5 text-sm text-muted">{specs}</p> : null}
-      <ul className="mt-4 space-y-2">
+      <ul className={cn("space-y-2", features.length > 0 && "mt-4")}>
         {features.map((f) => (
           <li key={f} className="flex items-start gap-2 text-sm text-ink/90">
             <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[color:var(--color-brand)]" strokeWidth={2.5} />
@@ -350,7 +350,7 @@ export function ColivingRuleCard({
       </div>
       <div>
         <h4 className="text-sm font-semibold text-ink">{title}</h4>
-        <p className="mt-1 text-sm leading-relaxed text-muted">{text}</p>
+        {text ? <p className="mt-1 text-sm leading-relaxed text-muted">{text}</p> : null}
       </div>
     </div>
   );
@@ -484,13 +484,6 @@ export const DEFAULT_MEAL_SCHEDULE = [
   { label: "Breakfast", time: "7:30 – 9:30 AM" },
   { label: "Lunch", time: "12:30 – 2:30 PM" },
   { label: "Dinner", time: "8:00 – 10:00 PM" },
-] as const;
-
-export const DEFAULT_ROOM_FEATURES = [
-  "Single bed, mattress + pillow",
-  "AC / heating · hot water",
-  "Personal cupboard + study desk",
-  "Television in common area",
 ] as const;
 
 export { Home, Users, Clock };

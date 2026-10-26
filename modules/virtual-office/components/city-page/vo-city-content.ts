@@ -143,7 +143,7 @@ export function getVoCityState(citySlug: string) {
 export const VO_OTHER_CITIES = [
   { name: "Delhi", slug: "delhi" },
   { name: "Noida", slug: "noida" },
-  { name: "Gurgaon", slug: "gurugram" },
+  { name: "Gurgaon", slug: "gurgaon" },
   { name: "Bangalore", slug: "bangalore" },
   { name: "Mumbai", slug: "mumbai" },
   { name: "Pune", slug: "pune" },

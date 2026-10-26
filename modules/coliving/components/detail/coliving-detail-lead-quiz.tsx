@@ -17,6 +17,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { buildUserEnquiryBody } from "@/lib/user-enquiry-payload";
 import type { PgOwnerContact } from "@/lib/pg-owner-contact";
+import { roomOccupancy } from "@/lib/pg-room-occupancy";
+import { ratingLabel } from "@/lib/rating-label";
 import { ColivingOwnerContactSuccess } from "@/modules/coliving/components/coliving-owner-contact-success";
 import { useColivingLeadQuiz } from "@/modules/coliving/components/detail/coliving-detail-lead-quiz-context";
 import { fetchPgOwnerContact } from "@/services/pg-owner-contact-api";
@@ -59,11 +61,7 @@ function inferRoomIcon(name: string): RoomIcon {
 }
 
 function roomSubtitle(name: string): string {
-  const n = name.toLowerCase();
-  if (n.includes("triple")) return "3 beds · most chosen";
-  if (n.includes("double")) return "2 beds · attached bath";
-  if (n.includes("single") || n.includes("private")) return "1 bed · private bath";
-  return "Fully furnished · attached bath";
+  return roomOccupancy(name) || "Ask about this room";
 }
 
 function buildRoomOptions(space: Space): RoomOption[] {
@@ -98,6 +96,7 @@ type ColivingDetailLeadQuizProps = {
   localityLabel?: string;
   /** Shown as owner name when unlock API omits name. */
   ownerNameFallback?: string | null;
+  reviewCount?: number;
 };
 
 export function ColivingDetailLeadQuiz({
@@ -105,13 +104,14 @@ export function ColivingDetailLeadQuiz({
   spaceListingId,
   localityLabel,
   ownerNameFallback,
+  reviewCount,
 }: ColivingDetailLeadQuizProps) {
   const { open, closeQuiz, shaking } = useColivingLeadQuiz();
 
   const plans = space.plans?.length ? space.plans : [{ name: "Standard room", price: space.price }];
   const minPrice = Math.min(...plans.map((p) => p.price));
   const maxPrice = Math.max(...plans.map((p) => p.price));
-  const rating = space.rating > 0 ? space.rating.toFixed(2) : "4.86";
+  const rating = ratingLabel(space.rating, reviewCount);
   const roomOptions = useMemo(() => buildRoomOptions(space), [space]);
 
   const [step, setStep] = useState(1);
@@ -356,7 +356,7 @@ export function ColivingDetailLeadQuiz({
 type QuizPanelBodyProps = {
   minPrice: number;
   maxPrice: number;
-  rating: string;
+  rating: string | null;
   done: boolean;
   step: number;
   totalSteps: number;
@@ -448,10 +448,14 @@ function QuizPanelBody({
           )}
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-[12.5px] text-ink/90 sm:gap-2">
-          <span>
-            <span className="text-amber-500">★</span> {rating} · 38 reviews
-          </span>
-          <span className="text-slate-300">·</span>
+          {rating ? (
+            <>
+              <span>
+                <span className="text-amber-500">★</span> {rating}
+              </span>
+              <span className="text-slate-300">·</span>
+            </>
+          ) : null}
           <span className="inline-flex items-center gap-1.5 font-medium text-[color:var(--color-brand)]">
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
             Zero brokerage

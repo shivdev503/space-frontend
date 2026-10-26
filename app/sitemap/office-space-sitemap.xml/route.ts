@@ -1,8 +1,9 @@
-import { sitemapXmlResponse } from "@/lib/sitemap-route-response";
-import { collectOfficeSpaceSitemapUrls } from "@/lib/sitemap-public-urls";
+import { sitemapEntriesResponse } from "@/lib/sitemap-route-response";
+import { collectOfficeSpaceSitemapEntries } from "@/lib/sitemap-public-urls";
 
-export const dynamic = "force-static";
+/** Built from live listings on request; cached for an hour (see sitemap-inventory). */
+export const dynamic = "force-dynamic";
 
 export function GET() {
-  return sitemapXmlResponse(collectOfficeSpaceSitemapUrls());
+  return sitemapEntriesResponse(collectOfficeSpaceSitemapEntries);
 }

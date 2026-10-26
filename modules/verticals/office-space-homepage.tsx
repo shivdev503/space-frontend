@@ -50,12 +50,14 @@ export function OfficeSpaceHomepage({ data }: OfficeSpaceHomepageProps) {
         </SectionWrapper>
       ) : null}
 
-      <SectionWrapper>
-        <SectionHeading
-          title="Explore Premium Managed Offices"
-        />
-        <SpaceRail spaces={data.featuredSpaces} />
-      </SectionWrapper>
+      {data.featuredSpaces.length > 0 ? (
+        <SectionWrapper>
+          <SectionHeading
+            title="Explore Premium Managed Offices"
+          />
+          <SpaceRail spaces={data.featuredSpaces} />
+        </SectionWrapper>
+      ) : null}
 
       {data.caseStudies ? (
         <SectionWrapper>

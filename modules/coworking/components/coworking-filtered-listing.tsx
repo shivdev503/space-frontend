@@ -1,14 +1,16 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
   applyCoworkingListFiltersClient,
+  COWORKING_LIST_PAGE_SIZE,
   countActiveCoworkingListFilters,
   coworkingFiltersToApiParams,
   coworkingFiltersToSearchParams,
+  coworkingListQueryKey,
   DEFAULT_COWORKING_LIST_FILTERS,
   parseCoworkingListFiltersFromSearchParams,
   type CoworkingListFilterState,
@@ -21,9 +23,9 @@ import { SpaceGridSkeleton } from "@/modules/spaces/components/space-grid-skelet
 import { loadCoworkingWorkspacesPageForCity } from "@/services/coworking-api";
 import { mapSeedSpaceToCoworkingWorkspace } from "@/services/coworking-workspace-mapper";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
-import type { Space } from "@/types";
+import type { InitialCoworkingListing, Space } from "@/types";
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = COWORKING_LIST_PAGE_SIZE;
 
 type CoworkingFilteredListingProps = {
   listBasePath: string;
@@ -31,6 +33,8 @@ type CoworkingFilteredListingProps = {
   locationLabel: string;
   microLocationId?: string;
   seedSpaces?: Space[];
+  /** Page 1 rendered on the server — shown immediately and in the HTML for crawlers. */
+  initialListing?: InitialCoworkingListing;
   showPopularLocalities?: boolean;
   popularLocalities?: {
     catalogCityId: string;
@@ -55,6 +59,7 @@ export function CoworkingFilteredListing({
   locationLabel,
   microLocationId,
   seedSpaces = [],
+  initialListing,
   showPopularLocalities = false,
   popularLocalities,
 }: CoworkingFilteredListingProps) {
@@ -66,12 +71,14 @@ export function CoworkingFilteredListing({
     parseCoworkingListFiltersFromSearchParams(new URLSearchParams(searchParams.toString())),
   );
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [rows, setRows] = useState<CoworkingModel.WorkSpace[]>([]);
-  const [totalRecords, setTotalRecords] = useState(0);
+  const [rows, setRows] = useState<CoworkingModel.WorkSpace[]>(initialListing?.rows ?? []);
+  const [totalRecords, setTotalRecords] = useState(initialListing?.totalRecords ?? 0);
   const [page, setPage] = useState(1);
   const [seedMode, setSeedMode] = useState(false);
   const [seedVisibleCount, setSeedVisibleCount] = useState(PAGE_SIZE);
-  const [loading, setLoading] = useState(needsRemote);
+  const [loading, setLoading] = useState(needsRemote && !initialListing);
+  /** Server page 1 is still valid until the URL's filters change. */
+  const usingInitialRef = useRef(Boolean(initialListing));
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -168,10 +175,17 @@ export function CoworkingFilteredListing({
       return;
     }
 
+    if (usingInitialRef.current) {
+      usingInitialRef.current = false;
+      if (initialListing?.query === coworkingListQueryKey(new URLSearchParams(searchParams.toString()))) {
+        return;
+      }
+    }
+
     startTransition(() => {
       void fetchPage(parsed, 1, false);
     });
-  }, [searchParams, needsRemote, catalogCityId, microLocationId, fetchPage, seedSpaces]);
+  }, [searchParams, needsRemote, catalogCityId, microLocationId, fetchPage, seedSpaces, initialListing]);
 
   useEffect(() => {
     if (!seedMode || !needsRemote) return;

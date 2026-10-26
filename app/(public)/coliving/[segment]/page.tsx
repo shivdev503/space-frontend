@@ -8,13 +8,14 @@ import { buildPgColivingCityPageParams } from "@/lib/pg-list-priority";
 import { buildPgListParamsFromSearchParams } from "@/lib/pg-list-params";
 import { seoFaqsOrFallback } from "@/lib/seo-page-faqs";
 import { seoPageTitleOrFallback } from "@/lib/seo-page-title";
+import { colivingCitySeo, colivingListingSeo } from "@/lib/seo-templates";
 import { ColivingCityPage } from "@/modules/coliving/coliving-city-page";
 import { ColivingDetailPage } from "@/modules/coliving/coliving-detail-page";
 import { getVerticalCityPageContent } from "@/services/cities";
 import { loadPgDetail, loadPgList } from "@/services/pg-api";
+import { colivingMarketStats } from "@/services/market-stats";
 import { getSeoBySlug } from "@/services/seo-content";
 import { toTitleCase } from "@/utils/format";
-import { pgDescriptionText } from "@/services/pg-mapper";
 
 type PageProps = {
   params: Promise<{ segment: string }>;
@@ -30,19 +31,17 @@ export async function generateMetadata({
   const cityPage = await getVerticalCityPageContent("coliving", segment);
 
   if (cityPage) {
-    return buildMetadataWithCmsSeoFallback(`/coliving/${cityPage.city.slug}`, {
-      title: cityPage.title,
-      description: cityPage.subtitle,
-    });
+    const stats = await colivingMarketStats(cityPage.city.name);
+    return buildMetadataWithCmsSeoFallback(
+      `/coliving/${cityPage.city.slug}`,
+      colivingCitySeo(cityPage.city.name, stats),
+    );
   }
 
   const pgRes = await loadPgDetail(segment);
   if (pgRes?.data) {
     const pg = pgRes.data;
-    return buildMetadataWithCmsSeoFallback(`/coliving/${pgRes.slug}`, {
-      title: `${pg.name} | ${pg.locality}, ${pg.city}`,
-      description: pgDescriptionText(pg).slice(0, 160) || "Explore coliving and PG rooms across top cities in India.",
-    });
+    return buildMetadataWithCmsSeoFallback(`/coliving/${pgRes.slug}`, colivingListingSeo(pg));
   }
 
   return buildMetadataWithCmsSeoFallback(`/coliving/${segment}`, {

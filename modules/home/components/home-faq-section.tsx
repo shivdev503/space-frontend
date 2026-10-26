@@ -3,6 +3,7 @@
 import { Plus, X } from "lucide-react";
 import { useState } from "react";
 
+import { FaqPageJsonLd } from "@/components/seo/faq-page-json-ld";
 import { cn } from "@/utils/cn";
 
 const FAQS = [
@@ -42,6 +43,7 @@ export function HomeFaqSection() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(12rem,18rem)_minmax(0,1fr)] lg:gap-16">
+      <FaqPageJsonLd faqs={FAQS} />
       <div className="lg:sticky lg:top-28 lg:self-start">
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-[#8f1d52]">
           FAQ

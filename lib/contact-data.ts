@@ -10,10 +10,6 @@ export const CONTACT_HOURS = "Mon – Sat, 9:00 AM – 7:00 PM IST";
 
 export const CONTACT_SOCIAL_LINKS = [
   {
-    label: "Facebook",
-    href: "https://www.facebook.com/",
-  },
-  {
     label: "Instagram",
     href: "https://www.instagram.com/spacewallah/",
   },

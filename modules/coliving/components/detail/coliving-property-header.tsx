@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { Check, ChevronLeft, Heart, MapPin, Share2 } from "lucide-react";
 
+import { Breadcrumbs } from "@/components/seo/breadcrumbs";
+import { listingTrail } from "@/lib/breadcrumb-trails";
+
 export type ColivingPropertyHeaderProps = {
   name: string;
   locality: string;
@@ -57,7 +60,7 @@ export function ColivingPropertyHeader({
     <>
       <nav
         className="flex items-center gap-1.5 pb-3 pt-0.5 text-[0.8125rem] leading-tight lg:hidden"
-        aria-label="Breadcrumb"
+        aria-label="Back to area"
       >
         <Link
           href={`/coliving/${citySlug}`}
@@ -69,24 +72,11 @@ export function ColivingPropertyHeader({
         <span className="min-w-0 truncate font-medium text-ink">{name}</span>
       </nav>
 
-      <nav
-        className="hidden flex-wrap items-center gap-2 pb-2 pt-1 text-[0.8125rem] text-muted lg:flex"
-        aria-label="Breadcrumb"
-      >
-        <Link href="/coliving" className="transition hover:text-ink">
-          Coliving
-        </Link>
-        <span className="text-slate-300" aria-hidden>
-          ›
-        </span>
-        <Link href={`/coliving/${citySlug}`} className="transition hover:text-ink">
-          {city}
-        </Link>
-        <span className="text-slate-300" aria-hidden>
-          ›
-        </span>
-        <span className="line-clamp-1 text-ink/90">{name}</span>
-      </nav>
+      <Breadcrumbs
+        className="hidden pb-2 pt-1 lg:block lg:text-[0.8125rem]"
+        separator="›"
+        items={listingTrail("coliving", { name, cityName: city, localityName: locality })}
+      />
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-5">
         <div className="min-w-0 flex-1">

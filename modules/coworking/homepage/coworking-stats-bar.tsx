@@ -4,7 +4,7 @@ const STATS: {
   label: string;
   highlight?: boolean;
 }[] = [
-  { value: "500", suffix: "+", label: "Verified Spaces" },
+  { value: "1000", suffix: "+", label: "Coworking Spaces" },
   { value: "12", suffix: "", label: "Cities Covered" },
   { value: "₹0", suffix: "", label: "Brokerage. Always.", highlight: true },
   { value: "2hr", suffix: "", label: "Expert Response" },

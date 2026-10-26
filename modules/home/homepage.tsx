@@ -74,7 +74,7 @@ export function Homepage({ data }: HomepageProps) {
       </SectionWrapper>
 
       <SectionWrapper>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {data.trustMetrics.map((metric) => (
             <div
               key={metric.id}

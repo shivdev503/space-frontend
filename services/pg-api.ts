@@ -11,15 +11,12 @@ import axios, { type AxiosInstance } from "axios";
 
 import { isPgPriorityForType, withPgOverallPriority } from "@/lib/pg-list-priority";
 import { resolvePgListingSlug, slugifyPgName } from "@/lib/pg-slug";
-import { toAbsoluteUrl } from "@/lib/sitemap-public-urls";
-import { canonicalCoworkingCitySlug } from "@/services/catalog-city-id";
 import {
   isCoworkingUserApiProxyEnabled,
   resolveCoworkingApiBaseUrl,
   resolveCoworkingApiTimeoutMs,
 } from "@/services/env-config";
 import { buildApiClientHeaders } from "@/services/api-client-headers";
-import { listHomepageCitiesFromAvailable } from "@/services/homepage-available-cities";
 import {
   normalizePgDetailResponse,
   normalizePgListItems,
@@ -219,37 +216,4 @@ export async function loadPgSearchHits(
     seed = seed.filter((h) => h.name.toLowerCase().includes(nameQ));
   }
   return seed.slice(0, limit);
-}
-
-/** `/coliving/[slug]` URLs for sitemap — uses API slugs when the user PG proxy is enabled. */
-export async function loadColivingDetailSitemapUrls(): Promise<string[]> {
-  if (!isCoworkingUserApiProxyEnabled()) return [];
-
-  const citySlugs = new Set(
-    listHomepageCitiesFromAvailable("coliving").map((c) =>
-      canonicalCoworkingCitySlug(c.slug),
-    ),
-  );
-  const out = new Set<string>();
-
-  for (const city of listHomepageCitiesFromAvailable("coliving")) {
-    try {
-      const res = await fetchPgList({
-        city: city.name,
-        limit: 50,
-        page: 1,
-        sortBy: "added_on",
-        orderBy: -1,
-      });
-      for (const pg of res.data) {
-        const slug = resolvePgListingSlug(pg);
-        if (!slug || citySlugs.has(canonicalCoworkingCitySlug(slug))) continue;
-        out.add(toAbsoluteUrl(`/coliving/${encodeURIComponent(slug)}`));
-      }
-    } catch {
-      // skip city on failure
-    }
-  }
-
-  return Array.from(out).sort((a, b) => a.localeCompare(b));
 }

@@ -46,21 +46,23 @@ export function CoworkingHomepage({ data }: CoworkingHomepageProps) {
       <CoworkingWorkspaceTypes />
       <CoworkingHowItWorks />
 
-      <SectionWrapper
-        id="featured"
-        className="border-y border-slate-200/90 bg-page py-16 sm:py-[104px]"
-        contentClassName="max-w-[1240px]"
-      >
-        <CoworkingSectionHeader
-          layout="row"
-          eyebrow="Featured Spaces"
-          title="Explore Premium Spaces"
-          description="Hand-picked spaces toured and verified by SpaceWallah consultants."
-          actionHref="/coworking/gurgaon"
-          actionLabel="Browse all spaces →"
-        />
-        <SpaceRail spaces={data.featuredSpaces} />
-      </SectionWrapper>
+      {data.featuredSpaces.length > 0 ? (
+        <SectionWrapper
+          id="featured"
+          className="border-y border-slate-200/90 bg-page py-16 sm:py-[104px]"
+          contentClassName="max-w-[1240px]"
+        >
+          <CoworkingSectionHeader
+            layout="row"
+            eyebrow="Featured Spaces"
+            title="Explore Premium Spaces"
+            description="Hand-picked spaces toured and verified by SpaceWallah consultants."
+            actionHref="/coworking/gurgaon"
+            actionLabel="Browse all spaces →"
+          />
+          <SpaceRail spaces={data.featuredSpaces} />
+        </SectionWrapper>
+      ) : null}
 
       <CoworkingVerification />
 

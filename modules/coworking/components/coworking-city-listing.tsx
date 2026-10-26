@@ -21,6 +21,7 @@ export function CoworkingCityListing({
       catalogCityId={data.catalogCityId ?? ""}
       locationLabel={data.city.name}
       seedSpaces={data.spaces}
+      initialListing={data.initialCoworkingListing}
       showPopularLocalities={showPopularLocalities}
       popularLocalities={
         data.catalogCityId

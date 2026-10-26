@@ -19,7 +19,7 @@ const TRUSTED_CITIES = [
 ] as const;
 
 const FEATURE_PILLS = [
-  { dot: "bg-blue-600", text: "1,200+ verified beds" },
+  { dot: "bg-blue-600", text: "10000+ coliving & PG options" },
   { dot: "bg-amber-500", text: "Move-in in 48 hours" },
   { dot: "bg-emerald-600/90", text: "Zero brokerage" },
 ] as const;
@@ -52,23 +52,11 @@ export function ColivingHero({ data }: ColivingHeroProps) {
 
             <FadeIn delay={0.06}>
               <h1 className="mt-4 max-w-[22ch] font-display text-[1.85rem] font-semibold leading-[1.1] tracking-[-0.038em] text-ink sm:mt-5 sm:max-w-none sm:text-4xl sm:leading-[1.07] lg:mt-6 lg:text-[2.65rem] lg:leading-[1.06] xl:text-[2.85rem] xl:leading-[1.05]">
-                <span className="lg:hidden">
-                  A home that{" "}
-                  <span className="font-serif text-[1.05em] font-semibold not-italic text-[color:var(--color-accent)]">
-                    feels like home
-                  </span>
-                  , the day you{" "}
-                  <span className="font-serif text-[1.05em] font-semibold not-italic text-[color:var(--color-accent)]">
-                    move in
-                  </span>
+                A home that{" "}
+                <span className="font-serif text-[1.05em] font-semibold not-italic text-[color:var(--color-accent)] lg:text-[1.12em]">
+                  feels like home
                 </span>
-                <span className="hidden lg:inline">
-                  A home that{" "}
-                  <span className="font-serif text-[1.12em] font-semibold not-italic text-[color:var(--color-accent)]">
-                    feels
-                  </span>{" "}
-                  like home, the day you move in
-                </span>
+                , the day you move in
               </h1>
             </FadeIn>
 

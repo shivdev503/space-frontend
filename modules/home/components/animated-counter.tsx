@@ -11,10 +11,23 @@ type AnimatedCounterProps = {
 export function AnimatedCounter({ value, suffix = "" }: AnimatedCounterProps) {
   const ref = useRef<HTMLSpanElement | null>(null);
   const isInView = useInView(ref, { once: true, amount: 0.7 });
-  const [count, setCount] = useState(0);
+  // Start at the real value so server HTML (and crawlers) show it — not "0+".
+  const [count, setCount] = useState(value);
+  const [animate, setAnimate] = useState(false);
+
+  // Count up only for counters that are still off-screen after hydration (no visible flash).
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const { top } = el.getBoundingClientRect();
+    if (top > window.innerHeight) {
+      setCount(0);
+      setAnimate(true);
+    }
+  }, []);
 
   useEffect(() => {
-    if (!isInView) return;
+    if (!animate || !isInView) return;
 
     const duration = 1200;
     const start = performance.now();
@@ -30,7 +43,7 @@ export function AnimatedCounter({ value, suffix = "" }: AnimatedCounterProps) {
     };
 
     requestAnimationFrame(tick);
-  }, [isInView, value]);
+  }, [animate, isInView, value]);
 
   return (
     <span ref={ref}>

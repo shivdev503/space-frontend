@@ -1,9 +1,10 @@
 "use client";
 
 import { ArrowRight, ChevronDown } from "lucide-react";
-import Link from "next/link";
 import { FormEvent, useState } from "react";
 
+import { Breadcrumbs } from "@/components/seo/breadcrumbs";
+import { cityTrail } from "@/lib/breadcrumb-trails";
 import { formatInrPrice } from "@/lib/virtual-office-city-catalog";
 import type { VoCityArea, VoCitySummary } from "@/modules/virtual-office/components/city-page/vo-city-content";
 import { VoCheck, VoWrap } from "@/modules/virtual-office/components/city-page/vo-city-design";
@@ -41,22 +42,12 @@ export function VoCityHero({ citySlug, cityDisplay, areas, summary }: VoCityHero
   return (
     <section className="bg-[#F5F9F7] pb-16 pt-5 sm:pb-20 lg:pb-24">
       <VoWrap>
-        <nav className="flex flex-wrap items-center gap-2 text-sm text-muted" aria-label="Breadcrumb">
-          <Link href="/" className="hover:text-ink">
-            Home
-          </Link>
-          <span aria-hidden>›</span>
-          <Link href="/virtual-office" className="hover:text-ink">
-            Virtual Office
-          </Link>
-          <span aria-hidden>›</span>
-          <span className="font-medium text-ink">{cityDisplay}</span>
-        </nav>
+        <Breadcrumbs items={cityTrail("virtual-office", cityDisplay)} separator="›" className="sm:text-sm" />
 
         <div className="mt-10 grid items-center gap-12 lg:grid-cols-[1fr_0.98fr] lg:gap-12">
           <div className="min-w-0">
             <h1 className="vo-displaytext-[2.75rem] font-extrabold leading-[1.02] tracking-[-0.045em] text-ink sm:text-[3.75rem] lg:text-[4.35rem]">
-              Virtual Office in {cityDisplay}
+              Virtual Office in {cityDisplay}{" "}
               <span className="block text-brand">
                 from {summary.lowestLabel}/month
               </span>

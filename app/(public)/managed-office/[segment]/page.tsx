@@ -3,11 +3,17 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
+import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
+import { buildPageMetadataFromSeo } from "@/lib/seo-metadata";
+import { seoFaqsOrFallback } from "@/lib/seo-page-faqs";
+import { managedOfficeCitySeo, managedOfficeListingSeo } from "@/lib/seo-templates";
 import { VerticalCityPage } from "@/modules/city-pages/vertical-city-page";
 import { OfficeSpaceDetailPage } from "@/modules/office-space/office-space-detail-page";
 import { getVerticalCityPageContent } from "@/services/cities";
 import { loadOfficeSpaceDetail } from "@/services/office-space-detail-api";
 import { officeSpacesAsSpaces } from "@/services/office-space-api";
+import { getSeoBySlug } from "@/services/seo-content";
+import type { SeoContent } from "@/types/seo.model";
 import { toTitleCase } from "@/utils/format";
 
 
@@ -20,19 +26,20 @@ export async function generateMetadata({
   const cityPage = await getVerticalCityPageContent("office-space", segment);
 
   if (cityPage) {
-    return buildMetadataWithCmsSeoFallback(`/managed-office/${cityPage.city.slug}`, {
-      title: cityPage.title,
-      description: cityPage.subtitle,
-    });
+    return buildMetadataWithCmsSeoFallback(
+      `/managed-office/${cityPage.city.slug}`,
+      managedOfficeCitySeo(cityPage.city.name),
+    );
   }
 
   const office = await loadOfficeSpaceDetail(segment);
   if (office) {
-    return buildMetadataWithCmsSeoFallback(`/managed-office/${office.slug}`, {
-      title: `${office.name} | Managed Office`,
-      description:
-        `${office.description ?? ""}`.trim() || "Explore premium managed offices across India.",
-    });
+    const pathname = `/managed-office/${office.slug}`;
+    // Per-office SEO from the API, when it is filled in.
+    if (office.seo?.title?.trim() && office.seo.status !== false) {
+      return buildPageMetadataFromSeo(pathname, office.seo as unknown as SeoContent);
+    }
+    return buildMetadataWithCmsSeoFallback(pathname, managedOfficeListingSeo(office));
   }
 
   return buildMetadataWithCmsSeoFallback(`/managed-office/${segment}`, {
@@ -49,7 +56,8 @@ export default async function OfficeSpaceSegmentPage({
   const { segment } = await params;
   const cityData = await getVerticalCityPageContent("office-space", segment);
   if (cityData) {
-    return <VerticalCityPage data={cityData} />;
+    const seo = await getSeoBySlug(pathnameToSeoSlug(`/managed-office/${cityData.city.slug}`));
+    return <VerticalCityPage data={{ ...cityData, faqs: seoFaqsOrFallback(seo, cityData.faqs) }} />;
   }
 
   const office = await loadOfficeSpaceDetail(segment);

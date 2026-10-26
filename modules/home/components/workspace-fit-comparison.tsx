@@ -43,14 +43,15 @@ const OPTIONS: ComparisonColumn[] = [
     },
   },
   {
-    title: "Managed Office",
-    href: "/managed-office",
+    // Figures from live PG listings: ~90% start at ₹6,500+/month, most ask 30 days' notice.
+    title: "Coliving & PG",
+    href: "/coliving",
     rows: {
-      bestFor: "Teams wanting their own lease",
-      teamSize: "1,000-1,00,000 sq ft",
-      commitment: "3-5 year lease",
-      moveIn: "30-120 days",
-      price: "₹65/sq ft",
+      bestFor: "Students, working professionals",
+      teamSize: "Single, double or triple sharing",
+      commitment: "Monthly, 30-day notice",
+      moveIn: "Same week",
+      price: "₹6,500/month",
     },
   },
   {

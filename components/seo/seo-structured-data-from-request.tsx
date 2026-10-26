@@ -1,6 +1,7 @@
 import { SeoStructuredData } from "@/components/seo/seo-structured-data";
 import { resolveCanonicalUrl } from "@/lib/canonical-url";
 import { getResolvedSeoForRequest } from "@/lib/seo-for-request";
+import { isFaqOwningHubPath } from "@/lib/vertical-detail-route";
 
 function isAddListingRoute(pathname: string) {
   return pathname === "/add" || pathname.startsWith("/add/");
@@ -16,12 +17,14 @@ export async function SeoStructuredDataFromRequest() {
 
   if (isAddListingRoute(pathSeg)) return null;
 
-  const hasJsonLd = Boolean(seo.script?.trim() || (seo.faqs && seo.faqs.length > 0));
+  // City/locality hubs emit FAQPage next to their in-page FAQ section.
+  const faqs = isFaqOwningHubPath(pathSeg) ? null : seo.faqs;
+  const hasJsonLd = Boolean(seo.script?.trim() || (faqs && faqs.length > 0));
   if (!hasJsonLd) return null;
 
   const pageUrl = resolveCanonicalUrl(pathname || "/", seo.url);
 
   return (
-    <SeoStructuredData scriptJson={seo.script} faqs={seo.faqs} pageUrl={pageUrl} />
+    <SeoStructuredData scriptJson={seo.script} faqs={faqs} pageUrl={pageUrl} />
   );
 }

@@ -4,8 +4,10 @@ import { Wifi } from "lucide-react";
 import { useState } from "react";
 
 import { buildMapsLink, type MapCoordinates } from "@/lib/coliving-map";
+import { roomFeatureList, roomOccupancy } from "@/lib/pg-room-occupancy";
 import { pgDescriptionParagraphs, pgStartingRent } from "@/services/pg-mapper";
 import type { PgDetail } from "@/types/pg.model";
+import { formatCurrency } from "@/utils/format";
 
 import {
   ColivingAmenityGrid,
@@ -20,7 +22,6 @@ import {
   Clock,
   DEFAULT_MEAL_SCHEDULE,
   DEFAULT_REVIEW_BARS,
-  DEFAULT_ROOM_FEATURES,
   Home,
   Users,
 } from "./coliving-detail-parts";
@@ -40,10 +41,31 @@ type ColivingDetailMainProps = {
 
 function buildHostTags(pg: PgDetail): string[] {
   const tags: string[] = ["↺ 48-hour move-in"];
-  if (pg.availableFrom) tags.push(`● Available from ${pg.availableFrom}`);
-  else tags.push("● Available all day");
+  tags.push(`● ${availabilityLabel(pg.availableFrom)}`);
   if (pg.postedBy) tags.push(`↑ Posted by ${pg.postedBy}`);
   return tags;
+}
+
+/** "Available now" once the date has passed (or is missing), otherwise "Available from 5 Nov 2026". */
+function availabilityLabel(availableFrom?: string): string {
+  const date = availableFrom ? new Date(availableFrom) : null;
+  if (!date || Number.isNaN(date.getTime()) || date.getTime() <= Date.now()) return "Available now";
+  return `Available from ${date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}`;
+}
+
+/** Explanations for host-selected rules that are only a label in the API. */
+function ruleText(rule: string, pg: PgDetail): string {
+  const lower = rule.toLowerCase();
+  if (lower.includes("lock-in") || lower.includes("lock in")) {
+    return pg.noticePeriod.required && pg.noticePeriod.days > 0
+      ? `A minimum stay applies, with ${pg.noticePeriod.days} days notice before you move out. Confirm the exact lock-in with the owner before booking.`
+      : "A minimum stay applies. Confirm the exact lock-in period with the owner before booking.";
+  }
+  if (lower.includes("guardian")) return "Parents and guardians cannot stay overnight.";
+  if (lower.includes("opposite gender")) return "Guests of the opposite gender are not allowed inside rooms.";
+  if (lower.includes("loud music")) return "Keep music and calls quiet after 10pm.";
+  if (lower.includes("vegetarian")) return "Only vegetarian food is cooked and allowed in the kitchen.";
+  return "";
 }
 
 function buildRules(pg: PgDetail) {
@@ -56,7 +78,7 @@ function buildRules(pg: PgDetail) {
     rules.push({
       type: isRestriction ? "no" : "allowed",
       title: rule,
-      text: "",
+      text: ruleText(rule, pg),
     });
   });
 
@@ -117,8 +139,21 @@ export function ColivingDetailMain({ pg }: ColivingDetailMainProps) {
     : null;
   const mapsLink = buildMapsLink(coordinates, pg.address);
 
+  const listedAmenities = new Set([...pg.commonAmenities, ...pg.roomAmenities].map((a) => a.toLowerCase()));
+  const notProvided = NOT_PROVIDED.filter((a) => !listedAmenities.has(a.toLowerCase()));
   const amenityItems =
-    amenTab === 0 ? pg.commonAmenities : amenTab === 1 ? pg.roomAmenities : NOT_PROVIDED;
+    amenTab === 0 ? pg.commonAmenities : amenTab === 1 ? pg.roomAmenities : notProvided;
+
+  const roomFeatures = roomFeatureList(pg.roomAmenities);
+  const minDeposit = Math.min(...pg.rooms.map((r) => r.deposit ?? Infinity));
+  const roomIntro = [
+    pg.roomAmenities.length
+      ? `Rooms come with ${pg.roomAmenities.slice(0, 6).join(", ").toLowerCase()}.`
+      : "",
+    Number.isFinite(minDeposit) && minDeposit > 0 ? `Security deposit from ${formatCurrency(minDeposit)}.` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const mealSchedule =
     pg.food.meals.length >= 3
@@ -144,7 +179,7 @@ export function ColivingDetailMain({ pg }: ColivingDetailMainProps) {
           hostName={pg.name.split(/[·,]/)[0]?.trim() || pg.postedBy || pg.name}
           hostInitials={hostInitials}
           verified={pg.verified}
-          subtitle={`${pg.type} · ${pg.rooms.length ? `${pg.rooms.length * 8} beds` : "Co-living"} · ${pg.contactSchedule || "Available all day"}`}
+          subtitle={[pg.type, pg.preferredGuests && pg.preferredGuests.toLowerCase() !== "all" ? `For ${pg.preferredGuests.toLowerCase()}` : "", pg.contactSchedule].filter(Boolean).join(" · ")}
           tags={buildHostTags(pg)}
         />
 
@@ -185,18 +220,17 @@ export function ColivingDetailMain({ pg }: ColivingDetailMainProps) {
           {pg.rooms.length} room type{pg.rooms.length !== 1 ? "s" : ""}.{" "}
           <ColivingAccent>Same residence</ColivingAccent>
         </ColivingSectionTitle>
-        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted sm:text-[0.9375rem]">
-          Every room comes fully furnished with a single bed, mattress, study desk, AC, hot water and a personal
-          cupboard. Deposit equals one month&apos;s rent — refundable on exit.
-        </p>
+        {roomIntro ? (
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted sm:text-[0.9375rem]">{roomIntro}</p>
+        ) : null}
 
         <div className="mt-8 flex flex-col gap-5 lg:grid lg:grid-cols-3 lg:gap-4">
           {pg.rooms.map((room) => (
             <ColivingRoomCard
               key={room.type}
               title={room.type}
-              specs="Fully furnished · attached bathroom"
-              features={[...DEFAULT_ROOM_FEATURES]}
+              specs={roomOccupancy(room.type)}
+              features={roomFeatures}
               rent={room.rent}
               deposit={room.deposit}
               recommended={room.rent != null && room.rent === minRent && minRent > 0}

@@ -7,10 +7,12 @@ import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
 import { buildPgColivingLocationPageParams } from "@/lib/pg-list-priority";
 import { seoFaqsOrFallback } from "@/lib/seo-page-faqs";
 import { seoPageTitleOrFallback } from "@/lib/seo-page-title";
+import { colivingLocalitySeo } from "@/lib/seo-templates";
 import { ColivingLocationPage } from "@/modules/coliving/coliving-location-page";
 import { getCatalogCityIdBySlug } from "@/services/catalog-city-id";
 import { getColivingLocationPageContent } from "@/services/coliving-location";
 import { loadPgList } from "@/services/pg-api";
+import { colivingMarketStats } from "@/services/market-stats";
 import { getSeoBySlug } from "@/services/seo-content";
 import { toTitleCase } from "@/utils/format";
 
@@ -29,10 +31,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     });
   }
 
-  return buildMetadataWithCmsSeoFallback(`/coliving/${segment}/${location}`, {
-    title: page.title,
-    description: page.subtitle,
-  });
+  const stats = await colivingMarketStats(page.city.name, page.locationName);
+  return buildMetadataWithCmsSeoFallback(
+    `/coliving/${page.citySlug}/${page.locationSlug}`,
+    colivingLocalitySeo(page.locationName, page.city.name, stats),
+  );
 }
 
 export default async function ColivingLocationRoute({ params }: PageProps) {
