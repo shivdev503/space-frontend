@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { notFound } from "next/navigation";
+import { cache } from "react";
 
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
 import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
@@ -17,6 +18,11 @@ import type { SeoContent } from "@/types/seo.model";
 import { toTitleCase } from "@/utils/format";
 
 
+/** Managed offices for a city page (shared by metadata and the page within one request). */
+const loadCityOffices = cache(async (catalogCityId?: string) =>
+  catalogCityId ? officeSpacesAsSpaces(catalogCityId, 36) : null,
+);
+
 export async function generateMetadata({
   params,
 }: {
@@ -26,10 +32,15 @@ export async function generateMetadata({
   const cityPage = await getVerticalCityPageContent("office-space", segment);
 
   if (cityPage) {
-    return buildMetadataWithCmsSeoFallback(
-      `/managed-office/${cityPage.city.slug}`,
-      managedOfficeCitySeo(cityPage.city.name),
-    );
+    const [metadata, offices] = await Promise.all([
+      buildMetadataWithCmsSeoFallback(`/managed-office/${cityPage.city.slug}`, managedOfficeCitySeo(cityPage.city.name)),
+      loadCityOffices(cityPage.catalogCityId),
+    ]);
+    // A city with no managed offices is a thin page: keep it out of Google until inventory exists.
+    if (offices && offices.length === 0) {
+      return { ...metadata, robots: { index: false, follow: true } };
+    }
+    return metadata;
   }
 
   const office = await loadOfficeSpaceDetail(segment);
@@ -56,8 +67,19 @@ export default async function OfficeSpaceSegmentPage({
   const { segment } = await params;
   const cityData = await getVerticalCityPageContent("office-space", segment);
   if (cityData) {
-    const seo = await getSeoBySlug(pathnameToSeoSlug(`/managed-office/${cityData.city.slug}`));
-    return <VerticalCityPage data={{ ...cityData, faqs: seoFaqsOrFallback(seo, cityData.faqs) }} />;
+    const [seo, initialOfficeSpaces] = await Promise.all([
+      getSeoBySlug(pathnameToSeoSlug(`/managed-office/${cityData.city.slug}`)),
+      loadCityOffices(cityData.catalogCityId),
+    ]);
+    return (
+      <VerticalCityPage
+        data={{
+          ...cityData,
+          faqs: seoFaqsOrFallback(seo, cityData.faqs),
+          initialOfficeSpaces: initialOfficeSpaces ?? undefined,
+        }}
+      />
+    );
   }
 
   const office = await loadOfficeSpaceDetail(segment);

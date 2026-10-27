@@ -10,9 +10,11 @@ import type { OfficeSpaceModel } from "@/types/office-space.model";
 import type { CityPageData } from "@/types";
 
 export function OfficeSpaceCityListing({ data }: { data: CityPageData }) {
-  const [offices, setOffices] = useState<OfficeSpaceModel.OfficeSpace[] | null>(null);
+  const initialOffices = data.initialOfficeSpaces;
+  const [offices, setOffices] = useState<OfficeSpaceModel.OfficeSpace[] | null>(initialOffices ?? null);
   const [visibleCount, setVisibleCount] = useState(24);
-  const needsRemote = Boolean(data.catalogCityId);
+  // Server-loaded offices (in the HTML for crawlers) skip the client fetch.
+  const needsRemote = Boolean(data.catalogCityId) && !initialOffices;
   const [loading, setLoading] = useState(needsRemote);
 
   useEffect(() => {

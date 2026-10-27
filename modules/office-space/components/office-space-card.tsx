@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Star } from "lucide-react";
 import type { OfficeSpaceModel } from "@/types/office-space.model";
+import { listingAltBase } from "@/lib/image-alt";
 import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/format";
 
@@ -51,7 +52,7 @@ export function OfficeSpaceCard({
         <div className="relative aspect-[16/11] overflow-hidden rounded-lg bg-slate-100 sm:aspect-square sm:rounded-2xl">
           <Image
             src={imageS3Link(office)}
-            alt={title}
+            alt={listingAltBase(office.name || title, "managed office", office.location?.micro_location?.name, office.location?.city?.name)}
             fill
             className="object-cover transition duration-700 group-hover:scale-[1.02]"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

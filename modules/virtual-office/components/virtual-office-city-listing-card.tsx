@@ -15,6 +15,7 @@ import { ContactFormModal } from "@/components/contact/contact-form-modal";
 import { virtualOfficePlanRows } from "@/lib/virtual-office-workspace-plans";
 import { deriveAppCitySlugFromWorkspace } from "@/services/coworking-workspace-mapper";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
+import { listingAltBase } from "@/lib/image-alt";
 import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/format";
 import { spaceImageUrl, toSpaceImageCdnUrl } from "@/lib/space-image-url";
@@ -77,7 +78,7 @@ export function VirtualOfficeCityListingCard({
       >
         <Image
           src={cardImageSrc(workspace)}
-          alt={workspace.name}
+          alt={listingAltBase(workspace.name, "virtual office", workspace.location?.micro_location?.name, workspace.location?.city?.name)}
           fill
           className="object-cover transition duration-300 hover:opacity-95"
           sizes="(max-width: 639px) 100vw, (max-width: 1023px) 100vw, 50vw"

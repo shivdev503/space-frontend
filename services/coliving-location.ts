@@ -61,7 +61,7 @@ function applyColivingLocalityToPage(
     ...page,
     locationSlug,
     locationName: localityName,
-    title: `Coliving Space in ${localityName}, ${cityName}`,
+    title: `PG & Coliving in ${localityName}, ${cityName}`,
     subtitle: `Explore furnished coliving rooms and PG options with meals, WiFi, and security near ${localityName}, ${cityName}.`,
   };
 }

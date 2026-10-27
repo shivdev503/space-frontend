@@ -42,6 +42,9 @@ const COMPANY_LINKS = [
   { label: "List Your Space", href: "/list-your-space" },
   { label: "Blog", href: "/blog" },
   { label: "Contact Us", href: "/contact" },
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Terms of Use", href: "/terms" },
+  { label: "Refund Policy", href: "/refund-policy" },
 ] as const;
 
 function LinkRow({

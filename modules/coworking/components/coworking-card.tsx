@@ -11,6 +11,7 @@ import {
   workspaceRating,
 } from "@/modules/coworking/components/coworking-detail-header";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
+import { listingAltBase } from "@/lib/image-alt";
 import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/format";
 import { spaceImageUrl, toSpaceImageCdnUrl } from "@/lib/space-image-url";
@@ -54,7 +55,7 @@ export function CoworkingCard({
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100">
               <Image
                 src={cardImageSrc(workspace)}
-                alt={workspace.name}
+                alt={listingAltBase(workspace.name, "coworking space", workspace.location?.micro_location?.name, workspace.location?.city?.name)}
                 fill
                 className="object-cover transition duration-700 group-hover:scale-[1.02]"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

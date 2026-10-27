@@ -20,7 +20,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(resolveAppUrl()),
   title: {
-    default: `${APP_NAME} | Premium Space Discovery`,
+    default: `Coworking Space, Office Space & PG in India | ${APP_NAME}`,
     template: `%s | ${APP_NAME}`,
   },
   description:

@@ -1048,7 +1048,7 @@ function buildCityPageTitle(vertical: SpaceVertical, cityName: string) {
   }
 
   if (vertical === "coliving") {
-    return `Coliving Space in ${cityName}`;
+    return `PG & Coliving in ${cityName}`;
   }
 
   return `Managed Office in ${cityName}`;
@@ -1383,7 +1383,7 @@ function buildLocationPageTitle(
   }
 
   if (vertical === "coliving") {
-    return `Coliving Space in ${locationName}, ${cityName}`;
+    return `PG & Coliving in ${locationName}, ${cityName}`;
   }
 
   return `Managed Office in ${locationName}, ${cityName}`;
@@ -2149,7 +2149,7 @@ export function getVerticalLandingData(vertical: SpaceVertical): VerticalLanding
     vertical,
     hero: {
       eyebrow: "Managed Office",
-      title: "Premium Managed Offices for Growing Teams",
+      title: "Managed Office Space for Rent in India",
       subtitle:
         "Private suites, managed spaces, and enterprise workplace solutions for teams that need polish and scale.",
       ctaLabel: "Find Managed Office",

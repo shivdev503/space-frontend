@@ -5,8 +5,9 @@ import Link from "next/link";
 import { Heart, MapPin, Star } from "lucide-react";
 
 import type { Space } from "@/types";
+import { listingAltBase } from "@/lib/image-alt";
 import { cn } from "@/utils/cn";
-import { formatCurrency } from "@/utils/format";
+import { formatCurrency, toTitleCase } from "@/utils/format";
 import { verticalPath } from "@/lib/vertical-path";
 
 const LISTING_IMAGE_FALLBACK =
@@ -35,7 +36,7 @@ export function VirtualOfficeCard({
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100">
             <Image
               src={space.images?.[0]?.trim() ? space.images[0] : LISTING_IMAGE_FALLBACK}
-              alt={space.name}
+              alt={listingAltBase(space.name, "virtual office", toTitleCase(space.location || ""), toTitleCase(space.city || ""))}
               fill
               className="object-cover transition duration-700 group-hover:scale-[1.02]"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

@@ -51,7 +51,7 @@ export function getFallbackSeoContent(pathname: string, slug: string): SeoConten
 
   if (v === "home") {
     return {
-      title: "Premium Space Discovery across India",
+      title: `Coworking Space, Office Space & PG in India | ${APP_NAME}`,
       description:
         "Compare coworking spaces, virtual offices, managed office options, and coliving/PG homes with SpaceWallah — find locations, plans, and deals that match your team.",
       path: "/",
@@ -63,7 +63,7 @@ export function getFallbackSeoContent(pathname: string, slug: string): SeoConten
 
   if (v === "coworking") {
     return {
-      title: `Coworking across India | ${APP_NAME}`,
+      title: `Coworking Space in India | 1000+ Verified Spaces | ${APP_NAME}`,
       description: coworking.description,
       path: p,
       footer_title: `Coworking on ${APP_NAME}`,
@@ -72,7 +72,7 @@ export function getFallbackSeoContent(pathname: string, slug: string): SeoConten
   }
   if (v === "office") {
     return {
-      title: `Managed office across India | ${APP_NAME}`,
+      title: `Office Space for Rent in India | Managed Offices | ${APP_NAME}`,
       description: office.description,
       path: p,
       footer_title: `Managed office on ${APP_NAME}`,
@@ -81,7 +81,7 @@ export function getFallbackSeoContent(pathname: string, slug: string): SeoConten
   }
   if (v === "virtual") {
     return {
-      title: `Virtual offices across India | ${APP_NAME}`,
+      title: `Virtual Office in India for GST & Company Registration | ${APP_NAME}`,
       description: virtual.description,
       path: p,
       footer_title: `Virtual office on ${APP_NAME}`,
@@ -90,7 +90,7 @@ export function getFallbackSeoContent(pathname: string, slug: string): SeoConten
   }
   if (v === "coliving") {
     return {
-      title: `Coliving Space across India | ${APP_NAME}`,
+      title: `PG & Coliving in India | Furnished Rooms with Food | ${APP_NAME}`,
       description: coliving.description,
       path: p,
       footer_title: `Coliving Space on ${APP_NAME}`,

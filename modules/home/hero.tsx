@@ -54,7 +54,7 @@ export function HomeHero({ searchOptions, featuredSpaces }: HomeHeroProps) {
           </FadeIn>
           <FadeIn delay={0.08}>
             <h1 className="mt-5 font-display text-3xl leading-[1.08] tracking-[-0.03em] text-[#faf6ee] drop-shadow-[0_6px_28px_rgba(8,6,5,0.55)] sm:text-4xl lg:text-5xl">
-              Find Your Perfect Space With Ease
+              Find Perfect Space for Work and Stay
             </h1>
           </FadeIn>
           <div

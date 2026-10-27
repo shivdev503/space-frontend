@@ -1,4 +1,5 @@
 import { Container } from "@/components/ui/container";
+import { listingAltBase } from "@/lib/image-alt";
 import { CoworkingDetailAbout } from "@/modules/coworking/components/coworking-detail/coworking-detail-about";
 import { CoworkingDetailAmenities } from "@/modules/coworking/components/coworking-detail/coworking-detail-amenities";
 import { CoworkingDetailBreadcrumb } from "@/modules/coworking/components/coworking-detail/coworking-detail-breadcrumb";
@@ -74,7 +75,16 @@ export function CoworkingDetailPage({
       <Container className="max-w-[1280px] pt-4 sm:pt-8 max-lg:px-4">
         <CoworkingDetailBreadcrumb workspace={workspace} />
         <CoworkingDetailHero workspace={workspace} />
-        <SpaceDetailGallery name={workspace.name} images={images} />
+        <SpaceDetailGallery
+          name={workspace.name}
+          altBase={listingAltBase(
+            workspace.name,
+            "coworking space",
+            workspace.location?.micro_location?.name,
+            workspace.location?.city?.name,
+          )}
+          images={images}
+        />
       </Container>
 
       <Container className="max-w-[1280px]">

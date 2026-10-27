@@ -1,6 +1,8 @@
 import { Container } from "@/components/ui/container";
+import { listingAltBase } from "@/lib/image-alt";
 import { SpaceDetailGallery } from "@/modules/space-detail/components/space-detail-gallery";
 import type { Space } from "@/types";
+import { toTitleCase } from "@/utils/format";
 
 type VirtualOfficeDetailGalleryProps = {
   space: Space;
@@ -38,6 +40,7 @@ export function VirtualOfficeDetailGallery({ space }: VirtualOfficeDetailGallery
         </div>
         <SpaceDetailGallery
           name={space.name}
+          altBase={listingAltBase(space.name, "virtual office", toTitleCase(space.location || ""), toTitleCase(space.city || ""))}
           images={images}
           imageAdjustments={imageAdjustments}
         />

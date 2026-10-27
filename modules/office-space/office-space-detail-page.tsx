@@ -3,6 +3,7 @@ import { MapPin, Star } from "lucide-react";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { Container } from "@/components/ui/container";
 import { listingTrail } from "@/lib/breadcrumb-trails";
+import { listingAltBase } from "@/lib/image-alt";
 import { buildMapsLink, normalizeMapCoordinates } from "@/lib/space-detail-map";
 import { OfficeSpaceHighlights } from "@/modules/office-space/components/office-space-highlights";
 import { OfficeSpaceCard } from "@/modules/office-space/components/office-space-card";
@@ -82,6 +83,7 @@ export function OfficeSpaceDetailPage({
           />
           <SpaceDetailGallery
             name={office.name ?? "Office space"}
+            altBase={listingAltBase(office.name ?? title, "managed office", micro, city)}
             images={galleryImages}
             imageAdjustments={imageAdjustments}
           />

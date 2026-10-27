@@ -72,7 +72,7 @@ export function CoworkingHero({ cities, className }: CoworkingHeroProps) {
         </span>
 
         <h1 className="max-w-[880px] font-display text-[1.65rem] font-bold leading-[1.12] tracking-[-0.03em] min-[400px]:text-[1.85rem] sm:text-[clamp(2.25rem,5vw,4.875rem)] sm:leading-[1.05] sm:tracking-[-0.035em]">
-          <span className="block text-ink sm:whitespace-nowrap">Find the Right Workspace</span>{" "}
+          <span className="block text-ink sm:whitespace-nowrap">Find Coworking Space</span>{" "}
           <span
             className={cn(
               "mt-0.5 block text-[color:var(--color-accent)] transition duration-250 sm:mt-0",

@@ -9,6 +9,7 @@ import { colivingDetailHref } from "@/lib/coliving-urls";
 import { ColivingListingCardViewNumber } from "@/modules/coliving/components/coliving-listing-card-view-number";
 import { pgImagesSorted, pgStartingRent } from "@/services/pg-mapper";
 import type { PgDetail } from "@/types/pg.model";
+import { listingAltBase, listingPhotoAlt } from "@/lib/image-alt";
 import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/format";
 
@@ -25,11 +26,13 @@ type ColivingListingCardProps = {
 function ColivingListingCardCarousel({
   images,
   name,
+  altBase,
   href,
   verified,
 }: {
   images: string[];
   name: string;
+  altBase: string;
   href: string;
   verified: boolean;
 }) {
@@ -83,7 +86,7 @@ function ColivingListingCardCarousel({
           >
             <RemoteImage
               src={src}
-              alt={`${name} — photo ${i + 1}`}
+              alt={listingPhotoAlt(altBase, i)}
               fill
               className="object-cover"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
@@ -174,7 +177,13 @@ export function ColivingListingCard({ pg, className }: ColivingListingCardProps)
 
   return (
     <article className={cn("group flex h-full min-h-0 flex-col", className)}>
-      <ColivingListingCardCarousel images={images} name={pg.name} href={href} verified={pg.verified} />
+      <ColivingListingCardCarousel
+        images={images}
+        name={pg.name}
+        altBase={listingAltBase(pg.name, "PG", pg.locality, pg.city)}
+        href={href}
+        verified={pg.verified}
+      />
 
       <Link href={href} className="mt-3 block min-w-0 space-y-0.5">
         <div className="flex items-start justify-between gap-3">

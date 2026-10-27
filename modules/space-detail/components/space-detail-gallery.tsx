@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Grid3X3, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { listingPhotoAlt } from "@/lib/image-alt";
 import { cn } from "@/utils/cn";
 
 export type ImageGalleryAdjustment = {
@@ -17,6 +18,8 @@ type ImageEntry = { src: string; originalIndex: number };
 
 export type SpaceDetailGalleryProps = {
   name: string;
+  /** Descriptive alt text base, e.g. "Awfis coworking space in Sector 62, Noida" (defaults to `name`). */
+  altBase?: string;
   images: string[];
   /** Per-image brightness/contrast (same indices as `images` before dedupe). */
   imageAdjustments?: Array<ImageGalleryAdjustment | undefined>;
@@ -67,10 +70,12 @@ function filterStyleForIndex(
 
 export function SpaceDetailGallery({
   name,
+  altBase,
   images,
   imageAdjustments,
   className,
 }: SpaceDetailGalleryProps) {
+  const altText = altBase?.trim() || name;
   const allEntries = useMemo(() => uniqueImageEntries(images), [images]);
   const allPhotos = useMemo(() => allEntries.map((e) => e.src), [allEntries]);
   const preview = useMemo(() => allEntries.slice(0, 5), [allEntries]);
@@ -223,7 +228,7 @@ export function SpaceDetailGallery({
             >
               <RemoteImage
                 src={entry.src}
-                alt={`${name} — photo ${i + 1}`}
+                alt={listingPhotoAlt(altText, i)}
                 fill
                 className="object-cover transition duration-700 group-hover:scale-[1.04]"
                 sizes="(max-width: 880px) 100vw, 50vw"
@@ -316,7 +321,7 @@ export function SpaceDetailGallery({
                         >
                           <RemoteImage
                             src={entry.src}
-                            alt={`${name} — photo ${photoIndex + 1}`}
+                            alt={listingPhotoAlt(altText, photoIndex)}
                             fill
                             className="object-cover transition duration-500 group-hover:brightness-[0.92]"
                             sizes={row.length === 1 ? "(max-width: 880px) 100vw, 880px" : "(max-width: 640px) 100vw, 440px"}
@@ -359,7 +364,7 @@ export function SpaceDetailGallery({
                 <div className="relative min-h-0 flex-1 overflow-hidden rounded-[1.25rem] border border-white/10 bg-black/40">
                   <RemoteImage
                     src={activeSrc}
-                    alt={`${name} — photo ${lightboxIndex + 1}`}
+                    alt={listingPhotoAlt(altText, lightboxIndex)}
                     fill
                     className="object-contain p-1 sm:p-2"
                     sizes="100vw"
@@ -409,7 +414,7 @@ export function SpaceDetailGallery({
                     >
                       <RemoteImage
                         src={entry.src}
-                        alt={`${name} thumbnail ${i + 1}`}
+                        alt={listingPhotoAlt(altText, i)}
                         fill
                         className="object-cover"
                         sizes="128px"
