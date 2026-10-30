@@ -72,6 +72,79 @@ function teamToPersonCount(team: string): string {
   return "1";
 }
 
+/** Copy, options and CRM fields for the lead form, so other verticals can reuse it. */
+export type LeadQuizConfig = {
+  heading: string;
+  subheading: string;
+  priceLabel: string;
+  lookingQuestion: string;
+  lookingOptions: QuizOption[];
+  teamQuestion: string;
+  teamOptions: QuizOption[];
+  teamToCount: (team: string) => string;
+  submitLabel: string;
+  doneMessage: string;
+  /** Appended to the space name in the enquiry, e.g. "coworking tour". */
+  enquiryContext: string;
+  spaceListingKey: "work_space" | "office_space" | "managed_office";
+  mxSpaceType: string;
+  emailPrefix: string;
+};
+
+const COWORKING_QUIZ: LeadQuizConfig = {
+  heading: "Book a free tour",
+  subheading: "Answer 3 quick questions — we'll line up a visit & your best rate.",
+  priceLabel: "Starting from",
+  lookingQuestion: "What are you looking for?",
+  lookingOptions: LOOKING_OPTIONS,
+  teamQuestion: "How big is your team?",
+  teamOptions: TEAM_OPTIONS,
+  teamToCount: teamToPersonCount,
+  submitLabel: "Get my free tour & quote",
+  doneMessage: "Our SpaceWallah expert will call you shortly to schedule your visit and share the best available rate.",
+  enquiryContext: "coworking tour",
+  spaceListingKey: "work_space",
+  mxSpaceType: "Web Coworking",
+  emailPrefix: "coworking.lead",
+};
+
+const OFFICE_TEAM_COUNTS: Record<string, string> = {
+  "Up to 20 seats": "15",
+  "20–50 seats": "35",
+  "50–100 seats": "75",
+  "100–250 seats": "150",
+  "250+ seats": "250",
+};
+
+export const MANAGED_OFFICE_QUIZ: LeadQuizConfig = {
+  heading: "Book a site visit",
+  subheading: "Answer 3 quick questions — we'll arrange a visit & negotiate the best terms.",
+  priceLabel: "Starting from",
+  lookingQuestion: "What kind of office do you need?",
+  // Values match the managed office seat types, so a plan's "Get quote" pre-selects its answer.
+  lookingOptions: [
+    { value: "Ready to move in", label: "Ready to move in", icon: Building2 },
+    { value: "Warm shell", label: "Warm shell", icon: Briefcase },
+    { value: "Bare shell", label: "Bare shell", icon: DoorClosed },
+    { value: "Not sure yet", label: "Not sure yet", icon: Search },
+  ],
+  teamQuestion: "How many seats do you need?",
+  teamOptions: [
+    { value: "Up to 20 seats", label: "Up to 20 seats", icon: User },
+    { value: "20–50 seats", label: "20–50 seats", icon: Users },
+    { value: "50–100 seats", label: "50–100 seats", icon: Users },
+    { value: "100–250 seats", label: "100–250 seats", icon: Building },
+    { value: "250+ seats", label: "250+ seats", icon: Building2 },
+  ],
+  teamToCount: (team) => OFFICE_TEAM_COUNTS[team] ?? "20",
+  submitLabel: "Get my site visit & quote",
+  doneMessage: "Our SpaceWallah expert will call you shortly to schedule your site visit and share the best terms.",
+  enquiryContext: "managed office site visit",
+  spaceListingKey: "managed_office",
+  mxSpaceType: "Web Managed Office",
+  emailPrefix: "office.lead",
+};
+
 type CoworkingDetailLeadQuizProps = {
   workspaceName: string;
   citySlug: string;
@@ -80,6 +153,7 @@ type CoworkingDetailLeadQuizProps = {
   startingFrom: number;
   priceSuffix: string;
   membershipHint?: string;
+  config?: LeadQuizConfig;
 };
 
 export function CoworkingDetailLeadQuiz({
@@ -90,6 +164,7 @@ export function CoworkingDetailLeadQuiz({
   startingFrom,
   priceSuffix,
   membershipHint,
+  config = COWORKING_QUIZ,
 }: CoworkingDetailLeadQuizProps) {
   const { open, closeQuiz, presetNeed, consumePresetNeed, registerReset } = useCoworkingLeadQuiz();
 
@@ -172,7 +247,7 @@ export function CoworkingDetailLeadQuiz({
     setSubmitError(null);
     try {
       const interestedIn = [
-        `${workspaceName} — coworking tour`,
+        `${workspaceName} — ${config.enquiryContext}`,
         lookingFor && `Looking for: ${lookingFor}`,
         teamSize && `Team: ${teamSize}`,
         moveIn && `Move-in: ${moveIn}`,
@@ -182,16 +257,16 @@ export function CoworkingDetailLeadQuiz({
 
       const body = buildUserEnquiryBody({
         name: name.trim(),
-        email: `coworking.lead+${toPhone10(phone)}@spacewallah.com`,
+        email: `${config.emailPrefix}+${toPhone10(phone)}@spacewallah.com`,
         phone,
         interestedIn,
         city: citySlug,
         microlocation: microlocation || undefined,
         pageUrl: typeof window !== "undefined" ? window.location.href : "",
         spaceId,
-        spaceListingKey: "work_space",
-        mxSpaceType: "Web Coworking",
-        noOfPerson: teamToPersonCount(teamSize),
+        spaceListingKey: config.spaceListingKey,
+        mxSpaceType: config.mxSpaceType,
+        noOfPerson: config.teamToCount(teamSize),
         moveInDate: moveIn,
       });
 
@@ -215,11 +290,12 @@ export function CoworkingDetailLeadQuiz({
     submitting,
     teamSize,
     workspaceName,
+    config,
   ]);
 
   const priceHeader = (
     <div className="border-b border-[#EEF0ED] bg-gradient-to-b from-[#EDF7EE] to-white px-5 pb-4 pt-5 sm:px-6">
-      <p className="text-[13px] font-semibold text-muted">Starting from</p>
+      <p className="text-[13px] font-semibold text-muted">{config.priceLabel}</p>
       <p className="mt-0.5 text-[28px] font-extrabold tracking-[-0.03em] text-ink sm:text-[32px]">
         {startingFrom > 0 ? formatCurrency(startingFrom) : "On request"}{" "}
         {startingFrom > 0 ? (
@@ -258,6 +334,7 @@ export function CoworkingDetailLeadQuiz({
       onPhone={setPhone}
       onBack={() => setStep((s) => Math.max(0, s - 1))}
       onSubmit={() => void handleSubmit()}
+      config={config}
     />
   );
 
@@ -270,10 +347,8 @@ export function CoworkingDetailLeadQuiz({
         >
           {priceHeader}
           <div className="px-5 pb-5 pt-5 sm:px-6 sm:pb-6">
-            <h3 className="text-lg font-extrabold tracking-[-0.02em] text-ink">Book a free tour</h3>
-            <p className="mt-1 text-[13.5px] text-muted">
-              Answer 3 quick questions — we&apos;ll line up a visit &amp; your best rate.
-            </p>
+            <h3 className="text-lg font-extrabold tracking-[-0.02em] text-ink">{config.heading}</h3>
+            <p className="mt-1 text-[13.5px] text-muted">{config.subheading}</p>
             <div className="mt-4">{quizPanel}</div>
           </div>
         </div>
@@ -288,7 +363,7 @@ export function CoworkingDetailLeadQuiz({
             exit={{ opacity: 0 }}
             role="dialog"
             aria-modal="true"
-            aria-label="Book a free tour"
+            aria-label={config.heading}
             onClick={handleClose}
           >
             <motion.div
@@ -309,10 +384,8 @@ export function CoworkingDetailLeadQuiz({
               </button>
 
               <div className="shrink-0 px-[22px] pb-4 pt-[26px] pr-[52px]">
-                <h3 className="text-[22px] font-extrabold tracking-[-0.02em] text-ink">Book a free tour</h3>
-                <p className="mt-1.5 text-[13.5px] text-muted">
-                  Answer 3 quick questions — we&apos;ll line up a visit &amp; your best rate.
-                </p>
+                <h3 className="text-[22px] font-extrabold tracking-[-0.02em] text-ink">{config.heading}</h3>
+                <p className="mt-1.5 text-[13.5px] text-muted">{config.subheading}</p>
               </div>
 
               <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-[22px] pb-[max(28px,env(safe-area-inset-bottom))]">
@@ -349,6 +422,7 @@ type CoworkingQuizBodyProps = {
   onPhone: (v: string) => void;
   onBack: () => void;
   onSubmit: () => void;
+  config: LeadQuizConfig;
 };
 
 function CoworkingQuizBody({
@@ -373,6 +447,7 @@ function CoworkingQuizBody({
   onPhone,
   onBack,
   onSubmit,
+  config,
 }: CoworkingQuizBodyProps) {
   if (done) {
     return (
@@ -380,7 +455,7 @@ function CoworkingQuizBody({
         <CircleCheckBig className="h-12 w-12 text-[color:var(--color-brand)]" strokeWidth={1.5} />
         <h3 className="text-xl font-extrabold tracking-[-0.02em] text-ink">You&apos;re all set!</h3>
         <p className="max-w-[34ch] text-[14px] leading-relaxed text-muted">
-          Our SpaceWallah expert will call you shortly to schedule your visit and share the best available rate.
+          {config.doneMessage}
         </p>
       </div>
     );
@@ -400,8 +475,8 @@ function CoworkingQuizBody({
 
       {step === 0 ? (
         <QuizStep
-          question="What are you looking for?"
-          options={LOOKING_OPTIONS}
+          question={config.lookingQuestion}
+          options={config.lookingOptions}
           gridCols={2}
           onSelect={(value) => {
             onLookingFor(value);
@@ -412,8 +487,8 @@ function CoworkingQuizBody({
 
       {step === 1 ? (
         <QuizStep
-          question="How big is your team?"
-          options={TEAM_OPTIONS}
+          question={config.teamQuestion}
+          options={config.teamOptions}
           gridCols={2}
           onSelect={(value) => {
             onTeamSize(value);
@@ -487,7 +562,7 @@ function CoworkingQuizBody({
             )}
           >
             {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {submitting ? "Sending…" : "Get my free tour & quote"}
+            {submitting ? "Sending…" : config.submitLabel}
           </button>
 
           <p className="flex items-center justify-center gap-1.5 text-center text-[12px] text-muted">

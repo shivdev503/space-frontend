@@ -14,6 +14,7 @@ import { MobileMenuDrawer } from "@/components/layout/mobile-menu-drawer";
 import { SearchBar } from "@/modules/home/components/search-bar";
 import { SearchOption } from "@/types";
 import { cn } from "@/utils/cn";
+import { isSiteHeaderHidden } from "@/lib/header-visibility";
 
 const headerSearchLocations: SearchOption[] = [
   { label: "Delhi", value: "delhi" },
@@ -95,9 +96,7 @@ export function Header() {
   const useSolidHeader = !isHomepage || isScrolled;
   const shouldExpandHeader = isHomepage && isScrolled && isHeaderSearchExpanded;
   const showFloatingHeroHeader = isHomepage && !isScrolled;
-  const isColivingListingWizard = pathname?.startsWith("/add/coliving-space");
-
-  if (isColivingListingWizard) {
+  if (isSiteHeaderHidden(pathname)) {
     return null;
   }
 

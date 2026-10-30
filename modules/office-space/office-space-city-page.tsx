@@ -4,7 +4,7 @@ import { CityPageFaqSection } from "@/modules/city-pages/components/city-page-fa
 import { CityPageHero } from "@/modules/city-pages/components/city-page-hero";
 import { CityPageLeadCtaBand } from "@/modules/city-pages/components/city-page-lead-cta-band";
 import { PopularLocalitiesRail } from "@/modules/city-pages/components/popular-localities-rail";
-import { OfficeSpaceCityListing } from "@/modules/office-space/components/office-space-city-listing";
+import { ManagedOfficeCityListing } from "@/modules/managed-office/components/managed-office-city-listing";
 import type { CityPageData } from "@/types";
 
 export function OfficeSpaceCityPage({ data }: { data: CityPageData }) {
@@ -25,7 +25,7 @@ export function OfficeSpaceCityPage({ data }: { data: CityPageData }) {
       </CityPageHero>
       <section className="pt-2 pb-14 sm:pt-3 sm:pb-20">
         <Container>
-          <OfficeSpaceCityListing data={data} />
+          <ManagedOfficeCityListing data={data} />
         </Container>
       </section>
       <CityPageLeadCtaBand

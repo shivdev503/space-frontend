@@ -29,7 +29,7 @@ type StickyLeadFormProps = {
   submitLabel: string;
   interestedInDefault?: string;
   mxSpaceType?: string;
-  spaceListingKey?: "work_space" | "office_space" | "living_space";
+  spaceListingKey?: "work_space" | "office_space" | "living_space" | "managed_office";
   microlocation?: string;
   /** Coworking detail mock layout — desktop card only; pair with {@link CoworkingDetailMobileBar}. */
   variant?: "default" | "coworking-detail";

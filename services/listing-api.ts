@@ -52,6 +52,7 @@ export const listingApiPaths = {
   validateVendor: "/api/user/validateVendor",
   vendorSignUp: "/api/user/vendorSignUp",
   resendOtp: "/api/user/resendOTP",
+  vendorGoogleLogin: "/api/user/vendorGoogleLogin",
   vendorDetails: (phone: string) =>
     `/api/user/vendorDetails?phone_number=${encodeURIComponent(phone)}`,
 
@@ -193,6 +194,20 @@ export async function validateVendor(
   try {
     const res = await getListingAxios().post<ListingModel.VendorSession>(
       listingApiPaths.validateVendor,
+      payload,
+    );
+    return toSuccess(res);
+  } catch (err) {
+    return toFailure(err);
+  }
+}
+
+export async function vendorGoogleLogin(
+  payload: ListingModel.VendorGoogleLoginRequest,
+): Promise<ListingApiResult<ListingModel.VendorGoogleLoginResponse>> {
+  try {
+    const res = await getListingAxios().post<ListingModel.VendorGoogleLoginResponse>(
+      listingApiPaths.vendorGoogleLogin,
       payload,
     );
     return toSuccess(res);

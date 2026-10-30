@@ -13,6 +13,7 @@ import {
 import { buildApiClientHeaders } from "@/services/api-client-headers";
 import { listSpaces } from "@/services/mock-db";
 import type { OfficeSpaceModel } from "@/types/office-space.model";
+import { normalizeOfficeLocation } from "@/lib/office-location";
 
 const DEFAULT_LIMIT = 36;
 
@@ -78,7 +79,7 @@ export async function officeSpacesAsSpaces(
       const slug = typeof row.slug === "string" ? row.slug.trim() : "";
       if (!_id || !slug) continue;
       const id = typeof row.id === "string" && row.id.trim() ? row.id.trim() : _id;
-      officeSpaces.push({ ...(row as any), _id, id } as OfficeSpaceModel.OfficeSpace);
+      officeSpaces.push(normalizeOfficeLocation({ ...(row as any), _id, id }) as OfficeSpaceModel.OfficeSpace);
     }
     return officeSpaces;
   } catch {

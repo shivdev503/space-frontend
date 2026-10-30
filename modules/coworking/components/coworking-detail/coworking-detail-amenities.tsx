@@ -7,7 +7,12 @@ import {
 } from "@/modules/coworking/components/coworking-detail/coworking-detail-ui";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 
-export function CoworkingDetailAmenities({ workspace }: { workspace: CoworkingModel.WorkSpace }) {
+/** Shared by coworking and managed office pages; only reads `amenties`. */
+export function CoworkingDetailAmenities({
+  workspace,
+}: {
+  workspace: { amenties?: CoworkingModel.WorkSpace["amenties"] };
+}) {
   // The API can list the same amenity twice (e.g. "Workshops") — show each name once.
   const seen = new Set<string>();
   const amenities = (workspace.amenties ?? [])

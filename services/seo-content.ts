@@ -1,5 +1,6 @@
 import { cache } from "react";
 
+import { legacySeoSlug } from "@/lib/pathname-to-seo-slug";
 import { normalizeSeoFromResponse } from "@/lib/seo-normalize";
 import { buildApiClientHeaders } from "@/services/api-client-headers";
 import { resolveApiBaseUrl, resolveInternalAppBaseUrl } from "@/services/env-config";
@@ -34,8 +35,16 @@ async function fetchSeoBySlugInternal(slug: string): Promise<SeoContent | null> 
   return null;
 }
 
+/** CMS entry for the slug, falling back to the legacy `office-space-…` slug for managed office URLs. */
+async function fetchSeoWithLegacyFallback(slug: string): Promise<SeoContent | null> {
+  const current = await fetchSeoBySlugInternal(slug);
+  if (current) return current;
+  const legacy = legacySeoSlug(slug);
+  return legacy ? fetchSeoBySlugInternal(legacy) : null;
+}
+
 /**
  * Deduplicate SEO fetch in the same request (e.g. `generateMetadata` + layout).
  * Always hits the upstream API — no cross-request cache.
  */
-export const getSeoBySlug = cache((slug: string) => fetchSeoBySlugInternal(slug));
+export const getSeoBySlug = cache((slug: string) => fetchSeoWithLegacyFallback(slug));

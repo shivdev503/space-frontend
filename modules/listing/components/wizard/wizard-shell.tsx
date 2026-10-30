@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/utils/cn";
 
 export type WizardStep = {
@@ -149,7 +150,15 @@ export function WizardShell({
               "disabled:cursor-not-allowed disabled:opacity-60",
             )}
           >
-            {busy ? "Saving…" : isLast ? submitLabel : "Next"}
+            {busy ? (
+              <span className="inline-flex items-center gap-2">
+                <Spinner /> Saving…
+              </span>
+            ) : isLast ? (
+              submitLabel
+            ) : (
+              "Next"
+            )}
           </button>
         </div>
       </div>

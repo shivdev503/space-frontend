@@ -132,7 +132,10 @@ export function managedOfficeCitySeo(city: string): SeoCopy {
   };
 }
 
-export function managedOfficeListingSeo(office: CoworkingModel.WorkSpace): SeoCopy {
+export function managedOfficeListingSeo(office: {
+  name: string;
+  location?: { micro_location?: { name?: string }; city?: { name?: string } };
+}): SeoCopy {
   const locality = office.location?.micro_location?.name?.trim() ?? "";
   const city = office.location?.city?.name?.trim() ?? "";
   return {

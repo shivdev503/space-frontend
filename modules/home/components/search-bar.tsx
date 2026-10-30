@@ -11,7 +11,7 @@ import {
   loadCoworkingWorkspaceSearchHits,
   type CoworkingSearchHit,
 } from "@/services/coworking-api";
-import { loadOfficeSpaceSearchHits, type OfficeSpaceSearchHit } from "@/services/office-space-api";
+import { loadManagedOfficeSearchHits, type ManagedOfficeSearchHit } from "@/services/managed-office-api";
 import { loadPgSearchHits, type PgSearchHit } from "@/services/pg-api";
 import { getCatalogCityIdBySlug } from "@/services/catalog-city-id";
 import { SearchOption } from "@/types";
@@ -105,7 +105,7 @@ export function SearchBar({
   const [selectedSpaceSlug, setSelectedSpaceSlug] = useState("");
   const [coworkingHits, setCoworkingHits] = useState<CoworkingSearchHit[]>([]);
   const [coworkingHitsLoading, setCoworkingHitsLoading] = useState(false);
-  const [officeHits, setOfficeHits] = useState<OfficeSpaceSearchHit[]>([]);
+  const [officeHits, setOfficeHits] = useState<ManagedOfficeSearchHit[]>([]);
   const [officeHitsLoading, setOfficeHitsLoading] = useState(false);
   const [pgHits, setPgHits] = useState<PgSearchHit[]>([]);
   const [pgHitsLoading, setPgHitsLoading] = useState(false);
@@ -261,7 +261,7 @@ export function SearchBar({
 
     setOfficeHitsLoading(true);
     const timer = window.setTimeout(() => {
-      loadOfficeSpaceSearchHits(catalogCityId, resolvedLocationSlug, {
+      loadManagedOfficeSearchHits(catalogCityId, {
         name: name || undefined,
         limit: 50,
       })

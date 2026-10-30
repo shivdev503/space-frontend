@@ -7,12 +7,12 @@ import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
 import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
 import { buildPageMetadataFromSeo } from "@/lib/seo-metadata";
 import { seoFaqsOrFallback } from "@/lib/seo-page-faqs";
+import { seoPageTitleOrFallback } from "@/lib/seo-page-title";
 import { managedOfficeCitySeo, managedOfficeListingSeo } from "@/lib/seo-templates";
 import { VerticalCityPage } from "@/modules/city-pages/vertical-city-page";
-import { OfficeSpaceDetailPage } from "@/modules/office-space/office-space-detail-page";
+import { ManagedOfficeDetailPage } from "@/modules/managed-office/managed-office-detail-page";
 import { getVerticalCityPageContent } from "@/services/cities";
-import { loadOfficeSpaceDetail } from "@/services/office-space-detail-api";
-import { officeSpacesAsSpaces } from "@/services/office-space-api";
+import { loadManagedOfficeDetail, managedOfficesByCity } from "@/services/managed-office-api";
 import { getSeoBySlug } from "@/services/seo-content";
 import type { SeoContent } from "@/types/seo.model";
 import { toTitleCase } from "@/utils/format";
@@ -20,7 +20,7 @@ import { toTitleCase } from "@/utils/format";
 
 /** Managed offices for a city page (shared by metadata and the page within one request). */
 const loadCityOffices = cache(async (catalogCityId?: string) =>
-  catalogCityId ? officeSpacesAsSpaces(catalogCityId, 36) : null,
+  catalogCityId ? managedOfficesByCity(catalogCityId, 60) : null,
 );
 
 export async function generateMetadata({
@@ -43,12 +43,13 @@ export async function generateMetadata({
     return metadata;
   }
 
-  const office = await loadOfficeSpaceDetail(segment);
+  const office = await loadManagedOfficeDetail(segment);
   if (office) {
     const pathname = `/managed-office/${office.slug}`;
-    // Per-office SEO from the API, when it is filled in.
-    if (office.seo?.title?.trim() && office.seo.status !== false) {
-      return buildPageMetadataFromSeo(pathname, office.seo as unknown as SeoContent);
+    // Per-office SEO from the API, when it is filled in (new_seo first, like workspaces).
+    const seo = office.new_seo?.title?.trim() ? office.new_seo : office.seo;
+    if (seo?.title?.trim() && seo.status !== false) {
+      return buildPageMetadataFromSeo(pathname, seo as unknown as SeoContent);
     }
     return buildMetadataWithCmsSeoFallback(pathname, managedOfficeListingSeo(office));
   }
@@ -67,7 +68,7 @@ export default async function OfficeSpaceSegmentPage({
   const { segment } = await params;
   const cityData = await getVerticalCityPageContent("office-space", segment);
   if (cityData) {
-    const [seo, initialOfficeSpaces] = await Promise.all([
+    const [seo, initialManagedOffices] = await Promise.all([
       getSeoBySlug(pathnameToSeoSlug(`/managed-office/${cityData.city.slug}`)),
       loadCityOffices(cityData.catalogCityId),
     ]);
@@ -75,22 +76,21 @@ export default async function OfficeSpaceSegmentPage({
       <VerticalCityPage
         data={{
           ...cityData,
+          title: seoPageTitleOrFallback(seo, cityData.title),
           faqs: seoFaqsOrFallback(seo, cityData.faqs),
-          initialOfficeSpaces: initialOfficeSpaces ?? undefined,
+          initialManagedOffices: initialManagedOffices ?? undefined,
         }}
       />
     );
   }
 
-  const office = await loadOfficeSpaceDetail(segment);
+  const office = await loadManagedOfficeDetail(segment);
   if (!office) notFound();
 
   const cityId = office.location?.city?.id?.trim();
   const similarOffices = cityId
-    ? ((await officeSpacesAsSpaces(cityId, 12)) ?? [])
-        .filter((o) => (o.id || o._id) !== (office.id || office._id))
-        .slice(0, 6)
+    ? ((await managedOfficesByCity(cityId, 12)) ?? []).filter((o) => o.id !== office.id).slice(0, 6)
     : [];
 
-  return <OfficeSpaceDetailPage office={office} similarOffices={similarOffices} />;
+  return <ManagedOfficeDetailPage office={office} similarOffices={similarOffices} />;
 }

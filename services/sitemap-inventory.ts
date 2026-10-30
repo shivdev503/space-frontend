@@ -119,7 +119,7 @@ export const loadVirtualOfficeInventory = cachedLoader(async () =>
 
 /** Managed office listings (`/managed-office/{slug}`); rows without a slug have no page. */
 export const loadManagedOfficeInventory = cachedLoader(async () => {
-  const json = await getJson("/api/user/officeSpaces", { limit: 1000 });
+  const json = await getJson("/api/user/managedOffices", { limit: 1000 });
   const rows = Array.isArray(json.data) ? json.data.filter(isRecord) : [];
   return rows
     .filter((row) => str(row.status) === "" || str(row.status) === "approve")

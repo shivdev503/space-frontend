@@ -1,11 +1,22 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+import { legacySeoSlug } from "@/lib/pathname-to-seo-slug";
+import { normalizeSeoFromResponse } from "@/lib/seo-normalize";
 import { buildApiClientHeaders } from "@/services/api-client-headers";
 import { resolveApiBaseUrl } from "@/services/env-config";
 
 export const dynamic = "force-dynamic";
 
 type Ctx = { params: Promise<{ slug: string }> };
+
+function hasSeoEntry(res: Response | null, text: string): boolean {
+  if (!res?.ok || !text) return false;
+  try {
+    return normalizeSeoFromResponse(JSON.parse(text)) != null;
+  } catch {
+    return false;
+  }
+}
 
 const NO_CACHE_HEADERS = {
   "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
@@ -22,17 +33,30 @@ export async function GET(_request: NextRequest, context: Ctx) {
   }
 
   const base = resolveApiBaseUrl();
-  const url = `${base}/api/user/newSeo/${encodeURIComponent(slug)}`;
-  const res = await fetch(url, {
-    cache: "no-store",
-    headers: buildApiClientHeaders(),
-  }).catch(() => null);
+  const load = (s: string) =>
+    fetch(`${base}/api/user/newSeo/${encodeURIComponent(s)}`, {
+      cache: "no-store",
+      headers: buildApiClientHeaders(),
+    }).catch(() => null);
+
+  let res = await load(slug);
+  let text = res ? await res.text() : "";
+
+  // Managed office URLs: fall back to the legacy `office-space-…` CMS slug when the new one has no entry.
+  const legacy = legacySeoSlug(slug);
+  if (legacy && !hasSeoEntry(res, text)) {
+    const legacyRes = await load(legacy);
+    const legacyText = legacyRes ? await legacyRes.text() : "";
+    if (hasSeoEntry(legacyRes, legacyText)) {
+      res = legacyRes;
+      text = legacyText;
+    }
+  }
 
   if (!res) {
     return NextResponse.json({ message: "SEO service unavailable" }, { status: 502, headers: NO_CACHE_HEADERS });
   }
 
-  const text = await res.text();
   return new NextResponse(text, {
     status: res.status,
     headers: {

@@ -38,7 +38,7 @@ export type ContactFormModalProps = {
    * (`work_space` for coworking / virtual office, `office_space` for office).
    * @default "work_space"
    */
-  spaceListingKey?: "work_space" | "office_space" | "living_space";
+  spaceListingKey?: "work_space" | "office_space" | "living_space" | "managed_office";
   /** Optional microlocation / neighbourhood string for `location[]`. */
   microlocation?: string;
 };

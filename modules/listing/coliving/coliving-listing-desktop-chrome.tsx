@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { Check, Clock, Info, MapPin } from "lucide-react";
 
+import { Spinner } from "@/components/ui/spinner";
+
 import { COLIVING_LISTING_STEPS } from "./coliving-listing.constants";
 import { COLIVING_DESKTOP_TIPS } from "./coliving-listing-desktop-tips";
 import { ColivingStepBody } from "./coliving-listing-step-body";
@@ -262,11 +264,11 @@ export function ColivingListingDesktopChrome({
                 disabled={busy}
                 onClick={() => void (isLast ? onSubmit() : onNext())}
               >
-                {busy
-                  ? isEdit
-                    ? "Saving…"
-                    : "Submitting…"
-                  : isLast
+                {busy ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Spinner /> {isEdit ? "Saving…" : "Submitting…"}
+                  </span>
+                ) : isLast
                     ? isEdit
                       ? "Update listing"
                       : "Submit listing"

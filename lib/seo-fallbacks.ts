@@ -10,7 +10,9 @@ function pickVertical(pathname: string, slug: string): VerticalKey {
     if (s === "generic") return "other";
     if (s === "home") return "other";
     if (s === "coworking" || s.startsWith("coworking-")) return "coworking";
-    if (s === "office-space" || s.startsWith("office-space-")) return "office";
+    if (s === "office-space" || s.startsWith("office-space-") || s === "managed-office" || s.startsWith("managed-office-")) {
+      return "office";
+    }
     if (s === "coliving" || s.startsWith("coliving-")) return "coliving";
     if (s === "virtual-office" || s.startsWith("virtual-office-")) return "virtual";
     if (s.startsWith("list-your-space") || s.startsWith("add")) return "listing";
@@ -101,10 +103,10 @@ export function getFallbackSeoContent(pathname: string, slug: string): SeoConten
     return {
       title: `List and manage your spaces | ${APP_NAME}`,
       description:
-        "Create a host account to list coworking and managed office inventory, manage leads, and keep your listings up to date.",
+        "Create a host account to list coworking spaces, managed offices and PG or coliving homes, track each listing's status and keep your listings up to date.",
       path: p,
       footer_title: "Hosts & property managers",
-      footer_description: `<p>List coworking and managed office listings on ${APP_NAME}, track leads, and update availability — all from one place.</p>`,
+      footer_description: `<p>List coworking spaces, managed offices and PG or coliving homes on ${APP_NAME}, track each listing's status and leads, and update availability, all from one place.</p>`,
     };
   }
   return {

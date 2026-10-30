@@ -1,5 +1,6 @@
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import type { OfficeSpaceModel } from "@/types/office-space.model";
+import type { ManagedOfficeModel } from "@/types/managed-office.model";
 
 export type SpaceVertical = "coworking" | "virtual-office" | "office-space" | "coliving";
 
@@ -221,6 +222,8 @@ export type CityPageData = {
   initialCoworkingListing?: InitialCoworkingListing;
   /** Managed office cards loaded on the server, so the HTML contains them. */
   initialOfficeSpaces?: OfficeSpaceModel.OfficeSpace[];
+  /** Managed office cards (`/api/user/managedOffices`) loaded on the server, so the HTML contains them. */
+  initialManagedOffices?: ManagedOfficeModel.ManagedOffice[];
   filters: {
     budgets: SearchOption[];
     teamSizes: SearchOption[];

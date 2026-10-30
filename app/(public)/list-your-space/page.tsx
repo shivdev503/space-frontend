@@ -3,13 +3,18 @@
 import { Eye, EyeOff, Headset, KeyRound, Mail, Phone, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { Container } from "@/components/ui/container";
-import { isListingOtpSkippedPublic } from "@/lib/listing-skip-otp";
+import { Spinner } from "@/components/ui/spinner";
+import { CONTACT_EMAIL, CONTACT_EMAIL_HREF, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_HREF } from "@/lib/contact-data";
+import { isListingOtpSkippedPublic, isListingPhoneLoginEnabledPublic } from "@/lib/listing-skip-otp";
 import { cn } from "@/utils/cn";
 
 const OTP_STEP_DISABLED = isListingOtpSkippedPublic();
+/** Mobile + OTP login is a backup, hidden until NEXT_PUBLIC_ENABLE_OTP_LOGIN=true. */
+const PHONE_LOGIN_ENABLED = isListingPhoneLoginEnabledPublic();
 
 type Mode = "signup" | "login";
 type ListAuthStep = "form" | "otp";
@@ -68,8 +73,23 @@ export default function ListYourSpacePage() {
   const [pendingPhone, setPendingPhone] = useState("");
   const [showOtp, setShowOtp] = useState(false);
 
-  const [busy, setBusy] = useState(false);
+  const [requesting, setBusy] = useState(false);
+  // Stays true until the next page has rendered, so buttons keep spinning while it loads.
+  const [navigating, startNavigation] = useTransition();
+  const busy = requesting || navigating;
+  const navigate = useCallback(
+    (href: string) => startNavigation(() => router.push(href)),
+    [router],
+  );
   const [error, setError] = useState<string | null>(null);
+
+  // Google: a new host is asked once for their mobile number before the account is created.
+  const [googleCredential, setGoogleCredential] = useState("");
+  const [googleEmail, setGoogleEmail] = useState("");
+  const [googleName, setGoogleName] = useState("");
+  const needsPhone = Boolean(googleCredential);
+  /** Which login is in progress, so the right control shows the spinner. */
+  const [lastMethod, setLastMethod] = useState<"google" | "phone">("google");
 
   const phone10 = useMemo(
     () => phoneNumber.replace(/\D/g, "").slice(-10),
@@ -107,6 +127,7 @@ export default function ListYourSpacePage() {
   }, []);
 
   async function requestSignupOtp() {
+    setLastMethod("phone");
     if (!canSubmitSignup || busy) return;
     setBusy(true);
     setError(null);
@@ -133,7 +154,7 @@ export default function ListYourSpacePage() {
       }
       if (data.sessionReady || OTP_STEP_DISABLED) {
         if (data.sessionReady) {
-          router.push("/add");
+          navigate("/add");
           return;
         }
         setError(
@@ -153,6 +174,7 @@ export default function ListYourSpacePage() {
   }
 
   async function requestLoginOtp() {
+    setLastMethod("phone");
     if (!canSubmitLogin || busy) return;
     setBusy(true);
     setError(null);
@@ -173,7 +195,7 @@ export default function ListYourSpacePage() {
       }
       if (data.sessionReady || OTP_STEP_DISABLED) {
         if (data.sessionReady) {
-          router.push("/add");
+          navigate("/add");
           return;
         }
         setError(
@@ -193,6 +215,7 @@ export default function ListYourSpacePage() {
   }
 
   async function verifyOtp() {
+    setLastMethod("phone");
     const code = otp.replace(/\D/g, "");
     if (code.length < 4 || !pendingPhone || busy) {
       if (code.length < 4) {
@@ -214,7 +237,7 @@ export default function ListYourSpacePage() {
         setError(data.message || "Invalid or expired OTP. Try again.");
         return;
       }
-      router.push("/add");
+      navigate("/add");
     } catch {
       setError("Verification failed. Please try again.");
     } finally {
@@ -257,6 +280,58 @@ export default function ListYourSpacePage() {
     }
   }
 
+  async function signInWithGoogle(credential: string, extra?: { name: string; phone_number: string }) {
+    if (busy) return;
+    setLastMethod("google");
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/user/vendorGoogleLogin", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential, ...extra }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        message?: string;
+        sessionReady?: boolean;
+        needs_phone?: boolean;
+        profile?: { name?: string; email?: string };
+      };
+      if (!res.ok) {
+        setError(data.message || "Google sign-in failed. Please try again.");
+        return;
+      }
+      if (data.needs_phone) {
+        setGoogleCredential(credential);
+        setGoogleEmail(data.profile?.email ?? "");
+        setGoogleName((current) => current || data.profile?.name || "");
+        return;
+      }
+      if (data.sessionReady) {
+        navigate("/add/dashboard");
+        return;
+      }
+      setError("Google sign-in failed. Please try again.");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function finishGoogleSignup(e: React.FormEvent) {
+    e.preventDefault();
+    if (!googleCredential || !googleName.trim() || !isValidPhone) return;
+    void signInWithGoogle(googleCredential, { name: googleName.trim(), phone_number: phone10 });
+  }
+
+  function cancelGoogleSignup() {
+    setGoogleCredential("");
+    setGoogleEmail("");
+    setError(null);
+  }
+
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!OTP_STEP_DISABLED && authStep === "otp") {
@@ -279,8 +354,8 @@ export default function ListYourSpacePage() {
               List your property. Get verified leads. Close faster.
             </h1>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-ink/70 sm:text-[0.95rem]">
-              Create your host account to list Coworking and Managed Office spaces. Manage inventory, track
-              leads, and update listings anytime.
+              Create your host account to list coworking spaces, managed offices and PG or coliving homes.
+              Track each listing&apos;s status, get leads and update your listings anytime.
             </p>
 
             <div className="mt-4 flex flex-wrap gap-2 sm:mt-5">
@@ -304,14 +379,22 @@ export default function ListYourSpacePage() {
             >
               <div className="text-center">
                 <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-[1.65rem]">
-                  {!OTP_STEP_DISABLED && authStep === "otp"
-                    ? "Verify OTP"
-                    : mode === "signup"
-                      ? "Create account"
-                      : "Log in"}
+                  {needsPhone
+                    ? "Almost there"
+                    : !OTP_STEP_DISABLED && authStep === "otp"
+                      ? "Verify OTP"
+                      : !PHONE_LOGIN_ENABLED
+                        ? "Log in or sign up"
+                        : mode === "signup"
+                          ? "Create account"
+                          : "Log in"}
                 </h2>
                 <p className="mt-2 text-sm leading-relaxed text-ink/60">
-                  {!OTP_STEP_DISABLED && authStep === "otp"
+                  {needsPhone
+                    ? "Add your mobile number so our team can reach you about your listings."
+                    : !PHONE_LOGIN_ENABLED
+                      ? "Continue with Google to list your property and track its status."
+                      : !OTP_STEP_DISABLED && authStep === "otp"
                     ? "Enter the code we sent to your phone."
                     : mode === "signup"
                       ? OTP_STEP_DISABLED
@@ -335,7 +418,100 @@ export default function ListYourSpacePage() {
                 </div>
               ) : null}
 
-              {OTP_STEP_DISABLED || authStep === "form" ? (
+              {needsPhone ? (
+                <form className="mt-5 grid gap-4" onSubmit={finishGoogleSignup}>
+                  {googleEmail ? (
+                    <p className="text-center text-sm text-ink/70">
+                      Signed in as <span className="font-semibold text-ink">{googleEmail}</span>
+                    </p>
+                  ) : null}
+                  <CompactField label="Your name" icon={<User className="h-4 w-4" />}>
+                    <input
+                      value={googleName}
+                      onChange={(e) => setGoogleName(e.target.value)}
+                      placeholder="Full name"
+                      autoComplete="name"
+                      className="min-h-0 w-full min-w-0 border-0 bg-transparent py-0.5 text-base outline-none placeholder:text-ink/35"
+                      disabled={busy}
+                    />
+                  </CompactField>
+                  <CompactField label="Mobile" icon={<Phone className="h-4 w-4" />} hasPrefix>
+                    <input
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      inputMode="numeric"
+                      autoComplete="tel"
+                      placeholder="10-digit number"
+                      className="min-h-0 w-full min-w-0 border-0 bg-transparent py-0.5 text-base outline-none placeholder:text-ink/35"
+                      disabled={busy}
+                      autoFocus
+                    />
+                  </CompactField>
+
+                  {error ? (
+                    <div className="rounded-lg border border-red-200/90 bg-red-50/90 px-4 py-2.5 text-sm text-red-800">
+                      {error}
+                    </div>
+                  ) : null}
+
+                  <button
+                    type="submit"
+                    disabled={busy || !googleName.trim() || !isValidPhone}
+                    className={cn(
+                      "mt-1 flex h-12 w-full items-center justify-center rounded-full text-base font-semibold transition",
+                      "border border-[color:var(--color-brand)] bg-[color:var(--color-brand)] text-white",
+                      "hover:brightness-105 active:scale-[0.99]",
+                      "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100",
+                    )}
+                  >
+                    {busy ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Spinner /> Creating your account…
+                      </span>
+                    ) : (
+                      "Create account"
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={cancelGoogleSignup}
+                    disabled={busy}
+                    className="text-sm font-medium text-ink/55 hover:text-ink disabled:opacity-50"
+                  >
+                    Use a different Google account
+                  </button>
+                </form>
+              ) : (
+                <>
+                  <div className="mt-6">
+                    <GoogleSignInButton onCredential={(credential) => void signInWithGoogle(credential)} disabled={busy} />
+                    {busy && lastMethod === "google" ? (
+                      <p
+                        className="mt-3 flex items-center justify-center gap-2 text-sm font-medium text-ink/70"
+                        role="status"
+                      >
+                        <Spinner className="text-[color:var(--color-brand)]" /> Signing you in…
+                      </p>
+                    ) : null}
+                  </div>
+
+                  {!PHONE_LOGIN_ENABLED && error ? (
+                    <div className="mt-4 rounded-lg border border-red-200/90 bg-red-50/90 px-4 py-2.5 text-sm text-red-800">
+                      {error}
+                    </div>
+                  ) : null}
+
+                  {PHONE_LOGIN_ENABLED ? (
+                    <div className="mt-5 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.12em] text-ink/40">
+                      <span className="h-px flex-1 bg-ink/10" aria-hidden />
+                      or use your mobile number
+                      <span className="h-px flex-1 bg-ink/10" aria-hidden />
+                    </div>
+                  ) : null}
+                </>
+              )}
+
+              {needsPhone || !PHONE_LOGIN_ENABLED ? null : OTP_STEP_DISABLED || authStep === "form" ? (
                 <form className="mt-5 grid gap-4" onSubmit={onSubmit}>
                   {mode === "signup" ? (
                     <>
@@ -405,7 +581,15 @@ export default function ListYourSpacePage() {
                       "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:brightness-100",
                     )}
                   >
-                    {busy ? "Please wait…" : OTP_STEP_DISABLED ? "Continue" : "Send OTP"}
+                    {busy ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Spinner /> {OTP_STEP_DISABLED ? "Signing you in…" : "Sending code…"}
+                      </span>
+                    ) : OTP_STEP_DISABLED ? (
+                      "Continue"
+                    ) : (
+                      "Send OTP"
+                    )}
                   </button>
 
                   <p className="pt-1 text-center text-sm text-ink/65">
@@ -493,7 +677,13 @@ export default function ListYourSpacePage() {
                       "disabled:cursor-not-allowed disabled:opacity-50",
                     )}
                   >
-                    {busy ? "Please wait…" : "Verify & continue"}
+                    {busy ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Spinner /> Verifying…
+                      </span>
+                    ) : (
+                      "Verify & continue"
+                    )}
                   </button>
 
                   <div className="flex items-center justify-between gap-2 pt-1 text-sm">
@@ -526,19 +716,19 @@ export default function ListYourSpacePage() {
                 <h3 className="text-sm font-semibold text-ink sm:text-base">Need help listing?</h3>
                 <div className="mt-1.5 flex flex-col gap-1 text-sm sm:mt-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-1 sm:gap-y-0.5">
                   <a
-                    href="tel:+919457777791"
+                    href={CONTACT_PHONE_HREF}
                     className="w-fit font-medium leading-snug text-ink whitespace-nowrap hover:text-[color:var(--color-brand)]"
                   >
-                    +91 945 777 7791
+                    {CONTACT_PHONE_DISPLAY}
                   </a>
                   <span className="hidden text-ink/40 sm:inline" aria-hidden>
                     ,
                   </span>
                   <a
-                    href="mailto:info@spacewallah.com"
+                    href={CONTACT_EMAIL_HREF}
                     className="font-medium leading-snug text-ink/80 break-all hover:text-[color:var(--color-brand)] sm:break-normal"
                   >
-                    info@spacewallah.com
+                    {CONTACT_EMAIL}
                   </a>
                 </div>
               </div>

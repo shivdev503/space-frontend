@@ -6,11 +6,13 @@ import { formatCurrency } from "@/utils/format";
 type CoworkingDetailMobileBarProps = {
   startingFrom: number;
   priceSuffix: string;
+  ctaLabel?: string;
 };
 
 export function CoworkingDetailMobileBar({
   startingFrom,
   priceSuffix,
+  ctaLabel = "Book a Free Tour",
 }: CoworkingDetailMobileBarProps) {
   const { openQuiz } = useCoworkingLeadQuiz();
 
@@ -30,7 +32,7 @@ export function CoworkingDetailMobileBar({
         onClick={openQuiz}
         className="inline-flex max-w-[230px] flex-1 items-center justify-center rounded-[13px] bg-[color:var(--color-brand)] px-5 py-3.5 text-base font-semibold text-white shadow-[0_6px_16px_rgba(18,184,134,0.32)] transition hover:bg-[color:var(--color-accent)]"
       >
-        Book a Free Tour
+        {ctaLabel}
       </button>
     </div>
   );

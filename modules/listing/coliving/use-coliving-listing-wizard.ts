@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
 import { mapPgApiToColivingDraft } from "@/lib/pg-listing-mapper";
 import { validateColivingLocation } from "@/lib/pg-listing-payload";
@@ -64,7 +64,10 @@ export function useColivingListingWizard(options: UseColivingListingWizardOption
   const [data, setDataState] = useState<ColivingListingDraft>(DEFAULT_COLIVING_LISTING);
   const [stepIdx, setStepIdx] = useState(0);
   const [submitted, setSubmitted] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const [saving, setBusy] = useState(false);
+  // After an edit we open the dashboard; stay busy until it has rendered.
+  const [navigating, startNavigation] = useTransition();
+  const busy = saving || navigating;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [initializing, setInitializing] = useState(Boolean(editId));
@@ -217,7 +220,7 @@ export function useColivingListingWizard(options: UseColivingListingWizardOption
       }
 
       if (editId) {
-        router.push("/add/dashboard");
+        startNavigation(() => router.push("/add/dashboard"));
         return;
       }
 

@@ -16,6 +16,7 @@ import {
 import { buildApiClientHeaders } from "@/services/api-client-headers";
 import { getSpaceBySlug } from "@/services/mock-db";
 import type { OfficeSpaceModel } from "@/types/office-space.model";
+import { normalizeOfficeLocation } from "@/lib/office-location";
 
 let client: AxiosInstance | null = null;
 
@@ -61,7 +62,7 @@ function coerceOfficeSpace(raw: unknown): OfficeSpaceModel.OfficeSpace | null {
   const _id = wireId(raw);
   if (!_id || !slug) return null;
   const id = typeof raw.id === "string" && raw.id.trim() ? raw.id.trim() : _id;
-  return { ...(raw as any), _id, id } as OfficeSpaceModel.OfficeSpace;
+  return normalizeOfficeLocation({ ...(raw as any), _id, id }) as OfficeSpaceModel.OfficeSpace;
 }
 
 async function fetchOfficeSpaceDetail(slug: string): Promise<OfficeSpaceModel.OfficeSpace | null> {

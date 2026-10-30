@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/utils/cn";
 import type { ListingModel } from "@/types/listing.model";
 
@@ -142,7 +143,13 @@ export function SharedGalleryStep({ images, onChange, disabled }: Props) {
         )}
       >
         <span className="text-lg font-semibold text-ink">
-          {uploading ? "Uploading…" : "+ Add photos"}
+          {uploading ? (
+            <span className="inline-flex items-center gap-2">
+              <Spinner /> Uploading…
+            </span>
+          ) : (
+            "+ Add photos"
+          )}
         </span>
         <span className="text-xs text-ink/60">
           JPG, PNG or WebP · up to {MAX_IMAGES - images.length} more

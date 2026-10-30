@@ -4,6 +4,7 @@ import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/utils/cn";
 
 type Props = {
@@ -37,7 +38,7 @@ export function HostLogoutButton({ variant = "light", className }: Props) {
         className,
       )}
     >
-      <LogOut className="h-4 w-4" aria-hidden />
+      {busy ? <Spinner /> : <LogOut className="h-4 w-4" aria-hidden />}
       <span className="sr-only sm:not-sr-only sm:inline">{busy ? "Logging out…" : "Logout"}</span>
     </button>
   );

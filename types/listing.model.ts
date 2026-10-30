@@ -58,6 +58,23 @@ export namespace ListingModel {
     data: VendorUser;
   }
 
+  /** `user/vendorGoogleLogin` request: Google ID token, plus name and mobile for a new host. */
+  export interface VendorGoogleLoginRequest {
+    credential: string;
+    name?: string;
+    phone_number?: string;
+    dial_code?: string;
+  }
+
+  /** Either a session, or `needs_phone` when a new host must add their mobile number first. */
+  export interface VendorGoogleLoginResponse {
+    message?: string;
+    token?: string;
+    data?: VendorUser;
+    needs_phone?: boolean;
+    profile?: { name?: string; email?: string };
+  }
+
   // -------- Catalog (amenities, categories, countries, states, cities, microlocations) --------
 
   export type Amenity = CoworkingModel.Amenity & {

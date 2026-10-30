@@ -15,7 +15,7 @@ export type BuildUserEnquiryInput = {
   /** Listing id from detail pages; only sent if it looks like a Mongo ObjectId. */
   spaceId?: string;
   /** Which body field to set when `spaceId` is a valid ObjectId. */
-  spaceListingKey?: "work_space" | "office_space" | "living_space";
+  spaceListingKey?: "work_space" | "office_space" | "living_space" | "managed_office";
   /** Upstream `mx_Space_Type` (e.g. Web Coworking). */
   mxSpaceType: string;
   noOfPerson?: string;
