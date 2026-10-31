@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition, type MouseEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ColivingCityFiltersModal } from "@/modules/coliving/components/coliving-city-filters-modal";
@@ -109,6 +109,17 @@ export function ColivingCityListing({
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
+  const pageHref = (target: number) => {
+    const qs = filtersToSearchParams(filters, target);
+    qs.delete("city"); // The path already carries the city.
+    const base = `/coliving/${data.city.slug}`;
+    return qs.toString() ? `${base}?${qs}` : base;
+  };
+  const goToPage = (target: number) => (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    if (!pending) load(filters, target);
+  };
+
   return (
     <div className="space-y-6">
       <ColivingCityListingToolbar
@@ -166,22 +177,24 @@ export function ColivingCityListing({
 
       {totalPages > 1 ? (
         <div className="flex flex-wrap justify-center gap-2 pt-4">
-          <Button
-            type="button"
-            variant="secondary"
-            disabled={page <= 1 || pending}
-            onClick={() => load(filters, page - 1)}
-          >
-            Previous
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            disabled={page >= totalPages || pending}
-            onClick={() => load(filters, page + 1)}
-          >
-            Next
-          </Button>
+          {page > 1 ? (
+            <Button href={pageHref(page - 1)} variant="secondary" onLinkClick={goToPage(page - 1)}>
+              Previous
+            </Button>
+          ) : (
+            <Button type="button" variant="secondary" disabled>
+              Previous
+            </Button>
+          )}
+          {page < totalPages ? (
+            <Button href={pageHref(page + 1)} variant="secondary" onLinkClick={goToPage(page + 1)}>
+              Next
+            </Button>
+          ) : (
+            <Button type="button" variant="secondary" disabled>
+              Next
+            </Button>
+          )}
         </div>
       ) : null}
     </div>

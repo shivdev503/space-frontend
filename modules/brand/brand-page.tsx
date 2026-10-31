@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/container";
 import { RemoteImage } from "@/components/ui/remote-image";
 import { CoworkingCard } from "@/modules/coworking/components/coworking-card";
 import type { BrandPageData } from "@/services/brand-api";
+import { coworkingCardRow } from "@/services/coworking-api";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import { cn } from "@/utils/cn";
 
@@ -80,7 +81,7 @@ export function BrandPage({ data, workspaces, activeCity }: BrandPageProps) {
           {workspaces.length > 0 ? (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {workspaces.map((ws) => (
-                <CoworkingCard key={ws.id || ws._id} workspace={ws} className="h-full" />
+                <CoworkingCard key={ws.id || ws._id} workspace={coworkingCardRow(ws)} className="h-full" />
               ))}
             </div>
           ) : (

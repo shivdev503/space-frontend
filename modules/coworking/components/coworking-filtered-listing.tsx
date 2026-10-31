@@ -73,7 +73,7 @@ export function CoworkingFilteredListing({
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [rows, setRows] = useState<CoworkingModel.WorkSpace[]>(initialListing?.rows ?? []);
   const [totalRecords, setTotalRecords] = useState(initialListing?.totalRecords ?? 0);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(initialListing?.page ?? 1);
   const [seedMode, setSeedMode] = useState(false);
   const [seedVisibleCount, setSeedVisibleCount] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(needsRemote && !initialListing);
@@ -213,7 +213,7 @@ export function CoworkingFilteredListing({
   const resultCount = seedMode ? seedFilteredRows.length : totalRecords;
   const hasMore = seedMode
     ? seedVisibleCount < seedFilteredRows.length
-    : rows.length < totalRecords;
+    : page * PAGE_SIZE < totalRecords;
   const showGrid = !loading && !pending;
   const gridPending = loadingMore;
 
@@ -225,6 +225,12 @@ export function CoworkingFilteredListing({
     if (loading || loadingMore || !hasMore) return;
     void fetchPage(filters, page + 1, true);
   }, [seedMode, loading, loadingMore, hasMore, fetchPage, filters, page]);
+
+  const nextPageHref = useMemo(() => {
+    const qs = coworkingFiltersToSearchParams(filters);
+    qs.set("page", String(page + 1));
+    return `${listBasePath}?${qs}`;
+  }, [filters, listBasePath, page]);
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -292,11 +298,14 @@ export function CoworkingFilteredListing({
           />
           {hasMore ? (
             <div className="mt-8 flex justify-center">
+              {/* A real link for crawlers; visitors stay on the page and the next rows load in place. */}
               <Button
-                type="button"
+                href={nextPageHref}
                 variant="secondary"
-                disabled={loadingMore}
-                onClick={handleLoadMore}
+                onLinkClick={(event) => {
+                  event.preventDefault();
+                  handleLoadMore();
+                }}
               >
                 {loadingMore ? "Loading…" : "Load more"}
               </Button>

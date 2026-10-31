@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
+import { withPageMetadata } from "@/lib/pagination-metadata";
 import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
 import { seoFaqsOrFallback } from "@/lib/seo-page-faqs";
 import { seoPageTitleOrFallback } from "@/lib/seo-page-title";
@@ -14,10 +15,12 @@ import { getSeoBySlug } from "@/services/seo-content";
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ segment: string; location: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<Metadata> {
-  const { segment, location } = await params;
+  const [{ segment, location }, sp] = await Promise.all([params, searchParams]);
   const page = await getVerticalLocationPageContent("coworking", segment, location);
 
   if (!page) notFound();
@@ -28,7 +31,8 @@ export async function generateMetadata({
     coworkingLocalitySeo(page.locationName, page.city.name, stats),
   );
   // A real locality with no spaces yet is a thin page.
-  return page.totalSpaces === 0 ? { ...metadata, robots: { index: false, follow: true } } : metadata;
+  if (page.totalSpaces === 0) return { ...metadata, robots: { index: false, follow: true } };
+  return withPageMetadata(metadata, sp);
 }
 
 export default async function CoworkingLocationPage({

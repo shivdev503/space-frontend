@@ -5,6 +5,7 @@ import { PopularLocalitiesRail } from "@/modules/city-pages/components/popular-l
 import { Breadcrumb } from "@/modules/location-pages/components/breadcrumb";
 import { FAQSection } from "@/modules/location-pages/components/faq-section";
 import { ManagedOfficeCard } from "@/modules/managed-office/components/managed-office-card";
+import { managedOfficeCardRow } from "@/modules/managed-office/managed-office-format";
 import type { ManagedOfficeLocality } from "@/services/managed-office-location";
 import type { CityPageData, FAQItem } from "@/types";
 
@@ -60,7 +61,7 @@ export function ManagedOfficeLocationPage({
         <Container>
           <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
             {locality.offices.map((office) => (
-              <ManagedOfficeCard key={office.id} office={office} />
+              <ManagedOfficeCard key={office.id} office={managedOfficeCardRow(office)} />
             ))}
           </div>
         </Container>

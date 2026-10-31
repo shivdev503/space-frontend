@@ -14,6 +14,7 @@ import { coworkingMarketStats } from "@/services/market-stats";
 import { resolveVerticalSegment } from "@/services/spaces";
 import { workspaceSeo } from "@/lib/coworking-workspace-content";
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
+import { withPageMetadata } from "@/lib/pagination-metadata";
 import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
 import { seoFaqsOrFallback } from "@/lib/seo-page-faqs";
 import { buildPageMetadataFromSeo } from "@/lib/seo-metadata";
@@ -23,18 +24,21 @@ import { getSeoBySlug } from "@/services/seo-content";
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ segment: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<Metadata> {
-  const { segment } = await params;
+  const [{ segment }, sp] = await Promise.all([params, searchParams]);
 
   const cityPage = await getVerticalCityPageContent("coworking", segment);
   if (cityPage) {
     const stats = await coworkingMarketStats(cityPage.city.slug);
-    return buildMetadataWithCmsSeoFallback(
+    const metadata = await buildMetadataWithCmsSeoFallback(
       `/coworking/${cityPage.city.slug}`,
       coworkingCitySeo(cityPage.city.name, stats),
     );
+    return withPageMetadata(metadata, sp);
   }
 
   const workspace = await loadCoworkingWorkspaceDetail(segment);

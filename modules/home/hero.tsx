@@ -33,7 +33,7 @@ export function HomeHero({ searchOptions, featuredSpaces }: HomeHeroProps) {
     <section className="relative min-h-[70vh]">
       <div className="absolute inset-0 overflow-hidden">
         <Image
-          src="/background-hero.jpg"
+          src="/background-hero.webp"
           alt="Workspace background"
           fill
           className="object-cover"

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ButtonHTMLAttributes, ReactNode } from "react";
+import { ButtonHTMLAttributes, MouseEventHandler, ReactNode } from "react";
 
 import { cn } from "@/utils/cn";
 
@@ -8,6 +8,8 @@ type ButtonProps = {
   href?: string;
   variant?: "primary" | "secondary" | "ghost";
   className?: string;
+  /** With `href`: runs on click, e.g. to load in place while crawlers follow the link. */
+  onLinkClick?: MouseEventHandler<HTMLAnchorElement>;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const variants = {
@@ -23,6 +25,7 @@ export function Button({
   href,
   variant = "primary",
   className,
+  onLinkClick,
   ...props
 }: ButtonProps) {
   const classes = cn(
@@ -33,7 +36,7 @@ export function Button({
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} className={classes} onClick={onLinkClick}>
         {children}
       </Link>
     );

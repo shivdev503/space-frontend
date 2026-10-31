@@ -12,6 +12,7 @@ import { managedOfficeCitySeo, managedOfficeListingSeo } from "@/lib/seo-templat
 import { VerticalCityPage } from "@/modules/city-pages/vertical-city-page";
 import { ManagedOfficeDetailPage } from "@/modules/managed-office/managed-office-detail-page";
 import { getVerticalCityPageContent } from "@/services/cities";
+import { managedOfficeCardRow } from "@/modules/managed-office/managed-office-format";
 import { loadManagedOfficeDetail, managedOfficesByCity } from "@/services/managed-office-api";
 import { getSeoBySlug } from "@/services/seo-content";
 import type { SeoContent } from "@/types/seo.model";
@@ -74,7 +75,7 @@ export default async function OfficeSpaceSegmentPage({
           ...cityData,
           title: seoPageTitleOrFallback(seo, cityData.title),
           faqs: seoFaqsOrFallback(seo, cityData.faqs),
-          initialManagedOffices: initialManagedOffices ?? undefined,
+          initialManagedOffices: initialManagedOffices?.map(managedOfficeCardRow),
         }}
       />
     );

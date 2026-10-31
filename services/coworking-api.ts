@@ -23,6 +23,7 @@ import {
   resolveCoworkingApiBaseUrl,
   resolveCoworkingApiTimeoutMs,
 } from "@/services/env-config";
+import { pageFromSearchParams } from "@/lib/pagination-metadata";
 import { isUpstreamFailure } from "@/lib/upstream-error";
 import { buildApiClientHeaders } from "@/services/api-client-headers";
 import {
@@ -301,6 +302,16 @@ export async function loadCoworkingWorkspacesPageForCity(
  * Page 1 of a coworking city/locality listing for server rendering, using the same filters
  * the client reads from the URL. Undefined when nothing loads, so the client fetches itself.
  */
+/** What a listing card and the list filters read: rows serialized to the browser don't need the rest. */
+export function coworkingCardRow(workspace: CoworkingModel.WorkSpace): CoworkingModel.WorkSpace {
+  const brand = workspace.brand;
+  return {
+    ...workspace,
+    images: (workspace.images ?? []).slice(0, 1),
+    brand: brand && ({ id: brand.id, name: brand.name, slug: brand.slug } as CoworkingModel.Brand),
+  };
+}
+
 export async function loadInitialCoworkingListing(
   catalogCityId: string,
   searchParams: Record<string, string | string[] | undefined>,
@@ -314,21 +325,25 @@ export async function loadInitialCoworkingListing(
   }
   const filters = parseCoworkingListFiltersFromSearchParams(sp);
   const apiFilters = coworkingFiltersToApiParams(filters, { includeSortInRequest: sp.has("sortBy") });
+  const page = pageFromSearchParams(searchParams);
   const payload = await loadCoworkingWorkspacesPageForCity(
     catalogCityId,
     COWORKING_LIST_PAGE_SIZE,
-    1,
+    page,
     microLocationId,
     false,
     apiFilters,
   );
-  const rows = applyCoworkingListFiltersClient(payload.data ?? [], filters) as CoworkingModel.WorkSpace[];
+  const rows = (applyCoworkingListFiltersClient(payload.data ?? [], filters) as CoworkingModel.WorkSpace[]).map(
+    coworkingCardRow,
+  );
   if (rows.length === 0) return undefined;
   const total = payload.meta?.totalRecords ?? payload.meta?.total;
   return {
     rows,
     totalRecords: typeof total === "number" && Number.isFinite(total) ? total : rows.length,
     query: coworkingListQueryKey(sp),
+    page,
   };
 }
 

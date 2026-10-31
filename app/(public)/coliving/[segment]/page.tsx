@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
+import { withPageMetadata } from "@/lib/pagination-metadata";
 import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
 import { buildPgColivingCityPageParams } from "@/lib/pg-list-priority";
 import { buildPgListParamsFromSearchParams } from "@/lib/pg-list-params";
@@ -21,20 +22,17 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ segment: string }>;
-}): Promise<Metadata> {
-  const { segment } = await params;
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
+  const [{ segment }, sp] = await Promise.all([params, searchParams]);
   const cityPage = await getVerticalCityPageContent("coliving", segment);
 
   if (cityPage) {
     const stats = await colivingMarketStats(cityPage.city.name);
-    return buildMetadataWithCmsSeoFallback(
+    const metadata = await buildMetadataWithCmsSeoFallback(
       `/coliving/${cityPage.city.slug}`,
       colivingCitySeo(cityPage.city.name, stats),
     );
+    return withPageMetadata(metadata, sp);
   }
 
   const pgRes = await loadPgDetail(segment);

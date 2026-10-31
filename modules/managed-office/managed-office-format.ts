@@ -65,6 +65,29 @@ export function managedOfficeImages(office: ManagedOfficeModel.ManagedOffice): {
   };
 }
 
+/** What a listing card reads: rows serialized to the browser don't need the rest. */
+export function managedOfficeCardRow(office: ManagedOfficeModel.ManagedOffice): ManagedOfficeModel.ManagedOffice {
+  const firstImage = [...(office.images ?? [])].sort((a, b) => (a?.order ?? 0) - (b?.order ?? 0)).slice(0, 1);
+  return {
+    _id: office._id,
+    id: office.id,
+    name: office.name,
+    slug: office.slug,
+    images: firstImage,
+    location: {
+      building_name: office.location?.building_name,
+      city: office.location?.city,
+      micro_location: office.location?.micro_location,
+      micro_location_string: office.location?.micro_location_string,
+    },
+    plans: office.plans,
+    starting_price: office.starting_price,
+    rating: office.rating,
+    lease_terms: office.lease_terms,
+    is_new_launch: office.is_new_launch,
+  };
+}
+
 /** Description HTML/text, preferring the rewritten copy. */
 export function managedOfficeDescription(office: ManagedOfficeModel.ManagedOffice): string {
   return office.new_description?.trim() || office.description?.trim() || "";

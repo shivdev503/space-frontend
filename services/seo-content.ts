@@ -6,6 +6,8 @@ import { buildApiClientHeaders } from "@/services/api-client-headers";
 import { resolveApiBaseUrl, resolveInternalAppBaseUrl } from "@/services/env-config";
 import type { SeoContent } from "@/types/seo.model";
 
+const SEO_REVALIDATE_SECONDS = 300;
+
 async function fetchSeoBySlugInternal(slug: string): Promise<SeoContent | null> {
   if (!slug) return null;
 
@@ -15,7 +17,8 @@ async function fetchSeoBySlugInternal(slug: string): Promise<SeoContent | null> 
   const tryFetch = async (url: string) => {
     // Network failures (API down, DNS, timeout) fall back to static SEO instead of erroring the page.
     const res = await fetch(url, {
-      cache: "no-store",
+      // Five minutes: SEO text changes rarely and is read on every page view.
+      next: { revalidate: SEO_REVALIDATE_SECONDS },
       headers: buildApiClientHeaders(),
     }).catch(() => null);
     if (!res?.ok) return null;

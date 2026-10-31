@@ -208,6 +208,8 @@ export type InitialCoworkingListing = {
   totalRecords: number;
   /** Normalised query string the rows were fetched for (client skips its first fetch on match). */
   query: string;
+  /** Listing page the rows belong to (`?page=N`). */
+  page: number;
 };
 
 export type CityPageData = {
