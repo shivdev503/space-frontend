@@ -13,8 +13,7 @@ export default function NotFound() {
           </p>
           <h1 className="mt-4 font-display text-5xl text-ink">Page not found</h1>
           <p className="mt-4 text-muted">
-            This route shell is ready, but the requested workspace path doesn&apos;t
-            exist in the current dataset.
+            This page doesn&apos;t exist or the listing has been removed.
           </p>
           <div className="mt-8 flex justify-center">
             <Button href="/">Back to home</Button>

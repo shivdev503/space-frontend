@@ -15,7 +15,6 @@ import { getVerticalCityPageContent } from "@/services/cities";
 import { loadManagedOfficeDetail, managedOfficesByCity } from "@/services/managed-office-api";
 import { getSeoBySlug } from "@/services/seo-content";
 import type { SeoContent } from "@/types/seo.model";
-import { toTitleCase } from "@/utils/format";
 
 
 /** Managed offices for a city page (shared by metadata and the page within one request). */
@@ -54,10 +53,7 @@ export async function generateMetadata({
     return buildMetadataWithCmsSeoFallback(pathname, managedOfficeListingSeo(office));
   }
 
-  return buildMetadataWithCmsSeoFallback(`/managed-office/${segment}`, {
-    title: `${toTitleCase(segment)} | Managed Office`,
-    description: "Explore premium managed offices across top cities in India.",
-  });
+  notFound();
 }
 
 export default async function OfficeSpaceSegmentPage({

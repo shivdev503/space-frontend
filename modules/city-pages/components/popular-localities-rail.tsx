@@ -20,6 +20,8 @@ type PopularLocalitiesRailProps = {
   hrefPrefix?: string;
   /** Catalog API filter — coliving pages use `for_coliving: true`. */
   spaceType?: MicroLocationSpaceType;
+  /** Show `fallbackLocations` as the full list, without calling the catalog API. */
+  fixedLocations?: boolean;
 };
 
 function fallbackToHits(
@@ -54,6 +56,7 @@ export function PopularLocalitiesRail({
   fallbackLocations,
   hrefPrefix = "/coworking",
   spaceType: spaceTypeProp,
+  fixedLocations = false,
 }: PopularLocalitiesRailProps) {
   const spaceType: MicroLocationSpaceType =
     spaceTypeProp ?? (hrefPrefix.startsWith("/coliving") ? "coliving" : "coworking");
@@ -66,7 +69,7 @@ export function PopularLocalitiesRail({
   const [items, setItems] = useState<MicroLocation[]>(() =>
     fallbackToHits(fallbackLocations, spaceType),
   );
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!fixedLocations);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
@@ -80,6 +83,7 @@ export function PopularLocalitiesRail({
   }, []);
 
   useEffect(() => {
+    if (fixedLocations) return;
     let cancelled = false;
     setLoading(true);
 
@@ -99,7 +103,7 @@ export function PopularLocalitiesRail({
     return () => {
       cancelled = true;
     };
-  }, [catalogCityId, spaceType]);
+  }, [catalogCityId, spaceType, fixedLocations]);
 
   useEffect(() => {
     if (loading) return;

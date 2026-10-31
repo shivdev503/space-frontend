@@ -15,7 +15,6 @@ import { getVerticalCityPageContent } from "@/services/cities";
 import { loadPgDetail, loadPgList } from "@/services/pg-api";
 import { colivingMarketStats } from "@/services/market-stats";
 import { getSeoBySlug } from "@/services/seo-content";
-import { toTitleCase } from "@/utils/format";
 
 type PageProps = {
   params: Promise<{ segment: string }>;
@@ -44,10 +43,7 @@ export async function generateMetadata({
     return buildMetadataWithCmsSeoFallback(`/coliving/${pgRes.slug}`, colivingListingSeo(pg));
   }
 
-  return buildMetadataWithCmsSeoFallback(`/coliving/${segment}`, {
-    title: `${toTitleCase(segment)} | Coliving Space`,
-    description: "Discover coliving homes and PG rooms across top cities in India.",
-  });
+  notFound();
 }
 
 export default async function ColivingSegmentPage({ params, searchParams }: PageProps) {

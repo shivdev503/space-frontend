@@ -13,8 +13,11 @@ import {
 } from "@/services/workspace-plan-pricing";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import type { PgDetail } from "@/types/pg.model";
+import { APP_NAME } from "@/utils/constants";
 
 export type SeoCopy = { title: string; description: string };
+
+const MAX_TITLE_LENGTH = 60;
 
 function rupees(amount: number): string {
   return `₹${Math.round(amount).toLocaleString("en-IN")}`;
@@ -57,6 +60,26 @@ export function coworkingLocalitySeo(locality: string, city: string, stats: Mark
   };
 }
 
+/** "{Name} {Locality} {City} | Coworking | SpaceWallah", dropping parts until it fits in 60 characters. */
+function coworkingListingTitle(ws: CoworkingModel.WorkSpace): string {
+  const name = ws.name.replace(/\s+/g, " ").trim();
+  const locality = ws.location?.micro_location?.name?.trim() ?? "";
+  const city = ws.location?.city?.name?.trim() ?? "";
+  const options = [
+    `${nameWithPlace(name, locality, city)} | Coworking | ${APP_NAME}`,
+    `${nameWithPlace(name, locality)} | Coworking | ${APP_NAME}`,
+    `${nameWithPlace(name)} | Coworking | ${APP_NAME}`,
+    `${nameWithPlace(name, locality)} | ${APP_NAME}`,
+    `${name} | ${APP_NAME}`,
+  ];
+  return options.find((title) => title.length <= MAX_TITLE_LENGTH) ?? `${name} | ${APP_NAME}`;
+}
+
+/** The space's own SEO title, unless it lacks the brand (most stored titles do and run over 60 characters). */
+export function coworkingBrandedTitle(title: string, ws: CoworkingModel.WorkSpace): string {
+  return includesWord(title, APP_NAME) ? title : coworkingListingTitle(ws);
+}
+
 export function coworkingListingSeo(ws: CoworkingModel.WorkSpace): SeoCopy {
   const locality = ws.location?.micro_location?.name?.trim() ?? "";
   const city = ws.location?.city?.name?.trim() ?? "";
@@ -70,7 +93,7 @@ export function coworkingListingSeo(ws: CoworkingModel.WorkSpace): SeoCopy {
   const offer = plans.length ? joinList(plans) : "flexible workspaces";
   const from = ws.starting_price ? ` from ${rupees(ws.starting_price)} per month` : "";
   return {
-    title: `${nameWithPlace(ws.name, locality, city)} | Price & Photos`,
+    title: coworkingListingTitle(ws),
     description: `${ws.name}${locality ? ` in ${locality}` : ""} offers ${offer}${from}. See amenities and photos and book a free tour.`,
   };
 }
@@ -122,6 +145,19 @@ export function virtualOfficeListingSeo(ws: CoworkingModel.WorkSpace): SeoCopy {
   return {
     title: `Virtual Office at ${nameWithPlace(ws.name, locality, city)} | GST Address`,
     description: `Get a virtual office address at ${ws.name}${locality ? ` in ${locality}` : ""}${city ? ` ${city}` : ""} for GST and company registration. NOC rent agreement and utility bill with zero brokerage.`,
+  };
+}
+
+export function managedOfficeLocalitySeo(
+  locality: string,
+  city: string,
+  facts: { count: number; minPrice: number | null },
+): SeoCopy {
+  const place = nameWithPlace(locality, undefined, city);
+  const from = facts.minPrice ? ` from ${rupees(facts.minPrice)} per seat` : "";
+  return {
+    title: `Managed Office in ${place} | ${APP_NAME}`,
+    description: `Compare ${countLabel(facts.count)} managed office${facts.count === 1 ? "" : "s"} in ${place}${from}. See photos and plans and get expert help at zero cost.`,
   };
 }
 

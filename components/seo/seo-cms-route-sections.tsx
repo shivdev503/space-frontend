@@ -106,7 +106,11 @@ export function SeoCmsRouteSections({
   return (
     <>
       {seo ? (
-        <SeoFooterContentSection title={seo.footer_title} description={seo.footer_description} />
+        <SeoFooterContentSection
+          title={seo.footer_title}
+          description={seo.footer_description}
+          demoteHeadings={pathSeg === "/"}
+        />
       ) : null}
       <Footer />
       <FooterMarketingSection />

@@ -128,9 +128,9 @@ export function Footer() {
 
           <div className="min-w-0 lg:pt-1">
             <div>
-              <h2 className="text-base font-bold tracking-tight text-ink sm:text-lg">
+              <p className="text-base font-bold tracking-tight text-ink sm:text-lg">
                 Company
-              </h2>
+              </p>
               <ul className="mt-3 space-y-2">
                 {COMPANY_LINKS.map((item) => (
                   <li key={item.href + item.label}>
@@ -146,9 +146,9 @@ export function Footer() {
             </div>
 
             <div className="mt-8">
-              <h2 className="text-base font-bold tracking-tight text-ink sm:text-lg">
+              <p className="text-base font-bold tracking-tight text-ink sm:text-lg">
                 Feel free to connect with us
-              </h2>
+              </p>
               <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-3">
                 <a
                   href={FOOTER_PHONE_HREF}

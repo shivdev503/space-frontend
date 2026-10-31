@@ -1,3 +1,4 @@
+import { ListingItemListJsonLd } from "@/components/seo/listing-json-ld";
 import { cityTrail } from "@/lib/breadcrumb-trails";
 import { Container } from "@/components/ui/container";
 import { CityPageFaqSection } from "@/modules/city-pages/components/city-page-faq-section";
@@ -21,6 +22,10 @@ export function ColivingCityPage({
 }) {
   return (
     <>
+      <ListingItemListJsonLd
+        name={data.title}
+        items={pgList.map((pg) => ({ name: pg.name, href: pg.slug ? `/coliving/${pg.slug}` : null }))}
+      />
       <CityPageHero title={data.title} breadcrumbs={cityTrail(data.vertical, data.city.name)}>
         {data.catalogCityId ? (
           <PopularLocalitiesRail

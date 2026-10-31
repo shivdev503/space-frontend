@@ -51,7 +51,9 @@ const TAG_KEYS = ["tags", "tag", "keywords", "labels"] as const;
 const FEATURED_KEYS = ["featured", "is_featured", "isFeatured", "is_news", "isNews"] as const;
 const ALT_KEYS = ["cover_image_alt", "coverImageAlt", "image_alt", "imageAlt", "alt_text", "altText"] as const;
 
-const DEFAULT_COVER =
+export const BLOG_DEFAULT_AUTHOR = "SpaceWallah Editorial";
+
+export const BLOG_DEFAULT_COVER =
   "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80";
 
 export const BLOG_API_TYPE_BY_VERTICAL: Record<SpaceVertical, string> = {
@@ -130,7 +132,7 @@ function pickCoverImage(row: Record<string, unknown>): string {
     const url = resolveImageUrl(row[key]);
     if (url) return url;
   }
-  return DEFAULT_COVER;
+  return BLOG_DEFAULT_COVER;
 }
 
 export function normalizeApiBlogType(raw: unknown): SpaceVertical | null {
@@ -257,9 +259,10 @@ export function normalizeBlogListItem(raw: unknown): BlogPost | null {
     excerpt,
     coverImage: pickCoverImage(row),
     coverImageAlt: pickFirst(row, ALT_KEYS) || title,
-    author: pickFirst(row, AUTHOR_KEYS) || "SpaceWallah Editorial",
+    author: pickFirst(row, AUTHOR_KEYS) || BLOG_DEFAULT_AUTHOR,
     authorRole: pickFirst(row, AUTHOR_ROLE_KEYS) || "Workspace advisors",
     publishedAt: parseDate(pickFirst(row, DATE_KEYS)),
+    hasPublishDate: Number.isFinite(Date.parse(pickFirst(row, DATE_KEYS))),
     readMinutes,
     tags: (() => {
       for (const key of TAG_KEYS) {

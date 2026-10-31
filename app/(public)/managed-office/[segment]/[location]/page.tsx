@@ -3,42 +3,57 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
-import { VerticalLocationPage } from "@/modules/location-pages/vertical-location-page";
-import { getVerticalLocationPageContent } from "@/services/coworking-api";
-import { toTitleCase } from "@/utils/format";
+import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
+import { seoFaqsOrFallback } from "@/lib/seo-page-faqs";
+import { seoPageTitleOrFallback } from "@/lib/seo-page-title";
+import { managedOfficeLocalitySeo } from "@/lib/seo-templates";
+import { MIN_LISTINGS_FOR_LOCALITY_PAGE } from "@/lib/sitemap-public-urls";
+import {
+  managedOfficeLocalityFacts,
+  managedOfficeLocalityFaqs,
+} from "@/modules/managed-office/managed-office-location-content";
+import { ManagedOfficeLocationPage } from "@/modules/managed-office/managed-office-location-page";
+import { loadManagedOfficeLocalityPage } from "@/services/managed-office-location";
+import { getSeoBySlug } from "@/services/seo-content";
 
-export async function generateMetadata({
-  params,
-}: {
+type PageProps = {
   params: Promise<{ segment: string; location: string }>;
-}): Promise<Metadata> {
+};
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { segment, location } = await params;
-  const page = await getVerticalLocationPageContent("office-space", segment, location);
+  const page = await loadManagedOfficeLocalityPage(segment, location);
+  if (!page) notFound();
 
-  if (!page) {
-    return buildMetadataWithCmsSeoFallback(`/managed-office/${segment}/${location}`, {
-      title: `Managed Office in ${toTitleCase(location)}, ${toTitleCase(segment)}`,
-      description: "Discover managed office options in this location.",
-    });
+  const { cityData, locality } = page;
+  const metadata = await buildMetadataWithCmsSeoFallback(
+    `/managed-office/${cityData.city.slug}/${locality.slug}`,
+    managedOfficeLocalitySeo(locality.name, cityData.city.name, managedOfficeLocalityFacts(locality.offices)),
+  );
+  // Too few offices to be useful in search: same bar as the locality sitemap.
+  if (locality.offices.length < MIN_LISTINGS_FOR_LOCALITY_PAGE) {
+    return { ...metadata, robots: { index: false, follow: true } };
   }
-
-  return buildMetadataWithCmsSeoFallback(`/managed-office/${segment}/${location}`, {
-    title: page.title,
-    description: page.subtitle,
-  });
+  return metadata;
 }
 
-export default async function OfficeSpaceLocationPage({
-  params,
-}: {
-  params: Promise<{ segment: string; location: string }>;
-}) {
+export default async function ManagedOfficeLocalityRoute({ params }: PageProps) {
   const { segment, location } = await params;
-  const data = await getVerticalLocationPageContent("office-space", segment, location);
+  const page = await loadManagedOfficeLocalityPage(segment, location);
+  if (!page) notFound();
 
-  if (!data) {
-    notFound();
-  }
+  const { cityData, locality, localities } = page;
+  const city = cityData.city.name;
+  const facts = managedOfficeLocalityFacts(locality.offices);
+  const seo = await getSeoBySlug(pathnameToSeoSlug(`/managed-office/${cityData.city.slug}/${locality.slug}`));
 
-  return <VerticalLocationPage data={data} />;
+  return (
+    <ManagedOfficeLocationPage
+      cityData={cityData}
+      locality={locality}
+      localities={localities}
+      title={seoPageTitleOrFallback(seo, `Managed Office Space in ${locality.name}, ${city}`)}
+      faqs={seoFaqsOrFallback(seo, managedOfficeLocalityFaqs(locality.name, city, facts))}
+    />
+  );
 }

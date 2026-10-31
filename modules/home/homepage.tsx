@@ -1,3 +1,4 @@
+import { OrganizationJsonLd } from "@/components/seo/organization-json-ld";
 import { SectionWrapper } from "@/components/sections/section-wrapper";
 import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -24,6 +25,7 @@ const headingGap = "mt-8 sm:mt-10";
 export function Homepage({ data }: HomepageProps) {
   return (
     <>
+      <OrganizationJsonLd />
       <HomeHero
         searchOptions={data.searchOptions}
         featuredSpaces={data.featuredSpaces}

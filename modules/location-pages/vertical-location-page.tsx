@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ListingItemListJsonLd } from "@/components/seo/listing-json-ld";
 import { Container } from "@/components/ui/container";
 import { PopularLocalitiesRail } from "@/modules/city-pages/components/popular-localities-rail";
 import { Breadcrumb } from "@/modules/location-pages/components/breadcrumb";
@@ -49,6 +50,10 @@ export function VerticalLocationPage({
 
   return (
     <>
+      <ListingItemListJsonLd
+        name={data.title}
+        items={(data.initialCoworkingListing?.rows ?? []).map((w) => ({ name: w.name, href: `/coworking/${w.slug}` }))}
+      />
       <section className="relative overflow-hidden pb-4 pt-10 sm:pb-6 sm:pt-14">
         <div className="absolute inset-x-0 top-0 -z-10 h-[24rem] bg-[radial-gradient(circle_at_top_left,rgba(48,88,215,0.12),transparent_30%),linear-gradient(180deg,#f8fbff_0%,#ffffff_94%)]" />
         <Container>

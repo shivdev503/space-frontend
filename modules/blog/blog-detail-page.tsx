@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Clock } from "lucide-react";
 
+import { ArticleJsonLd } from "@/components/seo/article-json-ld";
 import { Container } from "@/components/ui/container";
 import { BLOG_VERTICAL_HREF, BLOG_VERTICAL_LABELS, formatBlogDate } from "@/lib/blog-data";
 import { BlogProse } from "@/modules/blog/components/blog-prose";
@@ -18,6 +19,7 @@ export function BlogDetailPage({
 }) {
   return (
     <article>
+      <ArticleJsonLd post={post} />
       <section className="relative overflow-hidden pb-8 pt-10 sm:pb-10 sm:pt-14">
         <div className="absolute inset-x-0 top-0 -z-10 h-[28rem] bg-[radial-gradient(circle_at_top_left,rgba(76,175,80,0.12),transparent_32%),linear-gradient(180deg,#f8faf8_0%,#ffffff_94%)]" />
         <Container className="max-w-[920px]">

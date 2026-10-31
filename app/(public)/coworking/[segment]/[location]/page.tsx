@@ -11,7 +11,6 @@ import { VerticalLocationPage } from "@/modules/location-pages/vertical-location
 import { getVerticalLocationPageContent, loadInitialCoworkingListing } from "@/services/coworking-api";
 import { coworkingMarketStats } from "@/services/market-stats";
 import { getSeoBySlug } from "@/services/seo-content";
-import { toTitleCase } from "@/utils/format";
 
 export async function generateMetadata({
   params,
@@ -21,18 +20,15 @@ export async function generateMetadata({
   const { segment, location } = await params;
   const page = await getVerticalLocationPageContent("coworking", segment, location);
 
-  if (!page) {
-    return buildMetadataWithCmsSeoFallback(`/coworking/${segment}/${location}`, {
-      title: `Coworking in ${toTitleCase(location)}, ${toTitleCase(segment)}`,
-      description: "Discover coworking spaces in this location.",
-    });
-  }
+  if (!page) notFound();
 
   const stats = await coworkingMarketStats(segment, location);
-  return buildMetadataWithCmsSeoFallback(
+  const metadata = await buildMetadataWithCmsSeoFallback(
     `/coworking/${page.citySlug}/${page.locationSlug}`,
     coworkingLocalitySeo(page.locationName, page.city.name, stats),
   );
+  // A real locality with no spaces yet is a thin page.
+  return page.totalSpaces === 0 ? { ...metadata, robots: { index: false, follow: true } } : metadata;
 }
 
 export default async function CoworkingLocationPage({

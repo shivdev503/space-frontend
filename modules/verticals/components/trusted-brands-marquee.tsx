@@ -17,7 +17,7 @@ function BrandLogoCard({ brand }: { brand: Brand }) {
       {brand.image ? (
         <Image
           src={brand.image}
-          alt=""
+          alt={brand.name}
           fill
           className="object-contain object-center"
           sizes="(max-width: 640px) 168px, 208px"

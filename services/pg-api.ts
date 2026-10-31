@@ -11,6 +11,7 @@ import axios, { type AxiosInstance } from "axios";
 
 import { isPgPriorityForType, withPgOverallPriority } from "@/lib/pg-list-priority";
 import { resolvePgListingSlug, slugifyPgName } from "@/lib/pg-slug";
+import { isUpstreamFailure } from "@/lib/upstream-error";
 import {
   isCoworkingUserApiProxyEnabled,
   resolveCoworkingApiBaseUrl,
@@ -135,7 +136,8 @@ export async function loadPgDetail(findKey: string): Promise<PgDetailResponse | 
   if (!isCoworkingUserApiProxyEnabled()) return null;
   try {
     return await fetchPgDetail(findKey);
-  } catch {
+  } catch (error) {
+    if (isUpstreamFailure(error)) throw error;
     return null;
   }
 }

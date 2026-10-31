@@ -26,6 +26,8 @@ const editorProse = cn(
 type Props = {
   title?: string | null;
   description?: string | null;
+  /** Render the editor's H2s as H3s, for pages that already have their own H2 sections. */
+  demoteHeadings?: boolean;
 };
 
 /**
@@ -33,13 +35,14 @@ type Props = {
  * from the editor (`footer_description`), with typographic classes for `p`, `h*`,
  * lists, links, blockquotes, etc.
  */
-export function SeoFooterContentSection({ title, description }: Props) {
+export function SeoFooterContentSection({ title, description, demoteHeadings = false }: Props) {
   const t = title?.trim() ?? "";
   const d = description?.trim() ?? "";
   if (!t && !d) return null;
 
   const hasHtml = d.length > 0 && looksLikeEditorHtml(d);
-  const safeHtml = hasHtml ? prepareCmsFooterHtml(d) : "";
+  const preparedHtml = hasHtml ? prepareCmsFooterHtml(d) : "";
+  const safeHtml = demoteHeadings ? preparedHtml.replace(/<(\/?)h2\b/gi, "<$1h3") : preparedHtml;
   const plainForFallback = d.length > 0 && !hasHtml ? d : "";
 
   return (

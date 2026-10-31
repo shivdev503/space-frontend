@@ -23,6 +23,7 @@ import {
   resolveCoworkingApiBaseUrl,
   resolveCoworkingApiTimeoutMs,
 } from "@/services/env-config";
+import { isUpstreamFailure } from "@/lib/upstream-error";
 import { buildApiClientHeaders } from "@/services/api-client-headers";
 import {
   loadMicroLocationsByCitySpaceType,
@@ -357,8 +358,8 @@ async function fetchCoworkingWorkspaceDetail(slug: string): Promise<CoworkingMod
       const { data } = await getCoworkingAxios().get<unknown>(coworkingApiPaths.workSpace(trimmed));
       const ws = parseCoworkingWorkspaceSinglePayload(data);
       if (ws) return normalizeCoworkingWorkspacePricing(ws);
-    } catch {
-      /* seed */
+    } catch (error) {
+      if (isUpstreamFailure(error)) throw error;
     }
   }
 
@@ -371,8 +372,7 @@ async function fetchCoworkingWorkspaceDetail(slug: string): Promise<CoworkingMod
 export const loadCoworkingWorkspaceDetail: typeof fetchCoworkingWorkspaceDetail =
   typeof window === "undefined" ? cache(fetchCoworkingWorkspaceDetail) : fetchCoworkingWorkspaceDetail;
 
-/** Vertical location pages (coworking uses catalog + workspaces + micro-locations; others seed-only). */
-export async function getVerticalLocationPageContent(
+async function fetchVerticalLocationPageContent(
   vertical: SpaceVertical,
   city: string,
   location: string,
@@ -398,12 +398,23 @@ export async function getVerticalLocationPageContent(
   if (!microKey) return null;
 
   let workspaceMicroLocationId: string | null = null;
+  let isCatalogLocality = false;
   if (isLikelyMongoObjectId(microKey)) {
     workspaceMicroLocationId = microKey;
   } else {
     const hits = await loadMicroLocationsByCitySpaceType(cityPage.catalogCityId, "coworking");
     const hit = resolveMicroLocationFromSegment(hits, microKey);
-    if (hit) workspaceMicroLocationId = hit.id;
+    if (hit) {
+      workspaceMicroLocationId = hit.id;
+      isCatalogLocality = true;
+    } else if (preferCoworkingApi) {
+      const { findInventoryLocality } = await import("@/services/inventory-locality");
+      const fromInventory = await findInventoryLocality("coworking", cityRouteSlug, microKey);
+      if (fromInventory?.id) {
+        workspaceMicroLocationId = fromInventory.id;
+        isCatalogLocality = true;
+      }
+    }
   }
 
   let spaces: Space[] = [];
@@ -420,6 +431,7 @@ export async function getVerticalLocationPageContent(
   if (preferCoworkingApi && spaces.length === 0) {
     const fromSeed = getLocationPageData(vertical, cityRouteSlug, location, filters);
     if (fromSeed) return fromSeed;
+    if (!isCatalogLocality) return null;
   }
 
   return buildLocationPageDataFromSpaces(
@@ -433,3 +445,7 @@ export async function getVerticalLocationPageContent(
     workspaceMicroLocationId ?? undefined,
   );
 }
+
+/** Vertical location pages (coworking uses catalog + workspaces + micro-locations; others seed-only). */
+export const getVerticalLocationPageContent: typeof fetchVerticalLocationPageContent =
+  typeof window === "undefined" ? cache(fetchVerticalLocationPageContent) : fetchVerticalLocationPageContent;

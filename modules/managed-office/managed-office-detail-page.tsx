@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
+import { WorkspacePlaceJsonLd } from "@/components/seo/listing-json-ld";
 import { Container } from "@/components/ui/container";
 import { listingTrail } from "@/lib/breadcrumb-trails";
 import { listingAltBase } from "@/lib/image-alt";
@@ -54,6 +55,13 @@ export function ManagedOfficeDetailPage({
 
   return (
     <CoworkingLeadQuizProvider>
+      <WorkspacePlaceJsonLd
+        name={title}
+        path={`/managed-office/${office.slug}`}
+        images={images}
+        location={office.location}
+        amenities={office.amenties}
+      />
       <div className="bg-[color:var(--color-page-bg)]">
         <Container className="max-w-[1280px] pt-4 sm:pt-8 max-lg:px-4">
           <Breadcrumbs
@@ -62,6 +70,7 @@ export function ManagedOfficeDetailPage({
               name: title,
               cityName: city,
               cityId: office.location?.city?.id,
+              localityName: locality,
             })}
           />
           <ManagedOfficeDetailHero office={office} />

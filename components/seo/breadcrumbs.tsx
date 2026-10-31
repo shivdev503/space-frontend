@@ -5,7 +5,7 @@ import { cn } from "@/utils/cn";
 /** Same origin on server and client (the browser's own origin would differ on www / preview hosts). */
 const SITE_ORIGIN = (process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://spacewallah.com").replace(/\/+$/, "");
 
-function absoluteUrl(href: string): string {
+export function absoluteUrl(href: string): string {
   if (/^https?:\/\//i.test(href)) return href;
   return href === "/" ? SITE_ORIGIN : `${SITE_ORIGIN}${href}`;
 }

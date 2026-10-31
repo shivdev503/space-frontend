@@ -1,3 +1,4 @@
+import { WorkspacePlaceJsonLd } from "@/components/seo/listing-json-ld";
 import { Container } from "@/components/ui/container";
 import { listingAltBase } from "@/lib/image-alt";
 import { CoworkingDetailAbout } from "@/modules/coworking/components/coworking-detail/coworking-detail-about";
@@ -71,6 +72,13 @@ export function CoworkingDetailPage({
 
   return (
     <CoworkingLeadQuizProvider>
+    <WorkspacePlaceJsonLd
+      name={workspace.name}
+      path={`/coworking/${workspace.slug}`}
+      images={images}
+      location={workspace.location}
+      amenities={workspace.amenties}
+    />
     <div className="bg-[color:var(--color-page-bg)]">
       <Container className="max-w-[1280px] pt-4 sm:pt-8 max-lg:px-4">
         <CoworkingDetailBreadcrumb workspace={workspace} />

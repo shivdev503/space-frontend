@@ -8,6 +8,7 @@
 import axios, { type AxiosInstance } from "axios";
 import { cache } from "react";
 
+import { isUpstreamFailure } from "@/lib/upstream-error";
 import { buildApiClientHeaders } from "@/services/api-client-headers";
 import {
   isCoworkingUserApiProxyEnabled,
@@ -136,7 +137,8 @@ async function fetchManagedOfficeDetail(slugOrId: string): Promise<ManagedOffice
       `/api/user/managedOffice/${encodeURIComponent(key)}`,
     );
     return coerceManagedOffice(isRecord(data) ? data.data : null);
-  } catch {
+  } catch (error) {
+    if (isUpstreamFailure(error)) throw error;
     return null;
   }
 }

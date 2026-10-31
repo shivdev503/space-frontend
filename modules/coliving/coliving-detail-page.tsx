@@ -1,3 +1,4 @@
+import { PgPlaceJsonLd } from "@/components/seo/listing-json-ld";
 import { Container } from "@/components/ui/container";
 import { listingAltBase } from "@/lib/image-alt";
 import { ColivingDetailAnchorBar } from "@/modules/coliving/components/detail/coliving-detail-anchor-bar";
@@ -33,6 +34,7 @@ export function ColivingDetailPage({ response, similar }: ColivingDetailPageProp
 
   return (
     <ColivingLeadQuizProvider>
+      <PgPlaceJsonLd pg={pg} path={`/coliving/${slug}`} />
       <div className="bg-[#f9f8f5] pb-24 lg:pb-0">
         <Container className="max-w-[1280px] pt-4 sm:pt-8 max-lg:px-4">
           <ColivingDetailHeader pg={pg} slug={slug} />

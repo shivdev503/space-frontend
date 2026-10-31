@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { notFound } from "next/navigation";
 
+import { WorkspacePlaceJsonLd } from "@/components/seo/listing-json-ld";
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
 import { buildPageMetadataFromSeo } from "@/lib/seo-metadata";
 import { virtualOfficeCitySeo, virtualOfficeListingSeo } from "@/lib/seo-templates";
@@ -46,6 +47,8 @@ export async function generateMetadata({
     return buildMetadataWithCmsSeoFallback(pathname, virtualOfficeListingSeo(workspace));
   }
 
+  await resolveVerticalSegment("virtual-office", segment);
+
   return buildMetadataWithCmsSeoFallback(`/virtual-office/${segment}`, {
     title: `${toTitleCase(segment)} | Virtual Office`,
     description: "Compare virtual office providers and compliance-ready plans across India.",
@@ -70,10 +73,21 @@ export default async function VirtualOfficeSegmentPage({
     return <VerticalCityPage data={cityData} />;
   }
 
+  const workspace = await loadCoworkingWorkspaceDetail(result.space.slug);
+
   return (
-    <VirtualOfficeDetailPage
-      space={result.space}
-      similarSpaces={await getSimilarSpaces("virtual-office", result.space.city, result.space.id)}
-    />
+    <>
+      <WorkspacePlaceJsonLd
+        name={result.space.name}
+        path={`/virtual-office/${result.space.slug}`}
+        images={result.space.images}
+        location={workspace?.location}
+        amenities={workspace?.amenties}
+      />
+      <VirtualOfficeDetailPage
+        space={result.space}
+        similarSpaces={await getSimilarSpaces("virtual-office", result.space.city, result.space.id)}
+      />
+    </>
   );
 }

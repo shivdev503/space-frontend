@@ -66,8 +66,8 @@ export function listingTrail(
     items.push({ name: cityLabel, href: `${base}/${citySlug}` });
     const locality = listing.localityName?.trim();
     const localitySlug = locality ? slugifyMicroLocationName(locality) : "";
-    // Virtual office and managed office have no locality pages.
-    if (locality && localitySlug && (vertical === "coworking" || vertical === "coliving")) {
+    // Virtual office has no locality pages.
+    if (locality && localitySlug && vertical !== "virtual-office") {
       items.push({ name: toTitleCase(locality), href: `${base}/${citySlug}/${localitySlug}` });
     }
   }

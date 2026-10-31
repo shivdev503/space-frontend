@@ -19,6 +19,8 @@ export type BlogPost = {
   author: string;
   authorRole: string;
   publishedAt: string;
+  /** False when the API sent no usable date and `publishedAt` is only a display fallback. */
+  hasPublishDate?: boolean;
   readMinutes: number;
   tags: string[];
   featured?: boolean;

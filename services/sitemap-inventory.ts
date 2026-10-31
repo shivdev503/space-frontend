@@ -8,8 +8,9 @@
  */
 
 import { cachedLoader } from "@/lib/cached-loader";
-import { resolvePgListingSlug } from "@/lib/pg-slug";
+import { resolvePgListingSlug, slugifyPgName } from "@/lib/pg-slug";
 import { buildApiClientHeaders } from "@/services/api-client-headers";
+import { canonicalCoworkingCitySlug, resolveCatalogIdToSlug } from "@/services/catalog-city-id";
 import { isCoworkingUserApiProxyEnabled, resolveApiBaseUrl } from "@/services/env-config";
 import { fetchPgList } from "@/services/pg-api";
 
@@ -24,11 +25,27 @@ export type InventorySpace = {
   cityId?: string;
   cityName?: string;
   localityName?: string;
+  /** Micro-location id (workspaces only). */
+  localityId?: string;
   /** Operator brand slug (workspaces only), e.g. "awfis". */
   brandSlug?: string;
   /** Real last-modified time when the API provides one. */
   updatedAt?: Date;
 };
+
+const PG_CITY_TO_ROUTE: Record<string, string> = {
+  bengaluru: "bangalore",
+  "new-delhi": "delhi",
+  "navi-mumbai": "mumbai",
+};
+
+/** Canonical route slug for a listing's city (e.g. catalog "gurugram" → "gurgaon"). */
+export function citySlugOf(item: InventorySpace): string | null {
+  const fromCatalog = item.cityId ? resolveCatalogIdToSlug(item.cityId) : null;
+  const raw = fromCatalog ?? (item.cityName ? slugifyPgName(item.cityName) : "");
+  if (!raw) return null;
+  return canonicalCoworkingCitySlug(PG_CITY_TO_ROUTE[raw] ?? raw);
+}
 
 export type RawRecord = Record<string, unknown>;
 
@@ -83,7 +100,8 @@ function workspaceToInventory(row: RawRecord): InventorySpace | null {
     slug,
     cityId: refId(location.city) || undefined,
     cityName: refName(location.city) || undefined,
-    localityName: refName(location.micro_location) || undefined,
+    localityName: refName(location.micro_location) || str(location.micro_location_string) || undefined,
+    localityId: refId(location.micro_location) || undefined,
     brandSlug: (isRecord(row.brand) ? str(row.brand.slug) : "") || undefined,
     updatedAt: parseDate(row.updated_on, row.updatedAt),
   };

@@ -13,10 +13,10 @@ type BrandRouteProps = {
 
 export async function generateMetadata({ params }: BrandRouteProps): Promise<Metadata> {
   const { slug } = await params;
-  const data = await loadBrandPageData(slug).catch(() => null);
+  const data = await loadBrandPageData(slug);
+  if (!data) notFound();
   // City-filtered views share the brand page's canonical URL.
   const pathname = `/brand/${slug.trim().toLowerCase()}`;
-  if (!data) return { title: "Brand not found", robots: { index: false } };
 
   if (data.brand.seo) return buildPageMetadataFromSeo(pathname, data.brand.seo);
 

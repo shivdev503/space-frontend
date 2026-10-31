@@ -18,9 +18,8 @@ import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
 import { seoFaqsOrFallback } from "@/lib/seo-page-faqs";
 import { buildPageMetadataFromSeo } from "@/lib/seo-metadata";
 import { seoPageTitleOrFallback } from "@/lib/seo-page-title";
-import { coworkingCitySeo, coworkingListingSeo } from "@/lib/seo-templates";
+import { coworkingBrandedTitle, coworkingCitySeo, coworkingListingSeo } from "@/lib/seo-templates";
 import { getSeoBySlug } from "@/services/seo-content";
-import { toTitleCase } from "@/utils/format";
 
 export async function generateMetadata({
   params,
@@ -42,15 +41,17 @@ export async function generateMetadata({
   if (workspace) {
     const pathname = `/coworking/${workspace.slug}`;
     const spaceSeo = workspaceSeo(workspace);
-    if (spaceSeo) return buildPageMetadataFromSeo(pathname, spaceSeo);
+    if (spaceSeo) {
+      return buildPageMetadataFromSeo(pathname, {
+        ...spaceSeo,
+        title: coworkingBrandedTitle(spaceSeo.title, workspace),
+      });
+    }
 
     return buildMetadataWithCmsSeoFallback(pathname, coworkingListingSeo(workspace));
   }
 
-  return buildMetadataWithCmsSeoFallback(`/coworking/${segment}`, {
-    title: `${toTitleCase(segment)} | Coworking`,
-    description: "Discover premium coworking spaces across top cities in India.",
-  });
+  notFound();
 }
 
 export default async function CoworkingSegmentPage({

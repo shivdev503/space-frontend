@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
 import { VerticalLocationPage } from "@/modules/location-pages/vertical-location-page";
 import { getVerticalLocationPageContent } from "@/services/coworking-api";
-import { toTitleCase } from "@/utils/format";
 
 export async function generateMetadata({
   params,
@@ -15,12 +14,7 @@ export async function generateMetadata({
   const { segment, location } = await params;
   const page = await getVerticalLocationPageContent("virtual-office", segment, location);
 
-  if (!page) {
-    return buildMetadataWithCmsSeoFallback(`/virtual-office/${segment}/${location}`, {
-      title: `Virtual Office in ${toTitleCase(location)}, ${toTitleCase(segment)}`,
-      description: "Discover virtual office options in this location.",
-    });
-  }
+  if (!page) notFound();
 
   return buildMetadataWithCmsSeoFallback(`/virtual-office/${segment}/${location}`, {
     title: page.title,

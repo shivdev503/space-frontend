@@ -15,9 +15,7 @@ type PageProps = {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await loadBlogPostBySlug(slug);
-  if (!post) {
-    return buildMetadata("Article not found", "This blog article could not be found.", `/blog/${slug}`);
-  }
+  if (!post) notFound();
   return buildMetadata(post.title, post.excerpt, `/blog/${post.slug}`);
 }
 

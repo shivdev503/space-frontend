@@ -5,6 +5,7 @@
 import axios, { type AxiosInstance } from "axios";
 import { cache } from "react";
 
+import { isUpstreamFailure } from "@/lib/upstream-error";
 import { resolveCatalogIdToSlug } from "@/services/catalog-city-id";
 import {
   isCoworkingUserApiProxyEnabled,
@@ -175,7 +176,8 @@ async function fetchMicroLocationsByCitySpaceType(
     });
     const parsed = microLocationsFromWire(data);
     return parsed.length > 0 ? parsed : mockMicroLocationsForCity(id, spaceType);
-  } catch {
+  } catch (error) {
+    if (isUpstreamFailure(error)) throw error;
     return mockMicroLocationsForCity(id, spaceType);
   }
 }

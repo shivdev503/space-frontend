@@ -2,12 +2,13 @@ import type { SitemapIndexEntry, SitemapUrlEntry } from "@/lib/sitemap-xml";
 import { slugifyPgName } from "@/lib/pg-slug";
 import { verticalPath } from "@/lib/vertical-path";
 import { NON_OPERATOR_BRAND_SLUGS } from "@/services/brand-api";
-import { canonicalCoworkingCitySlug, resolveCatalogIdToSlug } from "@/services/catalog-city-id";
+import { canonicalCoworkingCitySlug } from "@/services/catalog-city-id";
 import { AVAILABLE_CITY_VIRTUAL_OFFICE } from "@/services/cities-data";
 import { resolveAppUrl } from "@/services/env-config";
 import { slugifyMicroLocationName } from "@/services/location-api";
 import { EMPTY_CITY_PAGE_FILTERS, getCityPageData } from "@/services/mock-db";
 import {
+  citySlugOf,
   type InventorySpace,
   loadColivingInventory,
   loadCoworkingInventory,
@@ -37,20 +38,6 @@ function isCityPage(vertical: SpaceVertical, citySlug: string): boolean {
  * PG city names → the city page that lists them. The PG API matches `city` by substring,
  * so `/coliving/delhi` includes "New Delhi" and `/coliving/mumbai` includes "Navi Mumbai".
  */
-const PG_CITY_TO_ROUTE: Record<string, string> = {
-  bengaluru: "bangalore",
-  "new-delhi": "delhi",
-  "navi-mumbai": "mumbai",
-};
-
-/** Canonical route slug for a listing's city (e.g. catalog "gurugram" → "gurgaon"). */
-function citySlugOf(item: InventorySpace): string | null {
-  const fromCatalog = item.cityId ? resolveCatalogIdToSlug(item.cityId) : null;
-  const raw = fromCatalog ?? (item.cityName ? slugifyPgName(item.cityName) : "");
-  if (!raw) return null;
-  return canonicalCoworkingCitySlug(PG_CITY_TO_ROUTE[raw] ?? raw);
-}
-
 function cityUrl(vertical: SpaceVertical, citySlug: string): string {
   return toAbsoluteUrl(`/${verticalPath(vertical)}/${encodeURIComponent(citySlug)}`);
 }
@@ -170,15 +157,20 @@ export async function collectCityPagesSitemapEntries(): Promise<SitemapUrlEntry[
 }
 
 /**
- * `/{vertical}/{city}/{locality}` — coworking and coliving localities with at least
+ * `/{vertical}/{city}/{locality}` — coworking, managed office and coliving localities with at least
  * {@link MIN_LISTINGS_FOR_LOCALITY_PAGE} live listings.
  */
 export async function collectLocalityPagesSitemapEntries(): Promise<SitemapUrlEntry[]> {
-  const [coworking, coliving] = await Promise.all([loadCoworkingInventory(), loadColivingInventory()]);
+  const [coworking, managedOffice, coliving] = await Promise.all([
+    loadCoworkingInventory(),
+    loadManagedOfficeInventory(),
+    loadColivingInventory(),
+  ]);
 
   const entries: SitemapUrlEntry[] = [];
   const inventoryByVertical: Array<[SpaceVertical, InventorySpace[]]> = [
     ["coworking", coworking],
+    ["office-space", managedOffice],
     ["coliving", coliving],
   ];
   for (const [vertical, items] of inventoryByVertical) {

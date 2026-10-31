@@ -1,3 +1,4 @@
+import { ListingItemListJsonLd } from "@/components/seo/listing-json-ld";
 import { cityTrail } from "@/lib/breadcrumb-trails";
 import { Container } from "@/components/ui/container";
 import { CityPageFaqSection } from "@/modules/city-pages/components/city-page-faq-section";
@@ -10,6 +11,10 @@ import type { CityPageData } from "@/types";
 export function CoworkingCityPage({ data }: { data: CityPageData }) {
   return (
     <>
+      <ListingItemListJsonLd
+        name={data.title}
+        items={(data.initialCoworkingListing?.rows ?? []).map((w) => ({ name: w.name, href: `/coworking/${w.slug}` }))}
+      />
       <CityPageHero title={data.title} breadcrumbs={cityTrail(data.vertical, data.city.name)}>
         {data.catalogCityId ? (
           <PopularLocalitiesRail
