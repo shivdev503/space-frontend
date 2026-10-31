@@ -16,6 +16,8 @@ const IS_PRODUCTION = process.env.NODE_ENV === "production";
 const DEFAULT_APP_ORIGIN_DEV = IS_PRODUCTION ? "https://spacewallah.com" : "http://localhost:3000";
 const DEFAULT_API_ORIGIN_DEV = IS_PRODUCTION ? "https://api.spacewallah.com" : "http://localhost:8000";
 const DEFAULT_COWORKING_TIMEOUT_MS = 3500;
+/** Server calls fail the page when they time out, so they get far longer than the browser's quick fallback. */
+const DEFAULT_COWORKING_SERVER_TIMEOUT_MS = 8000;
 const DEFAULT_LEADS_TIMEOUT_MS = 8000;
 const DEFAULT_LISTING_TIMEOUT_MS = 15000;
 
@@ -97,9 +99,10 @@ export function isCoworkingUserApiProxyEnabled(): boolean {
 
 /** Coworking axios timeout with safe defaults. */
 export function resolveCoworkingApiTimeoutMs(): number {
+  const fallback = typeof window === "undefined" ? DEFAULT_COWORKING_SERVER_TIMEOUT_MS : DEFAULT_COWORKING_TIMEOUT_MS;
   const raw = process.env.COWORKING_API_TIMEOUT_MS?.trim();
-  const n = raw ? Number.parseInt(raw, 10) : DEFAULT_COWORKING_TIMEOUT_MS;
-  return Number.isFinite(n) && n > 0 ? n : DEFAULT_COWORKING_TIMEOUT_MS;
+  const n = raw ? Number.parseInt(raw, 10) : fallback;
+  return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
 /**

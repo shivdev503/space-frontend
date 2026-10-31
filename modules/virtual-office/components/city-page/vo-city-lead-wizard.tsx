@@ -275,7 +275,7 @@ export function VoCityLeadWizard({
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 94577 77791"
+                placeholder="+91 70173 33425"
                 className="mb-2.5 w-full rounded-lg border border-[#EAE7E0] bg-white px-3 py-2.5 text-sm text-ink outline-none transition focus:border-[color:var(--color-brand)]"
               />
               <label className="mb-1 block text-xs font-semibold uppercase tracking-[0.05em] text-muted">

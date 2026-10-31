@@ -8,12 +8,28 @@ import type { BrandPageData } from "@/services/brand-api";
 import { coworkingCardRow } from "@/services/coworking-api";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import { cn } from "@/utils/cn";
+import { formatCurrency } from "@/utils/format";
 
 type BrandPageProps = {
   data: BrandPageData;
   workspaces: CoworkingModel.WorkSpace[];
   activeCity?: string;
 };
+
+/** Live centre counts and prices, so each operator's copy is unique and stays current. */
+function brandSummary({ brand, cities, workspaces }: BrandPageData): string {
+  const places = [...cities].sort((a, b) => b.count - a.count).slice(0, 6);
+  const list = places.map((city) => `${city.name} (${city.count})`).join(", ");
+  const prices = workspaces.map((ws) => ws.starting_price ?? 0).filter((price) => price > 0);
+  const centres = workspaces.length === 1 ? "1 centre" : `${workspaces.length} centres`;
+  return [
+    `SpaceWallah lists ${centres} from ${brand.name}${cities.length > 1 ? ` across ${cities.length} cities` : ""}${list ? `, including ${list}` : ""}.`,
+    prices.length ? `Listed prices start at ${formatCurrency(Math.min(...prices))}.` : "",
+    "Compare plans and photos for each centre, then book a free tour with zero brokerage.",
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
 
 export function BrandPage({ data, workspaces, activeCity }: BrandPageProps) {
   const { brand, cities } = data;
@@ -94,6 +110,17 @@ export function BrandPage({ data, workspaces, activeCity }: BrandPageProps) {
           )}
         </Container>
       </section>
+
+      {total > 0 ? (
+        <section className="pb-14 sm:pb-20">
+          <Container>
+            <div className="max-w-3xl">
+              <h2 className="font-display text-[1.95rem] text-ink sm:text-3xl">{brand.name} centres on SpaceWallah</h2>
+              <p className="mt-4 text-[0.98rem] leading-7 text-muted">{brandSummary(data)}</p>
+            </div>
+          </Container>
+        </section>
+      ) : null}
     </>
   );
 }

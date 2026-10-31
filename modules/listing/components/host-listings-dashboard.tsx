@@ -3,16 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import {
-  Building2,
-  Home,
-  LayoutGrid,
-  MapPin,
-  Pencil,
-  Plus,
-  Sparkles,
-  Users,
-} from "lucide-react";
+import { ArrowRight, Building2, Home, MapPin, Pencil, Sparkles, Users } from "lucide-react";
 
 import {
   formatListingDate,
@@ -23,8 +14,8 @@ import {
   type StatusTone,
 } from "@/lib/host-listing-dashboard";
 
+import { LISTING_VERTICALS } from "./add-vertical-chooser";
 import "./host-listings-dashboard.css";
-import { HostLogoutButton } from "./host-logout-button";
 
 const KIND_ICONS: Record<HostListingKind, typeof Users> = {
   coworking: Users,
@@ -133,22 +124,6 @@ export function HostListingsDashboard({ hostName, listings, loadError }: Props) 
       <div className="host-dash__bg" aria-hidden />
 
       <div className="host-dash__inner">
-        {/* Top bar — Add / Logout live here, not in the hero banner */}
-        <div className="host-dash__topbar">
-          <span className="host-dash__brand">
-            <span className="host-dash__brand-dot" aria-hidden />
-            Host
-          </span>
-          <div className="host-dash__top-actions">
-            <Link href="/add" className="host-dash__btn-add">
-              <Plus size={16} strokeWidth={2.5} aria-hidden />
-              <span className="hidden sm:inline">Add listing</span>
-              <span className="sm:hidden">Add</span>
-            </Link>
-            <HostLogoutButton variant="light" />
-          </div>
-        </div>
-
         {/* Hero */}
         <header className="host-dash__hero">
           <div className="host-dash__hero-glow" aria-hidden />
@@ -161,15 +136,16 @@ export function HostListingsDashboard({ hostName, listings, loadError }: Props) 
               <h1 className="host-dash__title">
                 {firstName ? (
                   <>
-                    Welcome back, <em>{firstName}</em>
+                    {total > 0 ? "Welcome back" : "Welcome"}, <em>{firstName}</em>
                   </>
                 ) : (
                   <>Your listings</>
                 )}
               </h1>
               <p className="host-dash__subtitle">
-                Manage coworking, office, and PG properties. Update photos, pricing, and rules in
-                minutes.
+                {total > 0
+                  ? "Update photos, pricing and rules for your spaces in minutes."
+                  : "List your space and reach people looking for offices and homes across India."}
               </p>
             </div>
           </div>
@@ -193,22 +169,31 @@ export function HostListingsDashboard({ hostName, listings, loadError }: Props) 
         {loadError ? <div className="host-dash__alert">{loadError} Try refreshing.</div> : null}
 
         {total === 0 ? (
-          <div className="host-dash__empty">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[rgba(76,175,80,0.12)] text-[#4caf50]">
-              <LayoutGrid size={28} strokeWidth={1.6} aria-hidden />
-            </div>
-            <h2 className="mt-5 font-display text-2xl font-semibold text-[var(--hd-ink)]">
-              No listings yet
+          <section className="host-start" aria-labelledby="host-start-title">
+            <h2 id="host-start-title" className="host-start__title">
+              What would you like to list?
             </h2>
-            <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-[var(--hd-muted)]">
-              Publish your first space in under 15 minutes — we&apos;ll review and go live within
-              24 hours.
+            <p className="host-start__text">
+              Pick a category to begin. Listing is free, and our team reviews new listings within 24 hours.
             </p>
-            <Link href="/add" className="host-dash__btn-add mt-7 inline-flex">
-              <Plus size={16} strokeWidth={2.5} aria-hidden />
-              Create your first listing
-            </Link>
-          </div>
+            <ul className="host-start__grid">
+              {LISTING_VERTICALS.map(({ href, title, description, Icon, eta }) => (
+                <li key={href}>
+                  <Link href={href} className="host-start__card">
+                    <span className="host-start__icon">
+                      <Icon size={22} strokeWidth={1.8} aria-hidden />
+                    </span>
+                    <span className="host-start__name">{title}</span>
+                    <span className="host-start__desc">{description}</span>
+                    <span className="host-start__foot">
+                      <span>About {eta}</span>
+                      <ArrowRight size={16} strokeWidth={2.2} aria-hidden />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
         ) : (
           <>
             <p className="host-dash__section-title">

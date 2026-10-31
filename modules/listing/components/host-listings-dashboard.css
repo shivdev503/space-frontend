@@ -1,5 +1,16 @@
 /* Host listings dashboard — scoped premium styles */
 
+/* Host header: the shared logout button reads these outside .host-dash too. */
+.host-bar {
+  --hd-ink: #141414;
+  --hd-shadow: none;
+}
+
+.host-bar .host-dash__btn-logout {
+  height: 2.5rem;
+  padding: 0 0.75rem;
+}
+
 .host-dash {
   --hd-ink: #141414;
   --hd-muted: rgba(20, 20, 20, 0.58);
@@ -38,40 +49,6 @@
   .host-dash__inner {
     padding: 1.25rem 1.5rem 3rem;
   }
-}
-
-/* —— Top bar (mobile-first) —— */
-.host-dash__topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.35rem 0 1rem;
-}
-
-.host-dash__brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--hd-muted);
-}
-
-.host-dash__brand-dot {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 999px;
-  background: var(--hd-brand);
-  box-shadow: 0 0 0 3px rgba(18, 184, 134, 0.25);
-}
-
-.host-dash__top-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 /* —— Hero —— */
@@ -568,4 +545,103 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--hd-muted);
+}
+
+/* First-run: choose what to list */
+.host-start {
+  margin-top: 1.25rem;
+  border-radius: 1.5rem;
+  background: var(--hd-card);
+  padding: 1.5rem 1.25rem;
+  box-shadow: var(--hd-shadow);
+}
+
+@media (min-width: 640px) {
+  .host-start {
+    padding: 2rem;
+  }
+}
+
+.host-start__title {
+  font-family: var(--font-display, inherit);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--hd-ink);
+}
+
+.host-start__text {
+  margin-top: 0.4rem;
+  max-width: 38rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--hd-muted);
+}
+
+.host-start__grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .host-start__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+}
+
+.host-start__card {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  border: 1px solid rgba(20, 20, 20, 0.1);
+  border-radius: 1rem;
+  padding: 1.1rem;
+  background: #fff;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+
+.host-start__card:hover {
+  transform: translateY(-2px);
+  border-color: var(--hd-brand);
+  box-shadow: var(--hd-shadow-hover);
+}
+
+.host-start__icon {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 0.8rem;
+  background: rgba(18, 184, 134, 0.1);
+  color: var(--hd-brand-dark);
+}
+
+.host-start__name {
+  margin-top: 0.85rem;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--hd-ink);
+}
+
+.host-start__desc {
+  margin-top: 0.2rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--hd-muted);
+}
+
+.host-start__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 0.9rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--hd-brand-dark);
 }

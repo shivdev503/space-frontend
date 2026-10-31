@@ -3,8 +3,8 @@
  */
 
 import axios, { type AxiosInstance } from "axios";
-import { cache } from "react";
 
+import { cachedLoader } from "@/lib/cached-loader";
 import { isUpstreamFailure } from "@/lib/upstream-error";
 import { resolveCatalogIdToSlug } from "@/services/catalog-city-id";
 import {
@@ -182,7 +182,18 @@ async function fetchMicroLocationsByCitySpaceType(
   }
 }
 
+const microLocationLoaders = new Map<string, () => Promise<MicroLocation[]>>();
+
+/** A city's locality list rarely changes, so the server keeps it for an hour (failures are not kept). */
+function cachedMicroLocations(cityCatalogId: string, spaceType: MicroLocationSpaceType): Promise<MicroLocation[]> {
+  const key = `${cityCatalogId}|${spaceType}`;
+  let loader = microLocationLoaders.get(key);
+  if (!loader) {
+    loader = cachedLoader(() => fetchMicroLocationsByCitySpaceType(cityCatalogId, spaceType));
+    microLocationLoaders.set(key, loader);
+  }
+  return loader();
+}
+
 export const loadMicroLocationsByCitySpaceType: typeof fetchMicroLocationsByCitySpaceType =
-  typeof window === "undefined"
-    ? cache(fetchMicroLocationsByCitySpaceType)
-    : fetchMicroLocationsByCitySpaceType;
+  typeof window === "undefined" ? cachedMicroLocations : fetchMicroLocationsByCitySpaceType;

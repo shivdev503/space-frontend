@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Instagram, Linkedin, Mail, Phone } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Mail, Phone } from "lucide-react";
 
 import { Container } from "@/components/ui/container";
 
@@ -17,11 +17,16 @@ const FOOTER_EMAIL = CONTACT_EMAIL;
 const FOOTER_PHONE_DISPLAY = CONTACT_PHONE_DISPLAY;
 const FOOTER_PHONE_HREF = CONTACT_PHONE_HREF;
 
-/** Social profile URLs for the upper footer (Facebook hidden until the SpaceWallah page is ready). */
+/** Social profile URLs for the upper footer. */
 export const FOOTER_SOCIAL_LINKS = [
   {
+    label: "Facebook",
+    href: "https://www.facebook.com/profile.php?id=61595877574456",
+    Icon: Facebook,
+  },
+  {
     label: "Instagram",
-    href: "https://www.instagram.com/spacewallah/",
+    href: "https://www.instagram.com/space.wallah",
     Icon: Instagram,
   },
   {

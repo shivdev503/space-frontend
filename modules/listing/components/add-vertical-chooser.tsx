@@ -5,7 +5,6 @@ import {
   Building2,
   Clock3,
   Home,
-  LayoutGrid,
   ShieldCheck,
   Sparkles,
   Users,
@@ -15,7 +14,7 @@ import {
 import { Container } from "@/components/ui/container";
 import { cn } from "@/utils/cn";
 
-const VERTICALS = [
+export const LISTING_VERTICALS = [
   {
     href: "/add/coliving-space",
     title: "PG & Co-living",
@@ -60,10 +59,9 @@ const TRUST_POINTS = [
 
 type Props = {
   hostName?: string | null;
-  hasListings?: boolean;
 };
 
-export function AddVerticalChooser({ hostName, hasListings }: Props) {
+export function AddVerticalChooser({ hostName }: Props) {
   const firstName = hostName?.trim().split(/\s+/)[0];
 
   return (
@@ -89,15 +87,6 @@ export function AddVerticalChooser({ hostName, hasListings }: Props) {
                 Pick a category below. Each guided flow auto-saves your progress.
               </p>
             </div>
-            {hasListings ? (
-              <Link
-                href="/add/dashboard"
-                className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-white px-3.5 py-2 text-sm font-semibold text-ink ring-1 ring-ink/10 transition hover:ring-[color:var(--color-brand)]/40"
-              >
-                <LayoutGrid className="h-4 w-4 text-[color:var(--color-brand)]" aria-hidden />
-                My listings
-              </Link>
-            ) : null}
           </div>
 
           {/* Trust pills */}
@@ -115,7 +104,7 @@ export function AddVerticalChooser({ hostName, hasListings }: Props) {
 
           {/* Cards — stack on mobile, 3 cols only when there's room */}
           <div className="mt-6 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {VERTICALS.map((v) => (
+            {LISTING_VERTICALS.map((v) => (
               <VerticalCard key={v.href} {...v} />
             ))}
           </div>
@@ -158,7 +147,7 @@ function VerticalCard({
   Icon,
   features,
   eta,
-}: (typeof VERTICALS)[number]) {
+}: (typeof LISTING_VERTICALS)[number]) {
   return (
     <Link
       href={href}

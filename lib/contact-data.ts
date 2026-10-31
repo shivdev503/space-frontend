@@ -1,7 +1,7 @@
 import type { SpaceVertical } from "@/types";
 
-export const CONTACT_PHONE = "9457777791";
-export const CONTACT_PHONE_DISPLAY = "+91 94577 77791";
+export const CONTACT_PHONE = "7017333425";
+export const CONTACT_PHONE_DISPLAY = "+91 70173 33425";
 export const CONTACT_PHONE_HREF = `tel:+91${CONTACT_PHONE}`;
 export const CONTACT_EMAIL = "info@spacewallah.com";
 export const CONTACT_EMAIL_HREF = `mailto:${CONTACT_EMAIL}`;
@@ -10,8 +10,12 @@ export const CONTACT_HOURS = "Mon – Sat, 9:00 AM – 7:00 PM IST";
 
 export const CONTACT_SOCIAL_LINKS = [
   {
+    label: "Facebook",
+    href: "https://www.facebook.com/profile.php?id=61595877574456",
+  },
+  {
     label: "Instagram",
-    href: "https://www.instagram.com/spacewallah/",
+    href: "https://www.instagram.com/space.wallah",
   },
   {
     label: "LinkedIn",
