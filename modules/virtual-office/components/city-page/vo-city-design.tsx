@@ -28,7 +28,7 @@ export function VoBand({
         "scroll-mt-24 py-16 sm:py-20 lg:py-24",
         tone === "white" && "bg-white",
         tone === "soft" && "bg-[#F5F9F7]",
-        tone === "dark" && "bg-[#0B3B2E] text-white",
+        tone === "dark" && "bg-[#12B886] text-white",
         className,
       )}
     >
@@ -114,9 +114,9 @@ export function VoGreenButton({ className, ...props }: ButtonProps) {
   return <ButtonBase {...props} className={cn("bg-[#12B886] text-white hover:bg-[#10a678]", className)} />;
 }
 
-/** Dark green fill, white text. */
+/** Green fill, white text. */
 export function VoDarkButton({ className, ...props }: ButtonProps) {
-  return <ButtonBase {...props} className={cn("bg-[#0B3B2E] text-white hover:bg-[#0e4a3a]", className)} />;
+  return <ButtonBase {...props} className={cn("bg-[#12B886] text-white hover:bg-[#10a678]", className)} />;
 }
 
 /** Dark outline. */
@@ -124,7 +124,7 @@ export function VoOutlineButton({ className, ...props }: ButtonProps) {
   return (
     <ButtonBase
       {...props}
-      className={cn("border-[1.5px] border-[#0B3B2E] bg-white text-ink hover:bg-[#F5F9F7]", className)}
+      className={cn("border-[1.5px] border-[#12B886] bg-white text-ink hover:bg-[#F5F9F7]", className)}
     />
   );
 }

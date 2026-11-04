@@ -140,16 +140,6 @@ export function getVoCityState(citySlug: string) {
   return CITY_STATES[citySlug.trim().toLowerCase()] ?? null;
 }
 
-export const VO_OTHER_CITIES = [
-  { name: "Delhi", slug: "delhi" },
-  { name: "Noida", slug: "noida" },
-  { name: "Gurgaon", slug: "gurgaon" },
-  { name: "Bangalore", slug: "bangalore" },
-  { name: "Mumbai", slug: "mumbai" },
-  { name: "Pune", slug: "pune" },
-  { name: "Hyderabad", slug: "hyderabad" },
-] as const;
-
 export const VO_SHARE_DOCS = {
   proprietor: {
     label: "Proprietor",

@@ -10,16 +10,15 @@ import {
   Package,
   Plus,
   ShieldCheck,
+  Star,
   TrendingUp,
   Users,
 } from "lucide-react";
-import Link from "next/link";
-import { FormEvent, useState, type ReactNode } from "react";
+import { FormEvent, useCallback, useState, type ReactNode } from "react";
 
 import { CONTACT_PHONE_DISPLAY, CONTACT_PHONE_HREF } from "@/lib/contact-data";
 import { formatInrPrice } from "@/lib/virtual-office-city-catalog";
 import {
-  VO_OTHER_CITIES,
   VO_REVIEWS,
   VO_SHARE_DOCS,
   type VoCityArea,
@@ -36,10 +35,13 @@ import {
   VoHeading,
   VoKicker,
   VoLead,
+  VoOutlineButton,
   VoWrap,
 } from "@/modules/virtual-office/components/city-page/vo-city-design";
 import { useVoCityLead } from "@/modules/virtual-office/components/city-page/vo-city-lead-context";
 import { useVoQuickEnquiry } from "@/modules/virtual-office/components/city-page/vo-city-quick-enquiry";
+import { VoCityReviewsModal } from "@/modules/virtual-office/components/city-page/vo-city-reviews-modal";
+import type { SeoReview } from "@/types/seo.model";
 import { cn } from "@/utils/cn";
 
 /* ───────────────────────── Stats ───────────────────────── */
@@ -61,11 +63,11 @@ export function VoCityStatsBar({
   ];
 
   return (
-    <section className="bg-[#0B3B2E] py-8">
+    <section className="bg-[#12B886] py-8">
       <VoWrap className="grid grid-cols-2 gap-x-6 gap-y-6 lg:grid-cols-4">
         {stats.map((stat) => (
           <div key={stat.label}>
-            <p className="vo-display text-[1.6rem] font-extrabold tracking-[-0.03em] text-[#5EE6B4] sm:text-[2rem]">
+            <p className="vo-display text-[1.6rem] font-extrabold tracking-[-0.03em] text-white sm:text-[2rem]">
               {stat.value}
             </p>
             <p className="mt-0.5 text-[14px] font-medium text-white/90 sm:text-[15px]">{stat.label}</p>
@@ -83,7 +85,7 @@ export function VoCityAreaPriceSection({ cityDisplay, areas }: { cityDisplay: st
   if (!areas.length) return null;
 
   return (
-    <VoBand id="areas">
+    <VoBand id="areas" tone="soft">
       <VoKicker>Compare by location</VoKicker>
       <VoHeading>Virtual Office Price in {cityDisplay} by Area</VoHeading>
       <VoLead className="max-w-[44rem]">
@@ -109,7 +111,7 @@ export function VoCityAreaPriceSection({ cityDisplay, areas }: { cityDisplay: st
                 <span
                   className={cn(
                     "mt-1.5 inline-block rounded-md px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.04em]",
-                    area.badge.tone === "dark" ? "bg-[#0B3B2E] text-[#5EE6B4]" : "bg-[#E3F5EC] text-brand",
+                    area.badge.tone === "dark" ? "bg-[#12B886] text-white" : "bg-[#E3F5EC] text-brand",
                   )}
                 >
                   {area.badge.label}
@@ -219,7 +221,7 @@ export function VoCityPlansSection({ cityDisplay, summary }: { cityDisplay: stri
             className={cn(
               "relative flex flex-col rounded-[22px] p-8",
               plan.featured
-                ? "bg-[#0B3B2E] text-white shadow-[0_30px_70px_rgba(11,59,46,0.28)] lg:py-10"
+                ? "bg-[#12B886] text-white shadow-[0_30px_70px_rgba(11,59,46,0.28)] lg:py-10"
                 : "border border-[#E2EBE7] bg-white text-ink",
             )}
           >
@@ -257,13 +259,13 @@ export function VoCityPlansSection({ cityDisplay, summary }: { cityDisplay: stri
                     f.included && (plan.featured ? "text-white" : "text-ink"),
                   )}
                 >
-                  {f.included ? <VoCheck className={plan.featured ? "text-[#5EE6B4]" : undefined} /> : <VoCross />}
+                  {f.included ? <VoCheck className={plan.featured ? "text-white" : undefined} /> : <VoCross />}
                   {f.text}
                 </li>
               ))}
             </ul>
             {plan.featured ? (
-              <VoGreenButton onClick={openLead} className="mt-8 w-full">
+              <VoGreenButton onClick={openLead} className="mt-8 w-full bg-white text-[#12B886] hover:bg-[#F5F9F7]">
                 Get This Plan
               </VoGreenButton>
             ) : (
@@ -314,7 +316,7 @@ export function VoCityWhySpaceWallahSection() {
         <div className="overflow-hidden rounded-[20px] border border-[#E2EBE7] text-[15px]">
           <div className="grid grid-cols-[1.1fr_1fr_1fr] text-xs font-bold uppercase tracking-[0.1em]">
             <span className="bg-white px-5 py-4" />
-            <span className="bg-[#0B3B2E] px-5 py-4 text-[#5EE6B4]">SpaceWallah</span>
+            <span className="bg-[#12B886] px-5 py-4 text-white">SpaceWallah</span>
             <span className="bg-[#F5F9F7] px-5 py-4 text-muted">Going direct</span>
           </div>
           {rows.map(([label, us, them]) => (
@@ -433,7 +435,7 @@ export function VoCityDocumentsSection({ cityDisplay }: { cityDisplay: string })
           <ol className="mt-6 space-y-4">
             {given.map((doc, index) => (
               <li key={doc.title} className="flex gap-4 rounded-2xl bg-[#F5F9F7] p-5">
-                <span className="vo-display grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#0B3B2E] text-base font-extrabold text-[#5EE6B4]">
+                <span className="vo-display grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#12B886] text-base font-extrabold text-white">
                   {index + 1}
                 </span>
                 <div>
@@ -511,7 +513,7 @@ export function VoCityStepsSection({ cityDisplay }: { cityDisplay: string }) {
   ];
 
   return (
-    <VoBand tone="soft">
+    <VoBand>
       <VoKicker>How it works</VoKicker>
       <VoHeading>Get Your Virtual Office in {cityDisplay} in 6 Simple Steps</VoHeading>
       <VoLead className="max-w-[44rem]">
@@ -521,15 +523,9 @@ export function VoCityStepsSection({ cityDisplay }: { cityDisplay: string }) {
 
       <ol className="mt-11 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {steps.map(([title, text], index) => {
-          const last = index === steps.length - 1;
           return (
             <li key={title} className="flex gap-4 rounded-[20px] border border-[#E2EBE7] bg-white p-7">
-              <span
-                className={cn(
-                  "vo-display grid h-11 w-11 shrink-0 place-items-center rounded-full text-lg font-extrabold",
-                  last ? "bg-[#0B3B2E] text-[#5EE6B4]" : "bg-[#12B886] text-ink",
-                )}
-              >
+              <span className="vo-display grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#12B886] text-lg font-extrabold text-white">
                 {index + 1}
               </span>
               <div>
@@ -541,9 +537,9 @@ export function VoCityStepsSection({ cityDisplay }: { cityDisplay: string }) {
         })}
       </ol>
 
-      <div className="mt-7 flex flex-col gap-4 rounded-[20px] bg-[#0B3B2E] px-7 py-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-7 flex flex-col gap-4 rounded-[20px] bg-[#12B886] px-7 py-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-lg font-semibold text-white">We help at every step. Our team checks each document before you file.</p>
-        <VoGreenButton onClick={openLead} className="shrink-0">
+        <VoGreenButton onClick={openLead} className="shrink-0 bg-white text-[#12B886] hover:bg-[#F5F9F7]">
           Start My Application →
         </VoGreenButton>
       </div>
@@ -564,7 +560,7 @@ export function VoCityVsRegularSection({ cityDisplay, summary }: { cityDisplay: 
   ];
 
   return (
-    <VoBand>
+    <VoBand tone="soft">
       <div className="text-center">
         <VoKicker>Save money</VoKicker>
         <VoHeading>Virtual Office vs Regular Office in {cityDisplay}</VoHeading>
@@ -578,7 +574,7 @@ export function VoCityVsRegularSection({ cityDisplay, summary }: { cityDisplay: 
         <div className="min-w-[560px] text-[15px]">
           <div className="grid grid-cols-[0.8fr_1fr_1.1fr]">
             <span className="bg-white px-6 py-4" />
-            <span className="vo-display bg-[#0B3B2E] px-6 py-4 text-[17px] font-extrabold text-white">
+            <span className="vo-display bg-[#12B886] px-6 py-4 text-[17px] font-extrabold text-white">
               SpaceWallah virtual office
             </span>
             <span className="vo-display bg-white px-6 py-4 text-[17px] font-extrabold text-muted">
@@ -619,13 +615,13 @@ export function VoCityAdvantageSection({
 
   return (
     <VoBand tone="dark">
-      <VoKicker className="text-[#5EE6B4]">The {cityDisplay} advantage</VoKicker>
+      <VoKicker className="text-white">The {cityDisplay} advantage</VoKicker>
       <VoHeading className="text-white">Why a {cityDisplay} Address Helps Your Business Grow</VoHeading>
 
       <div className="mt-11 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
         {points.map(([title, text], index) => (
           <div key={title} className="flex gap-4">
-            <span className="vo-display grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/10 text-base font-extrabold text-[#5EE6B4]">
+            <span className="vo-display grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/10 text-base font-extrabold text-white">
               {String(index + 1).padStart(2, "0")}
             </span>
             <div>
@@ -638,7 +634,7 @@ export function VoCityAdvantageSection({
 
       <div className="mt-12 flex flex-col gap-5 rounded-[20px] border border-white/10 bg-white/[0.06] p-7 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-[42rem]">
-          <p className="vo-display text-[1.3rem] font-extrabold tracking-[-0.015em] text-[#5EE6B4]">
+          <p className="vo-display text-[1.3rem] font-extrabold tracking-[-0.015em] text-white">
             Selling online from {state?.state ?? cityDisplay}?
           </p>
           <p className="mt-2 text-[16px] leading-relaxed text-white/90">
@@ -647,7 +643,7 @@ export function VoCityAdvantageSection({
               : `A ${cityDisplay} virtual office gives you a local GSTIN for this state. Already registered here? Add it as an additional place of business on your GST.`}
           </p>
         </div>
-        <VoGreenButton onClick={openLead} className="shrink-0">
+        <VoGreenButton onClick={openLead} className="shrink-0 bg-white text-[#12B886] hover:bg-[#F5F9F7]">
           Get a {state?.state ?? cityDisplay} GST Address
         </VoGreenButton>
       </div>
@@ -714,13 +710,98 @@ export function VoCityAudienceSection({ cityDisplay }: { cityDisplay: string }) 
 
 /* ───────────────────────── Reviews ───────────────────────── */
 
+const REVIEWS_PREVIEW_COUNT = 3;
+
+type VoReviewCard = {
+  quote: string;
+  initials: string;
+  name: string;
+  subtitle: string;
+  rating?: number;
+};
+
+const STATIC_REVIEW_CARDS: VoReviewCard[] = VO_REVIEWS.map((r) => ({
+  quote: r.quote,
+  initials: r.initials,
+  name: r.name,
+  subtitle: `${r.role} · ${r.plan}`,
+}));
+
+function initialsOf(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase();
+}
+
+/** Reviews from the page's NewSeo record; rows without a name or text are skipped. */
+function toReviewCards(reviews: SeoReview[] | undefined): VoReviewCard[] {
+  return (reviews ?? []).flatMap((r) => {
+    const name = r.name?.trim();
+    const quote = r.review?.trim();
+    if (!name || !quote) return [];
+    const rating = typeof r.rating === "number" && r.rating >= 1 && r.rating <= 5 ? r.rating : undefined;
+    const subtitle = [r.designation?.trim(), r.company_name?.trim()].filter(Boolean).join(" · ");
+    return [{ quote, name, initials: initialsOf(name), subtitle, rating }];
+  });
+}
+
+function VoReviewStars({ rating }: { rating: number }) {
+  return (
+    <span className="flex gap-0.5" aria-label={`${rating} out of 5`}>
+      {[1, 2, 3, 4, 5].map((n) => (
+        <Star
+          key={n}
+          className={cn("h-4 w-4", n <= Math.round(rating) ? "fill-[#F4A621] text-[#F4A621]" : "text-[#DCE7E2]")}
+          aria-hidden
+        />
+      ))}
+    </span>
+  );
+}
+
+function VoReviewFigure({ review, className }: { review: VoReviewCard; className?: string }) {
+  return (
+    <figure className={cn("flex flex-col rounded-[20px] border p-7", className)}>
+      {review.rating ? (
+        <div className="mb-4">
+          <VoReviewStars rating={review.rating} />
+        </div>
+      ) : null}
+      <blockquote className="flex-1 text-[17px] leading-[1.65] text-ink">{review.quote}</blockquote>
+      <figcaption className="mt-6 flex items-center gap-4">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#E3F5EC] text-[15px] font-bold text-brand">
+          {review.initials}
+        </span>
+        <span>
+          <span className="block text-[16px] font-bold text-ink">{review.name}</span>
+          {review.subtitle ? <span className="block text-[14px] text-muted">{review.subtitle}</span> : null}
+        </span>
+      </figcaption>
+    </figure>
+  );
+}
+
+/**
+ * Shows the page's own reviews (NewSeo `reviews`) when it has any, otherwise the static set.
+ * The first three are inline; the rest open in a modal.
+ */
 export function VoCityReviewsSection({
   title = "What Our Customers Say",
   tone = "soft",
+  reviews,
 }: {
   title?: string;
   tone?: "white" | "soft";
+  reviews?: SeoReview[];
 }) {
+  const [showAll, setShowAll] = useState(false);
+  const closeAll = useCallback(() => setShowAll(false), []);
+
+  const dynamic = toReviewCards(reviews);
+  const cards = dynamic.length ? dynamic : STATIC_REVIEW_CARDS;
+  const rated = dynamic.filter((r) => r.rating != null);
+  const average = rated.length ? rated.reduce((sum, r) => sum + r.rating!, 0) / rated.length : null;
+  const cardClass = tone === "white" ? "border-transparent bg-[#F5F9F7]" : "border-[#E2EBE7] bg-white";
+
   return (
     <VoBand tone={tone}>
       <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
@@ -728,39 +809,48 @@ export function VoCityReviewsSection({
           <VoKicker>Customer reviews</VoKicker>
           <VoHeading>{title}</VoHeading>
         </div>
-        <div className="flex items-center gap-4 self-start rounded-2xl border border-[#E2EBE7] bg-white px-5 py-3.5 sm:self-auto">
-          <span className="vo-display text-[2rem] font-extrabold text-ink">4.8</span>
-          <span className="text-[14px] leading-snug text-muted">
-            out of 5 rating
-            <b className="block font-bold text-ink">512 verified businesses</b>
-          </span>
-        </div>
+        {dynamic.length ? (
+          average != null ? (
+            <div className="flex items-center gap-4 self-start rounded-2xl border border-[#E2EBE7] bg-white px-5 py-3.5 sm:self-auto">
+              <span className="vo-display text-[2rem] font-extrabold text-ink">{average.toFixed(1)}</span>
+              <span className="text-[14px] leading-snug text-muted">
+                out of 5 rating
+                <b className="block font-bold text-ink">
+                  from {rated.length} {rated.length === 1 ? "review" : "reviews"}
+                </b>
+              </span>
+            </div>
+          ) : null
+        ) : (
+          <div className="flex items-center gap-4 self-start rounded-2xl border border-[#E2EBE7] bg-white px-5 py-3.5 sm:self-auto">
+            <span className="vo-display text-[2rem] font-extrabold text-ink">4.8</span>
+            <span className="text-[14px] leading-snug text-muted">
+              out of 5 rating
+              <b className="block font-bold text-ink">512 verified businesses</b>
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="mt-10 grid gap-5 lg:grid-cols-3">
-        {VO_REVIEWS.map((review) => (
-          <figure
-            key={review.name}
-            className={cn(
-              "flex flex-col rounded-[20px] border p-7",
-              tone === "white" ? "border-transparent bg-[#F5F9F7]" : "border-[#E2EBE7] bg-white",
-            )}
-          >
-            <blockquote className="flex-1 text-[17px] leading-[1.65] text-ink">{review.quote}</blockquote>
-            <figcaption className="mt-6 flex items-center gap-4">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#E3F5EC] text-[15px] font-bold text-brand">
-                {review.initials}
-              </span>
-              <span>
-                <span className="block text-[16px] font-bold text-ink">{review.name}</span>
-                <span className="block text-[14px] text-muted">
-                  {review.role} · {review.plan}
-                </span>
-              </span>
-            </figcaption>
-          </figure>
+        {cards.slice(0, REVIEWS_PREVIEW_COUNT).map((review, i) => (
+          <VoReviewFigure key={`${review.name}-${i}`} review={review} className={cardClass} />
         ))}
       </div>
+
+      {cards.length > REVIEWS_PREVIEW_COUNT ? (
+        <div className="mt-8 flex justify-center">
+          <VoOutlineButton onClick={() => setShowAll(true)} className="px-8 py-3.5">
+            Show all {cards.length} reviews
+          </VoOutlineButton>
+        </div>
+      ) : null}
+
+      <VoCityReviewsModal open={showAll} onClose={closeAll} title={title}>
+        {cards.map((review, i) => (
+          <VoReviewFigure key={`${review.name}-${i}`} review={review} className="border-[#E2EBE7] bg-white" />
+        ))}
+      </VoCityReviewsModal>
     </VoBand>
   );
 }
@@ -779,14 +869,14 @@ export function VoCityCallbackSection({ citySlug, cityDisplay }: { citySlug: str
   return (
     <section className="bg-white py-16 sm:py-20">
       <VoWrap>
-        <div className="relative overflow-hidden rounded-[32px] bg-[#0B3B2E] px-6 py-12 sm:px-12 lg:px-16 lg:py-16">
+        <div className="relative overflow-hidden rounded-[32px] bg-[#12B886] px-6 py-12 sm:px-12 lg:px-16 lg:py-16">
           <div className="pointer-events-none absolute -bottom-10 right-28 h-36 w-32 rounded-[36px] bg-white/[0.05]" aria-hidden />
           <div className="pointer-events-none absolute -bottom-10 right-0 h-36 w-24 rounded-[36px] bg-white/[0.05]" aria-hidden />
           <div className="pointer-events-none absolute right-[-40px] top-1/2 h-32 w-32 rounded-full bg-white/[0.05]" aria-hidden />
 
           <div className="relative grid items-center gap-10 lg:grid-cols-[1.05fr_1fr]">
             <div>
-              <VoKicker className="text-[#5EE6B4]">Free expert call</VoKicker>
+              <VoKicker className="text-white">Free expert call</VoKicker>
               <VoHeading className="max-w-[32rem] text-white">Not Sure Which Area or Plan Is Right?</VoHeading>
               <p className="mt-5 max-w-[32rem] text-[17px] leading-[1.7] text-white/90">
                 Share your number. A SpaceWallah expert calls you and picks the best virtual office in {cityDisplay} for
@@ -799,7 +889,7 @@ export function VoCityCallbackSection({ citySlug, cityDisplay }: { citySlug: str
                   "A document checklist before you file",
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3">
-                    <VoCheck className="text-[#5EE6B4]" />
+                    <VoCheck className="text-white" />
                     {item}
                   </li>
                 ))}
@@ -830,7 +920,7 @@ export function VoCityCallbackSection({ citySlug, cityDisplay }: { citySlug: str
                       autoComplete="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      placeholder="98765 43210"
+                      placeholder="Enter your mobile number"
                       className="min-w-0 flex-1 px-4 py-3.5 text-[16px] text-ink outline-none placeholder:text-[#7D8A86]"
                     />
                   </div>
@@ -959,15 +1049,15 @@ export function VoCityFinalCta({
       <VoWrap>
         <div className="flex flex-col gap-8 rounded-[32px] bg-[#12B886] px-7 py-11 sm:px-14 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="vo-display max-w-[34rem] text-[2rem] font-extrabold leading-[1.08] tracking-[-0.035em] text-ink sm:text-[2.6rem]">
+            <h2 className="vo-display max-w-[34rem] text-[2rem] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-[2.6rem]">
               {title}
             </h2>
-            <p className="mt-4 text-[17px] text-ink">
+            <p className="mt-4 text-[17px] text-white">
               {subtitle}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <VoDarkButton onClick={openLead} className="py-4">
+            <VoDarkButton onClick={openLead} className="bg-white py-4 text-[#12B886] hover:bg-[#F5F9F7]">
               {ctaLabel}
             </VoDarkButton>
             <a
@@ -985,78 +1075,3 @@ export function VoCityFinalCta({
     </section>
   );
 }
-
-/* ───────────────────────── Related links ───────────────────────── */
-
-function Chip({ href, children, onClick }: { href?: string; children: ReactNode; onClick?: () => void }) {
-  const classes =
-    "inline-flex rounded-full border border-[#E2EBE7] bg-white px-4 py-2.5 text-[14px] font-bold text-ink transition hover:border-[#12B886]";
-  if (href) {
-    return (
-      <Link href={href} className={classes}>
-        {children}
-      </Link>
-    );
-  }
-  return (
-    <button type="button" onClick={onClick} className={classes}>
-      {children}
-    </button>
-  );
-}
-
-export function VoCityRelatedLinks({
-  citySlug,
-  cityDisplay,
-  areas,
-}: {
-  citySlug: string;
-  cityDisplay: string;
-  areas: VoCityArea[];
-}) {
-  const { openLead } = useVoCityLead();
-  const otherCities = VO_OTHER_CITIES.filter((c) => c.slug !== citySlug && c.name !== cityDisplay).slice(0, 6);
-
-  return (
-    <section className="border-t border-[#E2EBE7] bg-[#F5F9F7] py-14">
-      <VoWrap className="grid gap-10 md:grid-cols-3">
-        <div>
-          <h2 className="vo-display text-[1.3rem] font-extrabold tracking-[-0.015em] text-ink">
-            Virtual Office by Area in {cityDisplay}
-          </h2>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {areas.map((area) => (
-              <Chip key={area.locality} href="#areas">
-                {area.name}
-              </Chip>
-            ))}
-          </div>
-        </div>
-        <div>
-          <h2 className="vo-display text-[1.3rem] font-extrabold tracking-[-0.015em] text-ink">
-            More Workspaces in {cityDisplay}
-          </h2>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Chip href={`/coworking/${citySlug}`}>Coworking Space</Chip>
-            <Chip href={`/managed-office/${citySlug}`}>Managed Office</Chip>
-            <Chip href={`/coliving/${citySlug}`}>Coliving</Chip>
-            <Chip onClick={openLead}>GST Registration</Chip>
-          </div>
-        </div>
-        <div>
-          <h2 className="vo-display text-[1.3rem] font-extrabold tracking-[-0.015em] text-ink">
-            Virtual Office in Other Cities
-          </h2>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {otherCities.map((city) => (
-              <Chip key={city.slug} href={`/virtual-office/${city.slug}`}>
-                {city.name}
-              </Chip>
-            ))}
-          </div>
-        </div>
-      </VoWrap>
-    </section>
-  );
-}
-
