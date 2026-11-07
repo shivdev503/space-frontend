@@ -132,11 +132,12 @@ export function CoworkingDetailPage({
               More premium, verified coworking options around {toTitleCase(cityName)}.
             </p>
 
-            <div className="no-scrollbar mt-6 flex snap-x gap-5 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="no-scrollbar mt-6 flex snap-x gap-4 overflow-x-auto pb-2 sm:gap-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {similarWorkspaces.map((ws) => (
+                // Same width as a card in the 4-column coworking listing grid.
                 <div
                   key={ws.id}
-                  className="w-[min(84vw,360px)] shrink-0 snap-start sm:w-[350px]"
+                  className="w-[min(78vw,300px)] shrink-0 snap-start sm:w-[287px]"
                 >
                   <CoworkingCard workspace={ws} className="h-full" />
                 </div>

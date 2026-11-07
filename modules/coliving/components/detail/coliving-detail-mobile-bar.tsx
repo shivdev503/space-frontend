@@ -17,7 +17,7 @@ export function ColivingDetailMobileBar({ space, reviewCount }: ColivingDetailMo
   const rating = ratingLabel(space.rating, reviewCount);
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur-md lg:hidden">
+    <div data-bottom-bar className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur-md lg:hidden">
       <div className="mx-auto flex max-w-lg items-center justify-between gap-4">
         <div>
           <p className="text-lg font-semibold text-ink">

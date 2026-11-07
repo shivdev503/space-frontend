@@ -15,6 +15,7 @@ import { SearchBar } from "@/modules/home/components/search-bar";
 import { SearchOption } from "@/types";
 import { cn } from "@/utils/cn";
 import { isSiteHeaderHidden } from "@/lib/header-visibility";
+import { ShortlistHeaderLink } from "@/modules/shortlist/shortlist-header-link";
 
 const headerSearchLocations: SearchOption[] = [
   { label: "Delhi", value: "delhi" },
@@ -249,6 +250,7 @@ export function Header() {
               shouldExpandHeader && "pointer-events-none opacity-0",
             )}
           >
+            <ShortlistHeaderLink solid={useSolidHeader} />
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen((open) => !open)}

@@ -4,6 +4,9 @@ import {
   workspaceAddress,
   workspaceRating,
 } from "@/modules/coworking/components/coworking-detail-header";
+import { toCompareItem } from "@/lib/coworking-compare";
+import { CompareToggle } from "@/modules/compare/compare-toggle";
+import { ShortlistHeart } from "@/modules/shortlist/shortlist-heart";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import { toTitleCase } from "@/utils/format";
 
@@ -41,6 +44,10 @@ export function CoworkingDetailHero({ workspace }: { workspace: CoworkingModel.W
             {landmark ? ` · Near ${landmark}` : null}
           </span>
         </p>
+        <div className="mt-4 flex flex-wrap items-center gap-2.5">
+          <ShortlistHeart item={toCompareItem(workspace)} variant="button" />
+          <CompareToggle item={toCompareItem(workspace)} variant="button" />
+        </div>
       </div>
 
       {rating > 0 ? (

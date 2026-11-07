@@ -49,6 +49,7 @@ export async function publicRouteExists(pathname: string): Promise<boolean> {
 
   if (root === "blog" && !second) return (await loadBlogPostBySlug(first)) != null;
   if (root === "brand" && !second) return (await loadBrandPageData(first)) != null;
+  if (root === "coworking" && (first === "compare" || first === "shortlist") && !second) return true;
 
   const vertical = VERTICAL_BY_ROOT[root];
   if (!vertical) return true;

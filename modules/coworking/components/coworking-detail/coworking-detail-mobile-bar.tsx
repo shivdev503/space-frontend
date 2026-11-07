@@ -17,7 +17,7 @@ export function CoworkingDetailMobileBar({
   const { openQuiz } = useCoworkingLeadQuiz();
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[80] flex items-center justify-between gap-3.5 border-t border-[#E7E9E6] bg-white px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(20,24,29,0.1)] lg:hidden">
+    <div data-bottom-bar className="fixed inset-x-0 bottom-0 z-[80] flex items-center justify-between gap-3.5 border-t border-[#E7E9E6] bg-white px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(20,24,29,0.1)] lg:hidden">
       <p className="text-xs font-semibold text-muted">
         From{" "}
         <b className="block text-xl font-extrabold tracking-[-0.02em] text-ink">

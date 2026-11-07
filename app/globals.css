@@ -195,3 +195,32 @@ img {
     transform: scale(1);
   }
 }
+
+/* Coworking compare table: two columns per phone screen, scroll sideways for more. */
+.compare-scope {
+  --label-w: 0px;
+  --col: calc((100vw - 2rem) / 2);
+}
+@media (min-width: 640px) {
+  .compare-scope {
+    --col: 232px;
+  }
+}
+@media (min-width: 1024px) {
+  .compare-scope {
+    --label-w: 196px;
+    --col: 244px;
+  }
+}
+.compare-track {
+  width: max(100%, calc(var(--label-w) + var(--n) * var(--col)));
+}
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+}
+@media (min-width: 1024px) {
+  .compare-grid {
+    grid-template-columns: var(--label-w) repeat(var(--n), minmax(0, 1fr));
+  }
+}

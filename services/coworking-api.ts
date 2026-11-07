@@ -23,6 +23,7 @@ import {
   resolveCoworkingApiBaseUrl,
   resolveCoworkingApiTimeoutMs,
 } from "@/services/env-config";
+import { CARD_PHOTO_MAX } from "@/lib/listing-photos";
 import { pageFromSearchParams } from "@/lib/pagination-metadata";
 import { isUpstreamFailure } from "@/lib/upstream-error";
 import { buildApiClientHeaders } from "@/services/api-client-headers";
@@ -307,7 +308,8 @@ export function coworkingCardRow(workspace: CoworkingModel.WorkSpace): Coworking
   const brand = workspace.brand;
   return {
     ...workspace,
-    images: (workspace.images ?? []).slice(0, 1),
+    // Enough photos for the card carousel, not the whole gallery.
+    images: [...(workspace.images ?? [])].sort((a, b) => (a?.order ?? 0) - (b?.order ?? 0)).slice(0, CARD_PHOTO_MAX),
     brand: brand && ({ id: brand.id, name: brand.name, slug: brand.slug } as CoworkingModel.Brand),
   };
 }

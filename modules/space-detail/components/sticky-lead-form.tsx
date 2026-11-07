@@ -370,7 +370,7 @@ export function StickyLeadForm({
       </aside>
 
       {/* Mobile: sticky bottom CTA → modal */}
-      <div className="fixed inset-x-0 bottom-0 z-[70] border-t border-slate-200 bg-white/92 p-3 backdrop-blur lg:hidden">
+      <div data-bottom-bar className="fixed inset-x-0 bottom-0 z-[70] border-t border-slate-200 bg-white/92 p-3 backdrop-blur lg:hidden">
         <CtaButton onClick={() => setOpenMobile(true)} disabled={isPending}>
           Enquire Now
           <ArrowRight className="h-4 w-4" />
