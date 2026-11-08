@@ -3,6 +3,11 @@
 # Usage: remote-deploy.sh <release-id> <path-to-tarball>
 set -euo pipefail
 
+# Non-interactive SSH skips ~/.bashrc, so load nvm (when Node was installed with it) to find node and pm2.
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+command -v pm2 >/dev/null || { echo "pm2 not found on PATH ($PATH)" >&2; exit 1; }
+
 APP_DIR=/var/www/spacewallah-web
 RELEASE_ID="$1"
 TARBALL="$2"
