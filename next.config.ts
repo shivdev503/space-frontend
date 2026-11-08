@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Self-contained server bundle for the EC2 deploy (.github/workflows/deploy.yml).
+  output: "standalone",
   // Resolve metadata before streaming for every user agent, so <title>, description,
   // canonical and Open Graph tags are always in <head> (Next 15 otherwise streams them
   // into <body> for Googlebot and most crawlers).

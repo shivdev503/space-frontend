@@ -1,0 +1,62 @@
+name: Deploy website to AWS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time; a newer push waits for the running one instead of cancelling it mid-upload.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # NEXT_PUBLIC_* values are baked in at build time, so the env file must exist before the build.
+      - name: Write production env
+        run: printf '%s\n' "$PRODUCTION_ENV" > .env.production
+        env:
+          PRODUCTION_ENV: ${{ secrets.PRODUCTION_ENV }}
+
+      - run: npm run typecheck
+
+      - run: npm run build
+
+      - name: Package release
+        run: |
+          cp -r public .next/standalone/public
+          cp -r .next/static .next/standalone/.next/static
+          cp .env.production deploy/ecosystem.config.cjs .next/standalone/
+          tar -czf release.tgz -C .next/standalone .
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          SSH_HOST: ${{ secrets.EC2_HOST }}
+
+      - name: Upload and switch release
+        run: |
+          RELEASE_ID="$(date -u +%Y%m%d%H%M%S)-${GITHUB_SHA::7}"
+          TARGET="$SSH_USER@$SSH_HOST"
+          scp -i ~/.ssh/deploy_key release.tgz "$TARGET:/tmp/spacewallah-web-$RELEASE_ID.tgz"
+          ssh -i ~/.ssh/deploy_key "$TARGET" "bash -s -- $RELEASE_ID /tmp/spacewallah-web-$RELEASE_ID.tgz" < deploy/remote-deploy.sh
+        env:
+          SSH_HOST: ${{ secrets.EC2_HOST }}
+          SSH_USER: ${{ secrets.EC2_USER }}
