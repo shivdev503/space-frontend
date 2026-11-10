@@ -27,6 +27,10 @@ function applyApiClientAuthHeaders(headers: Record<string, string>): void {
   const clientSecret = resolveApiClientSecret();
   if (clientKey) headers["x-client-key"] = clientKey;
   if (clientSecret) headers["x-client-secret"] = clientSecret;
+  // Server-side only (not NEXT_PUBLIC_, so never in the browser bundle): exempts page renders
+  // from the backend's per-IP rate limit, since every render comes from this server's one IP.
+  const internalToken = typeof window === "undefined" ? process.env.INTERNAL_API_TOKEN?.trim() : undefined;
+  if (internalToken) headers["x-internal-token"] = internalToken;
 }
 
 export function buildApiClientHeaders(
