@@ -7,6 +7,8 @@ import { PopularLocalitiesRail } from "@/modules/city-pages/components/popular-l
 import { Breadcrumb } from "@/modules/location-pages/components/breadcrumb";
 import { FAQSection } from "@/modules/location-pages/components/faq-section";
 import { ColivingLocationListing } from "@/modules/coliving/components/coliving-location-listing";
+import { AreaInsightsSection } from "@/modules/location-pages/components/area-insights-section";
+import type { AreaInsights } from "@/services/area-insights";
 import { getCatalogCityIdBySlug } from "@/services/catalog-city-id";
 import type { PgDetail } from "@/types/pg.model";
 import type { LocationPageData } from "@/types";
@@ -15,10 +17,12 @@ export function ColivingLocationPage({
   data,
   pgList,
   pgTotal,
+  insights = null,
 }: {
   data: LocationPageData;
   pgList: PgDetail[];
   pgTotal: number;
+  insights?: AreaInsights | null;
 }) {
   const catalogCityId = data.catalogCityId ?? getCatalogCityIdBySlug(data.citySlug) ?? "";
 
@@ -77,6 +81,8 @@ export function ColivingLocationPage({
           ) : null}
         </Container>
       </section>
+
+      <AreaInsightsSection insights={insights} />
 
       <section className="pb-14 sm:pb-20">
         <Container>

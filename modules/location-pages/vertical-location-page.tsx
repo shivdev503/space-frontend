@@ -4,7 +4,9 @@ import { ListingItemListJsonLd } from "@/components/seo/listing-json-ld";
 import { Container } from "@/components/ui/container";
 import { PopularLocalitiesRail } from "@/modules/city-pages/components/popular-localities-rail";
 import { Breadcrumb } from "@/modules/location-pages/components/breadcrumb";
+import { AreaInsightsSection } from "@/modules/location-pages/components/area-insights-section";
 import { FAQSection } from "@/modules/location-pages/components/faq-section";
+import type { AreaInsights } from "@/services/area-insights";
 import { LocationListingExperience } from "@/modules/location-pages/components/location-listing-experience";
 import { getCatalogCityIdBySlug } from "@/services/catalog-city-id";
 import { LocationPageData } from "@/types";
@@ -13,6 +15,8 @@ import { verticalPath } from "@/lib/vertical-path";
 
 type VerticalLocationPageProps = {
   data: LocationPageData;
+  /** Facts, named listings and nearby-area links from the area's live listings (coworking). */
+  insights?: AreaInsights | null;
 };
 
 const toneMap = {
@@ -39,6 +43,7 @@ const toneMap = {
 
 export function VerticalLocationPage({
   data,
+  insights = null,
 }: VerticalLocationPageProps) {
   const tone = toneMap[data.vertical];
   const catalogCityId = data.catalogCityId ?? getCatalogCityIdBySlug(data.citySlug) ?? "";
@@ -164,6 +169,8 @@ export function VerticalLocationPage({
           </Container>
         </section>
       ) : null}
+
+      <AreaInsightsSection insights={insights} />
 
       <FAQSection faqs={data.faqs} locationName={data.locationName} />
 

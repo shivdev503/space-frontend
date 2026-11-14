@@ -10,6 +10,7 @@ import { colivingLocalitySeo } from "@/lib/seo-templates";
 import { ColivingLocationPage } from "@/modules/coliving/coliving-location-page";
 import { getColivingLocationPageContent, loadColivingLocalityPgs } from "@/services/coliving-location";
 import { colivingMarketStats } from "@/services/market-stats";
+import { colivingAreaInsights } from "@/services/area-insights";
 import { getSeoBySlug } from "@/services/seo-content";
 
 type PageProps = {
@@ -41,19 +42,24 @@ export default async function ColivingLocationRoute({ params }: PageProps) {
     notFound();
   }
 
-  const pgList = await loadColivingLocalityPgs(data);
   const pathname = `/coliving/${segment}/${location}`;
-  const seo = await getSeoBySlug(pathnameToSeoSlug(pathname));
+  const [pgList, seo, insights] = await Promise.all([
+    loadColivingLocalityPgs(data),
+    getSeoBySlug(pathnameToSeoSlug(pathname)),
+    colivingAreaInsights(data.citySlug, data.city.name, data.locationName, data.locationSlug),
+  ]);
 
   return (
     <ColivingLocationPage
       data={{
         ...data,
         title: seoPageTitleOrFallback(seo, data.title),
-        faqs: seoFaqsOrFallback(seo, data.faqs),
+        // CMS FAQs win; otherwise FAQs answered from this area's own listings (not the generic template).
+        faqs: seoFaqsOrFallback(seo, insights?.faqs.length ? insights.faqs : data.faqs),
       }}
       pgList={pgList.data}
       pgTotal={pgList.totalRecords}
+      insights={insights}
     />
   );
 }

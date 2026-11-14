@@ -24,7 +24,7 @@ export type MarketStats = {
 };
 
 /** Workspaces with `starting_price` resolved the same way as listing cards. */
-const loadCoworkingCards = cachedLoader(async () =>
+export const loadCoworkingCards = cachedLoader(async () =>
   normalizeCoworkingWorkspacesPayload({ data: await loadCoworkingWorkspaceRows() }).data,
 );
 

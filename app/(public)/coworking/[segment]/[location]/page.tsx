@@ -11,6 +11,7 @@ import { coworkingLocalitySeo } from "@/lib/seo-templates";
 import { VerticalLocationPage } from "@/modules/location-pages/vertical-location-page";
 import { getVerticalLocationPageContent, loadInitialCoworkingListing } from "@/services/coworking-api";
 import { coworkingMarketStats } from "@/services/market-stats";
+import { coworkingAreaInsights } from "@/services/area-insights";
 import { getSeoBySlug } from "@/services/seo-content";
 
 export async function generateMetadata({
@@ -50,18 +51,21 @@ export default async function CoworkingLocationPage({
   }
 
   const pathname = `/coworking/${segment}/${location}`;
-  const [seo, initialCoworkingListing] = await Promise.all([
+  const [seo, initialCoworkingListing, insights] = await Promise.all([
     getSeoBySlug(pathnameToSeoSlug(pathname)),
     loadInitialCoworkingListing(data.catalogCityId ?? "", sp, data.workspaceMicroLocationId),
+    coworkingAreaInsights(data.citySlug, data.city.name, data.locationName, data.locationSlug),
   ]);
   return (
     <VerticalLocationPage
       data={{
         ...data,
         title: seoPageTitleOrFallback(seo, data.title),
-        faqs: seoFaqsOrFallback(seo, data.faqs),
+        // CMS FAQs win; otherwise FAQs answered from this area's own listings (not the generic template).
+        faqs: seoFaqsOrFallback(seo, insights?.faqs.length ? insights.faqs : data.faqs),
         initialCoworkingListing,
       }}
+      insights={insights}
     />
   );
 }
