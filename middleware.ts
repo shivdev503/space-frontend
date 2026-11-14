@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { isDemoListingPath } from "@/lib/demo-listings";
+import { findListingRedirect, goneHtml, parseListingPath } from "@/lib/listing-redirects";
 import { LISTING_TOKEN_COOKIE, LISTING_USER_COOKIE } from "@/lib/listing-auth-constants";
 import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
 
@@ -18,7 +19,7 @@ function withPathnameHeader(request: NextRequest) {
  * 1) Passes `x-pathname` to Server Components (SEO) for every page request.
  * 2) Host / listing panel: require vendor session for `/add` routes.
  */
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   // Demo listings were indexed by Google; 410 tells crawlers they are gone for good.
   if (isDemoListingPath(request.nextUrl.pathname)) {
     return new NextResponse(GONE_HTML, {
@@ -29,6 +30,28 @@ export function middleware(request: NextRequest) {
         "cache-control": "public, max-age=86400",
       },
     });
+  }
+
+  // Old listing URLs: renamed listings and hidden duplicates redirect to the live page (301);
+  // listings removed on purpose answer 410 Gone. The backend never lists a live URL here.
+  const listing = parseListingPath(request.nextUrl.pathname);
+  if (listing) {
+    const hit = await findListingRedirect(listing.vertical, listing.slug);
+    if (hit?.to) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/${listing.vertical}/${hit.to}`;
+      return NextResponse.redirect(url, 301);
+    }
+    if (hit?.gone) {
+      return new NextResponse(goneHtml(listing.vertical, hit.city), {
+        status: 410,
+        headers: {
+          "content-type": "text/html; charset=utf-8",
+          "x-robots-tag": "noindex",
+          "cache-control": "public, max-age=600",
+        },
+      });
+    }
   }
 
   // Signed-in hosts skip the sign-up page. `reason` means the dashboard just sent them back here

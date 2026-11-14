@@ -57,3 +57,17 @@ export async function publicRouteExists(pathname: string): Promise<boolean> {
   if (await getVerticalCityPageContent(vertical, first)) return true;
   return listingExists(vertical, first);
 }
+
+/**
+ * A managed office area with no live offices any more (a retired locality such as
+ * `/managed-office/noida/sector-135`) whose city page exists → that city page. Called by the layout,
+ * which answers before the page starts streaming, so the redirect is a real 308 and not a soft one.
+ * Every other path → null.
+ */
+export async function retiredAreaRedirect(pathname: string): Promise<string | null> {
+  const [root, city, area, ...rest] = pathname.split("/").filter(Boolean);
+  if (root !== "managed-office" || !city || !area || rest.length) return null;
+  if ((await loadManagedOfficeLocalityPage(city, area)) != null) return null;
+  const cityData = await getVerticalCityPageContent("office-space", city);
+  return cityData ? `/managed-office/${encodeURIComponent(cityData.city.slug)}` : null;
+}
