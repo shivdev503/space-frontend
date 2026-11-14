@@ -4,8 +4,28 @@ import { isDemoListingPath } from "@/lib/demo-listings";
 import { findListingRedirect, goneHtml, parseListingPath } from "@/lib/listing-redirects";
 import { LISTING_TOKEN_COOKIE, LISTING_USER_COOKIE } from "@/lib/listing-auth-constants";
 import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
+import { resolveAppUrl } from "@/services/env-config";
 
 const GONE_HTML = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Listing removed | SpaceWallah</title></head><body style="font-family:system-ui,sans-serif;max-width:32rem;margin:15vh auto;padding:0 1rem;color:#222"><h1>This listing is no longer available</h1><p>It has been permanently removed.</p><p><a href="/" style="color:#12b886">Browse verified spaces on SpaceWallah</a></p></body></html>`;
+
+/**
+ * Absolute URL on the public site for a redirect. Behind nginx the request URL is the internal
+ * `localhost:3000`, so redirects are built from the public origin (APP_URL), falling back to the
+ * proxy's forwarded host.
+ */
+function publicUrl(request: NextRequest, pathname: string, search = ""): URL {
+  const configured = resolveAppUrl();
+  const forwardedHost = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  const forwardedProto = request.headers.get("x-forwarded-proto") ?? "https";
+  const origin = !/localhost|127\.0\.0\.1/.test(configured)
+    ? configured
+    : forwardedHost && !/^(localhost|127\.0\.0\.1)(:|$)/.test(forwardedHost)
+      ? `${forwardedProto}://${forwardedHost}`
+      : request.nextUrl.origin;
+  const url = new URL(pathname, origin);
+  url.search = search;
+  return url;
+}
 
 function withPathnameHeader(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
@@ -38,9 +58,7 @@ export async function middleware(request: NextRequest) {
   if (listing) {
     const hit = await findListingRedirect(listing.vertical, listing.slug);
     if (hit?.to) {
-      const url = request.nextUrl.clone();
-      url.pathname = `/${listing.vertical}/${hit.to}`;
-      return NextResponse.redirect(url, 301);
+      return NextResponse.redirect(publicUrl(request, `/${listing.vertical}/${hit.to}`, request.nextUrl.search), 301);
     }
     if (hit?.gone) {
       return new NextResponse(goneHtml(listing.vertical, hit.city), {
@@ -62,7 +80,7 @@ export async function middleware(request: NextRequest) {
     request.cookies.get(LISTING_TOKEN_COOKIE)?.value?.trim() &&
     request.cookies.get(LISTING_USER_COOKIE)?.value?.trim()
   ) {
-    return NextResponse.redirect(new URL("/add/dashboard", request.url));
+    return NextResponse.redirect(publicUrl(request, "/add/dashboard"));
   }
 
   if (request.nextUrl.pathname.startsWith("/add")) {
@@ -70,10 +88,7 @@ export async function middleware(request: NextRequest) {
     if (token) {
       return withPathnameHeader(request);
     }
-    const url = request.nextUrl.clone();
-    url.pathname = "/list-your-space";
-    url.searchParams.set("reason", "login-required");
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(publicUrl(request, "/list-your-space", "?reason=login-required"));
   }
 
   return withPathnameHeader(request);
