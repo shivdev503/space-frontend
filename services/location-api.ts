@@ -3,6 +3,7 @@
  */
 
 import axios, { type AxiosInstance } from "axios";
+import { cachingAdapter } from "@/lib/api-response-cache";
 
 import { cachedLoader } from "@/lib/cached-loader";
 import { isUpstreamFailure } from "@/lib/upstream-error";
@@ -143,6 +144,8 @@ function getLocationApiAxios(): AxiosInstance {
   const ms = resolveCoworkingApiTimeoutMs();
   if (!locationApiAxios) {
     locationApiAxios = axios.create({
+      // Public listing reads: short server-side cache (lib/api-response-cache.ts).
+      adapter: cachingAdapter,
       baseURL: resolveCoworkingApiBaseUrl(),
       timeout: ms,
       headers: buildApiClientHeaders(),

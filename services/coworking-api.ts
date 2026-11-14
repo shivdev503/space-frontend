@@ -11,6 +11,7 @@
  */
 
 import axios, { type AxiosInstance } from "axios";
+import { cachingAdapter } from "@/lib/api-response-cache";
 import { cache } from "react";
 
 import {
@@ -101,6 +102,8 @@ function getCoworkingAxios(): AxiosInstance {
   const coworkingAxiosTimeoutMs = resolveCoworkingApiTimeoutMs();
   if (!coworkingAxios) {
     coworkingAxios = axios.create({
+      // Public listing reads: short server-side cache (lib/api-response-cache.ts).
+      adapter: cachingAdapter,
       baseURL: resolveCoworkingApiBaseUrl(),
       timeout: coworkingAxiosTimeoutMs,
       headers: buildApiClientHeaders(),

@@ -4,6 +4,7 @@
  */
 
 import axios, { type AxiosInstance } from "axios";
+import { cachingAdapter } from "@/lib/api-response-cache";
 
 import {
   isCoworkingUserApiProxyEnabled,
@@ -23,6 +24,8 @@ function getClient(): AxiosInstance {
   const ms = resolveCoworkingApiTimeoutMs();
   if (!client) {
     client = axios.create({
+      // Public listing reads: short server-side cache (lib/api-response-cache.ts).
+      adapter: cachingAdapter,
       baseURL: resolveCoworkingApiBaseUrl(),
       timeout: ms,
       headers: buildApiClientHeaders(),
