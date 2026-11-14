@@ -257,10 +257,6 @@ export function ColivingRoomCard({
       {deposit != null ? (
         <p className="mt-1 text-xs text-muted">Deposit {formatCurrency(deposit)} · refundable on exit</p>
       ) : null}
-      <p className="mt-2 flex items-center gap-1.5 text-xs text-muted">
-        <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-brand)]" aria-hidden />
-        Beds available · move-in this week
-      </p>
       <div className="mt-4 flex gap-2">
         <Link
           href={bookingHref}
@@ -285,13 +281,8 @@ export function ColivingRoomCard({
   );
 }
 
-export function ColivingFoodCard({
-  meals,
-  bookingHref = "#booking-panel",
-}: {
-  meals: { label: string; time: string }[];
-  bookingHref?: string;
-}) {
+/** Food card: only what this PG says about its meals (which meals, and the food type when given). */
+export function ColivingFoodCard({ meals, note }: { meals: string[]; note?: string }) {
   return (
     <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/80 bg-white">
       <div className="relative aspect-[16/10] w-full bg-slate-200 sm:aspect-[2/1]">
@@ -301,27 +292,19 @@ export function ColivingFoodCard({
         </span>
       </div>
       <div className="p-5 sm:p-6">
-        <h3 className="font-display text-lg font-semibold text-ink">Breakfast · Lunch · Dinner</h3>
-        <p className="mt-2 text-sm leading-relaxed text-muted">
-          Served at scheduled times in the dining area. The menu changes weekly and accommodates dietary
-          requests with 24-hour notice.
-        </p>
-        <ul className="mt-5 space-y-2.5 text-sm text-ink/90">
-          {meals.map((meal) => (
-            <li key={meal.label} className="flex items-center gap-2">
-              <CircleCheck className="h-4 w-4 shrink-0 text-[color:var(--color-brand)]" aria-hidden />
-              <span>
-                <b>{meal.label}</b> · {meal.time}
-              </span>
-            </li>
-          ))}
-        </ul>
-        <Link
-          href={bookingHref}
-          className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-ink"
-        >
-          View weekly menu →
-        </Link>
+        {meals.length ? (
+          <ul className="space-y-2.5 text-sm text-ink/90">
+            {meals.map((meal) => (
+              <li key={meal} className="flex items-center gap-2">
+                <CircleCheck className="h-4 w-4 shrink-0 text-[color:var(--color-brand)]" aria-hidden />
+                <b>{meal}</b>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-muted">Ask the owner which meals are served.</p>
+        )}
+        {note ? <p className="mt-4 text-sm leading-relaxed text-muted">{note}</p> : null}
       </div>
     </div>
   );
@@ -419,11 +402,17 @@ export function ColivingReviewsBlock({
           {ratingLabel}
         </p>
         <div>
-          <p className="text-amber-500 text-base leading-none">★★★★★</p>
-          <p className="mt-1 text-xs text-muted">Verified residents only · last 12 months</p>
+          <p className="text-amber-500 text-base leading-none" aria-label={`${ratingLabel} out of 5`}>
+            {"★".repeat(Math.max(0, Math.min(5, Math.round(rating))))}
+            <span className="text-slate-300">{"★".repeat(5 - Math.max(0, Math.min(5, Math.round(rating))))}</span>
+          </p>
+          <p className="mt-1 text-xs text-muted">
+            {reviewCount} review{reviewCount !== 1 ? "s" : ""}
+          </p>
         </div>
       </div>
 
+      {bars.length ? (
       <div className="mt-6 space-y-3">
         {bars.map((bar) => (
           <div key={bar.label} className="grid grid-cols-[6.5rem_1fr_2.25rem] items-center gap-3 text-sm">
@@ -435,6 +424,7 @@ export function ColivingReviewsBlock({
           </div>
         ))}
       </div>
+      ) : null}
 
       {reviews.length > 0 ? (
         <div className="mt-8 flex gap-4 overflow-x-auto pb-2 [scrollbar-width:none] max-lg:-mx-4 max-lg:px-4 [&::-webkit-scrollbar]:hidden lg:grid lg:grid-cols-2 lg:overflow-visible lg:pb-0">

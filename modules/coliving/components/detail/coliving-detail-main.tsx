@@ -20,8 +20,6 @@ import {
   ColivingRoomCard,
   ColivingRuleCard,
   Clock,
-  DEFAULT_MEAL_SCHEDULE,
-  DEFAULT_REVIEW_BARS,
   Home,
   Users,
 } from "./coliving-detail-parts";
@@ -40,8 +38,7 @@ type ColivingDetailMainProps = {
 };
 
 function buildHostTags(pg: PgDetail): string[] {
-  const tags: string[] = ["↺ 48-hour move-in"];
-  tags.push(`● ${availabilityLabel(pg.availableFrom)}`);
+  const tags: string[] = [`● ${availabilityLabel(pg.availableFrom)}`];
   if (pg.postedBy) tags.push(`↑ Posted by ${pg.postedBy}`);
   return tags;
 }
@@ -57,9 +54,8 @@ function availabilityLabel(availableFrom?: string): string {
 function ruleText(rule: string, pg: PgDetail): string {
   const lower = rule.toLowerCase();
   if (lower.includes("lock-in") || lower.includes("lock in")) {
-    return pg.noticePeriod.required && pg.noticePeriod.days > 0
-      ? `A minimum stay applies, with ${pg.noticePeriod.days} days notice before you move out. Confirm the exact lock-in with the owner before booking.`
-      : "A minimum stay applies. Confirm the exact lock-in period with the owner before booking.";
+    // The notice period has its own card; nothing to add here.
+    return "";
   }
   if (lower.includes("guardian")) return "Parents and guardians cannot stay overnight.";
   if (lower.includes("opposite gender")) return "Guests of the opposite gender are not allowed inside rooms.";
@@ -83,20 +79,16 @@ function buildRules(pg: PgDetail) {
   });
 
   if (pg.noticePeriod.required) {
-    rules.push({
-      type: "allowed",
-      title: `${pg.noticePeriod.days}-day notice period`,
-      text: "Standard notice in writing — applies both ways, to you and the operator.",
-    });
+    rules.push({ type: "allowed", title: `${pg.noticePeriod.days}-day notice period`, text: "" });
   }
 
-  rules.push({
-    type: pg.gateClosing ? "no" : "allowed",
-    title: pg.gateClosing ? "Gate closes at night" : "No gate closing",
-    text: pg.gateClosing
-      ? "Please check curfew timings with the operator before move-in."
-      : "Available all day, 24/7. Late nights are fine — please log entry with security after midnight.",
-  });
+  // Only what the host set: a closing time when given, no invented curfew or late-night policy.
+  const gateTime = String((pg as PgDetail & { gateClosingTime?: string }).gateClosingTime ?? "").trim();
+  rules.push(
+    pg.gateClosing
+      ? { type: "no", title: gateTime ? `Gate closes at ${gateTime}` : "Gate closes at night", text: "" }
+      : { type: "allowed", title: "No gate closing time", text: "" },
+  );
 
   if (pg.maintenanceCharge.applicable) {
     rules.push({
@@ -113,11 +105,26 @@ function buildRules(pg: PgDetail) {
     rules.push({
       type: "allowed",
       title: "Open to",
-      text: `${pg.preferredGuests}. Standard ID verification at move-in.`,
+      text: `${guestsLabel(pg.preferredGuests)}.`,
     });
   }
 
   return rules;
+}
+
+/** Host value "Both" / "All" / "Co-ed" reads as "Boys and girls"; anything else as given. */
+function guestsLabel(value: string): string {
+  return /^(both|all|co-?ed|any)$/i.test(value.trim()) ? "Boys and girls" : value;
+}
+
+/** "Breakfast, Lunch and Dinner". */
+function listJoin(items: string[]): string {
+  return items.length < 2 ? items.join("") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+}
+
+/** Food note only when the host marked the PG vegetarian-only (from its own rules). */
+function vegetarianNote(pg: PgDetail): string | undefined {
+  return pg.rules.some((r) => /veg/i.test(r) && /only|no non/i.test(r)) ? "Vegetarian food only." : undefined;
 }
 
 function reviewToCard(r: PgDetail["reviews"][number], i: number) {
@@ -155,17 +162,13 @@ export function ColivingDetailMain({ pg }: ColivingDetailMainProps) {
     .filter(Boolean)
     .join(" ");
 
-  const mealSchedule =
-    pg.food.meals.length >= 3
-      ? pg.food.meals.slice(0, 3).map((m, i) => ({
-          label: m,
-          time: DEFAULT_MEAL_SCHEDULE[i]?.time ?? "",
-        }))
-      : [...DEFAULT_MEAL_SCHEDULE];
+  const meals = Array.from(new Set(pg.food.meals.map((m) => m.trim()).filter(Boolean)));
+  const mealsTitle = meals.length ? `${listJoin(meals)} included` : "Meals included";
+  const hasWifi = [...pg.commonAmenities, ...pg.roomAmenities].some((a) => /wi-?fi|internet/i.test(a));
 
   const billsLabel = [
     pg.food.included ? "Food" : null,
-    "Wi-Fi",
+    hasWifi ? "Wi-Fi" : null,
     pg.roomCleaning ? "Cleaning" : null,
     pg.water ? "Water" : null,
   ]
@@ -179,13 +182,13 @@ export function ColivingDetailMain({ pg }: ColivingDetailMainProps) {
           hostName={pg.name.split(/[·,]/)[0]?.trim() || pg.postedBy || pg.name}
           hostInitials={hostInitials}
           verified={pg.verified}
-          subtitle={[pg.type, pg.preferredGuests && pg.preferredGuests.toLowerCase() !== "all" ? `For ${pg.preferredGuests.toLowerCase()}` : "", pg.contactSchedule].filter(Boolean).join(" · ")}
+          subtitle={[pg.type, pg.preferredGuests ? `For ${guestsLabel(pg.preferredGuests).toLowerCase()}` : "", pg.contactSchedule].filter(Boolean).join(" · ")}
           tags={buildHostTags(pg)}
         />
 
         <div className="mt-8 max-w-3xl">
           <h2 className="font-display text-[1.65rem] font-semibold leading-[1.12] tracking-tight text-ink sm:text-[1.85rem] lg:text-[2.125rem]">
-            A quiet {pg.type.toLowerCase()} in <ColivingAccent>{pg.locality}</ColivingAccent>
+            {pg.type} in <ColivingAccent>{pg.locality}</ColivingAccent>
           </h2>
           {pgDescriptionParagraphs(pg).map((paragraph, i) => (
             <p key={i} className="mt-4 text-[0.9375rem] leading-relaxed text-ink/90 sm:text-base">
@@ -198,11 +201,11 @@ export function ColivingDetailMain({ pg }: ColivingDetailMainProps) {
           <ColivingHighlightGrid
             items={[
               { icon: Home, label: "Available for", value: pg.type },
-              { icon: Users, label: "Open to", value: pg.preferredGuests || "All guests" },
+              { icon: Users, label: "Open to", value: pg.preferredGuests ? guestsLabel(pg.preferredGuests) : "All guests" },
               {
                 icon: Wifi,
-                label: "All-inclusive bills",
-                value: billsLabel ? `Rent · ${billsLabel}` : "Rent · utilities",
+                label: "Included in rent",
+                value: billsLabel || "Rent only",
               },
               {
                 icon: Clock,
@@ -251,22 +254,10 @@ export function ColivingDetailMain({ pg }: ColivingDetailMainProps) {
       <ColivingBlock id="meals">
         <ColivingEyebrow>Food included</ColivingEyebrow>
         <ColivingSectionTitle>
-          {pg.food.included ? (
-            <>
-              Three meals a day, <ColivingAccent>freshly cooked</ColivingAccent>
-            </>
-          ) : (
-            "Meals not included"
-          )}
+          {pg.food.included ? mealsTitle : "Meals not included"}
         </ColivingSectionTitle>
         {pg.food.included ? (
-          <>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted sm:text-[0.9375rem]">
-              An in-house kitchen, run by a full-time cook, with a rotating weekly menu. All meals are vegetarian
-              by default — non-veg available on request.
-            </p>
-            <ColivingFoodCard meals={mealSchedule} />
-          </>
+          <ColivingFoodCard meals={meals} note={vegetarianNote(pg)} />
         ) : (
           <p className="mt-3 text-sm text-muted">Meals are not part of the monthly rent for this property.</p>
         )}
@@ -277,9 +268,6 @@ export function ColivingDetailMain({ pg }: ColivingDetailMainProps) {
         <ColivingSectionTitle>
           House rules &amp; <ColivingAccent>policies</ColivingAccent>
         </ColivingSectionTitle>
-        <p className="mt-3 max-w-2xl text-sm text-muted">
-          Transparent terms before you move in. No surprise clauses on move-out day.
-        </p>
         <div className="mt-6 flex flex-col gap-3">
           {buildRules(pg).map((rule) => (
             <ColivingRuleCard key={rule.title} type={rule.type} title={rule.title} text={rule.text} />
@@ -325,7 +313,7 @@ export function ColivingDetailMain({ pg }: ColivingDetailMainProps) {
           <ColivingReviewsBlock
             rating={pg.rating}
             reviewCount={pg.reviews.length}
-            bars={[...DEFAULT_REVIEW_BARS]}
+            bars={[]}
             reviews={pg.reviews.map(reviewToCard)}
           />
         ) : null}
