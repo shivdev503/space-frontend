@@ -1,3 +1,4 @@
+import { cachedLoader } from "@/lib/cached-loader";
 import type { SitemapIndexEntry, SitemapUrlEntry } from "@/lib/sitemap-xml";
 import { slugifyPgName } from "@/lib/pg-slug";
 import { verticalPath } from "@/lib/vertical-path";
@@ -5,6 +6,8 @@ import { NON_OPERATOR_BRAND_SLUGS } from "@/services/brand-api";
 import { canonicalCoworkingCitySlug } from "@/services/catalog-city-id";
 import { AVAILABLE_CITY_VIRTUAL_OFFICE } from "@/services/cities-data";
 import { resolveAppUrl } from "@/services/env-config";
+import { getColivingLocationPageContent, loadColivingLocalityPgs } from "@/services/coliving-location";
+import { getVerticalLocationPageContent } from "@/services/coworking-api";
 import { slugifyMicroLocationName } from "@/services/location-api";
 import { EMPTY_CITY_PAGE_FILTERS, getCityPageData } from "@/services/mock-db";
 import {
@@ -156,18 +159,58 @@ export async function collectCityPagesSitemapEntries(): Promise<SitemapUrlEntry[
   return sortByLoc(entries);
 }
 
+type LocalityCandidate = { vertical: SpaceVertical; city: string; locality: string; entry: SitemapUrlEntry };
+
+/**
+ * Does the locality page itself find listings? The sitemap groups listings by their own area name,
+ * but the page resolves the area through the catalog (e.g. "JP Nagar" vs "J P Nagar") and can come
+ * up empty — then it is `noindex`. Asking the page's own loaders keeps the two from disagreeing.
+ */
+async function localityPageHasListings(c: LocalityCandidate): Promise<boolean> {
+  try {
+    if (c.vertical === "coliving") {
+      const page = await getColivingLocationPageContent(c.city, c.locality);
+      if (!page) return false;
+      return (await loadColivingLocalityPgs(page)).totalRecords > 0;
+    }
+    if (c.vertical === "coworking") {
+      const page = await getVerticalLocationPageContent("coworking", c.city, c.locality);
+      return Boolean(page && page.totalSpaces > 0);
+    }
+    return true;
+  } catch {
+    // An API hiccup should not drop real pages from the sitemap.
+    return true;
+  }
+}
+
+/** Run `check` over items, a few at a time, keeping those that pass. */
+async function filterWithLimit<T>(items: T[], limit: number, check: (item: T) => Promise<boolean>): Promise<T[]> {
+  const keep: boolean[] = new Array(items.length).fill(false);
+  let next = 0;
+  async function worker() {
+    while (next < items.length) {
+      const i = next++;
+      keep[i] = await check(items[i]);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return items.filter((_, i) => keep[i]);
+}
+
 /**
  * `/{vertical}/{city}/{locality}` — coworking, managed office and coliving localities with at least
- * {@link MIN_LISTINGS_FOR_LOCALITY_PAGE} live listings.
+ * {@link MIN_LISTINGS_FOR_LOCALITY_PAGE} live listings whose page actually shows them.
+ * Checked once an hour (the page checks call the API), then served from memory.
  */
-export async function collectLocalityPagesSitemapEntries(): Promise<SitemapUrlEntry[]> {
+export const collectLocalityPagesSitemapEntries = cachedLoader(async (): Promise<SitemapUrlEntry[]> => {
   const [coworking, managedOffice, coliving] = await Promise.all([
     loadCoworkingInventory(),
     loadManagedOfficeInventory(),
     loadColivingInventory(),
   ]);
 
-  const entries: SitemapUrlEntry[] = [];
+  const candidates: LocalityCandidate[] = [];
   const inventoryByVertical: Array<[SpaceVertical, InventorySpace[]]> = [
     ["coworking", coworking],
     ["office-space", managedOffice],
@@ -185,18 +228,24 @@ export async function collectLocalityPagesSitemapEntries(): Promise<SitemapUrlEn
       }
       for (const [locality, group] of byLocality) {
         if (group.length < MIN_LISTINGS_FOR_LOCALITY_PAGE) continue;
-        entries.push({
-          loc: toAbsoluteUrl(
-            `/${verticalPath(vertical)}/${encodeURIComponent(city)}/${encodeURIComponent(locality)}`,
-          ),
-          lastmod: latest(group),
+        candidates.push({
+          vertical,
+          city,
+          locality,
+          entry: {
+            loc: toAbsoluteUrl(
+              `/${verticalPath(vertical)}/${encodeURIComponent(city)}/${encodeURIComponent(locality)}`,
+            ),
+            lastmod: latest(group),
+          },
         });
       }
     }
   }
 
-  return sortByLoc(entries);
-}
+  const live = await filterWithLimit(candidates, 6, localityPageHasListings);
+  return sortByLoc(live.map((c) => c.entry));
+});
 
 /** `/{vertical}/{slug}` for each live listing; slugs that collide with a city page are skipped. */
 function detailEntries(vertical: SpaceVertical, items: InventorySpace[]): SitemapUrlEntry[] {

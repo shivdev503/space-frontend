@@ -92,9 +92,22 @@ function refId(v: unknown): string {
   return str(v);
 }
 
+/**
+ * A listing Google may index: not hidden on the site and not set to `noindex` in its SEO block.
+ * Sitemaps list only these, so every URL we submit is one Google is allowed to keep.
+ */
+function isIndexableRow(row: RawRecord): boolean {
+  if (row.is_active === false) return false;
+  // Same rule as the detail page (`workspaceSeo`): its robots come from `new_seo` when that block is
+  // switched on and has a title; otherwise the page uses its default template, which is indexable.
+  const seo = isRecord(row.new_seo) ? row.new_seo : null;
+  if (!seo || seo.status === false || !str(seo.title)) return true;
+  return !/noindex/i.test(str(seo.robots));
+}
+
 function workspaceToInventory(row: RawRecord): InventorySpace | null {
   const slug = str(row.slug);
-  if (!slug) return null;
+  if (!slug || !isIndexableRow(row)) return null;
   const location = isRecord(row.location) ? row.location : {};
   return {
     slug,
@@ -170,10 +183,12 @@ export const loadColivingInventory = cachedLoader(async () => {
     const slug = resolvePgListingSlug(pg);
     if (!slug || seen.has(slug)) continue;
     seen.add(slug);
+    const raw = pg as unknown as RawRecord;
     out.push({
       slug,
       cityName: pg.city?.trim() || undefined,
       localityName: pg.locality?.trim() || undefined,
+      updatedAt: parseDate(raw.updated_on, raw.updatedAt, raw.added_on),
     });
   }
   return out;
