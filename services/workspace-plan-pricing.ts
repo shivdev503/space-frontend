@@ -67,7 +67,8 @@ export function extractMinimumPlanPrice(
   for (const plan of plans) {
     const raw = plan?.price;
     const n = typeof raw === "number" ? raw : Number(raw);
-    if (!Number.isFinite(n)) continue;
+    // 0 / missing = "price on request", never a starting price.
+    if (!Number.isFinite(n) || n <= 0) continue;
     if (min === null || n < min) min = n;
   }
 

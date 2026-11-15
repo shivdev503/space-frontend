@@ -114,8 +114,14 @@ export function CoworkingCard({
 
           <div className="flex items-center justify-between gap-3">
             <p className="min-w-0 text-[0.88rem] text-ink sm:text-[0.95rem]">
-              <span className="font-semibold">{formatCurrency(price)}</span>
-              <span className="text-muted"> /month</span>
+              {price > 0 ? (
+                <>
+                  <span className="font-semibold">{formatCurrency(price)}</span>
+                  <span className="text-muted"> /month</span>
+                </>
+              ) : (
+                <span className="font-semibold">Price on request</span>
+              )}
             </p>
             <button
               type="button"

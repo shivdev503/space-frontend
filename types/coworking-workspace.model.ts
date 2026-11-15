@@ -71,7 +71,9 @@ export namespace CoworkingModel {
 
   export interface Location {
     name: string;
-    floor: number;
+    /** Building name. */
+    name1?: string;
+    floor: number | string;
     address: string;
     address1: string;
     address2: string;
@@ -211,6 +213,11 @@ export namespace CoworkingModel {
     price?: unknown;
     spaceTag?: string;
     ratings?: string;
+    /** Number of reviews behind `ratings`, and where they are (e.g. "Google"). */
+    ratings_count?: number;
+    ratings_source?: string;
+    /** Centre size in sq ft. */
+    area_sqft?: number;
     is_favorite: boolean;
     price_type: string;
     starting_price: number;

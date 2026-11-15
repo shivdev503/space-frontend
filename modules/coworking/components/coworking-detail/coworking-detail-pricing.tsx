@@ -11,7 +11,6 @@ import {
 
 import {
   CoworkingDetailBlock,
-  CoworkingDetailEyebrow,
   CoworkingDetailSectionSub,
   CoworkingDetailSectionTitle,
 } from "@/modules/coworking/components/coworking-detail/coworking-detail-ui";
@@ -75,7 +74,6 @@ export function CoworkingDetailPricing({ workspace }: { workspace: CoworkingMode
 
   return (
     <CoworkingDetailBlock id="pricing">
-      <CoworkingDetailEyebrow>Membership plans</CoworkingDetailEyebrow>
       <CoworkingDetailSectionTitle>Flexible pricing for every team</CoworkingDetailSectionTitle>
       <CoworkingDetailSectionSub className="mb-6">
         Transparent, all-inclusive rates. Pay for what you use — no booking fees, exclusive SpaceWallah
@@ -120,13 +118,15 @@ export function CoworkingDetailPricing({ workspace }: { workspace: CoworkingMode
               <p className="text-[17px] font-bold text-ink">{name}</p>
               <p className="mb-4 mt-1 min-h-[34px] text-[13px] leading-snug text-muted">{desc}</p>
               <p className="mt-auto text-[15px] font-medium text-muted">
-                From{" "}
                 {showPrice ? (
-                  <b className="text-[27px] font-extrabold tracking-[-0.02em] text-ink">
-                    {formatCurrency(price)}
-                  </b>
+                  <>
+                    From{" "}
+                    <b className="text-[27px] font-extrabold tracking-[-0.02em] text-ink">
+                      {formatCurrency(price)}
+                    </b>
+                  </>
                 ) : (
-                  <b className="text-xl font-extrabold text-ink">On request</b>
+                  <b className="text-xl font-extrabold text-ink">Price on request</b>
                 )}
                 {showPrice ? <span>{planUnit(name)}</span> : null}
               </p>

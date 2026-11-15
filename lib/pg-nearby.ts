@@ -227,7 +227,7 @@ out body 24;`;
   return null;
 }
 
-function rankOverpassPlaces(
+export function rankOverpassPlaces(
   center: MapCoordinates,
   elements: { lat?: number; lon?: number; tags?: Record<string, string> }[],
   limit: number,

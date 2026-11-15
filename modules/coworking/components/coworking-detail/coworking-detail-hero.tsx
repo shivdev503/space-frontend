@@ -21,7 +21,7 @@ export function CoworkingDetailHero({ workspace }: { workspace: CoworkingModel.W
   const locLine = locParts.join(", ");
 
   return (
-    <header className="flex flex-col gap-3 pb-2 sm:flex-row sm:items-end sm:justify-between sm:gap-8 sm:pb-[22px]">
+    <header className="flex flex-col gap-3 pb-0 sm:flex-row sm:items-end sm:justify-between sm:gap-8 sm:pb-0">
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3 sm:block">
           <h1 className="min-w-0 text-[1.55rem] font-extrabold leading-[1.12] tracking-[-0.035em] text-ink sm:text-[2.65rem]">
@@ -57,7 +57,11 @@ export function CoworkingDetailHero({ workspace }: { workspace: CoworkingModel.W
               <Star className="h-6 w-6 fill-[#f2b01e] text-[#f2b01e]" aria-hidden />
               {rating.toFixed(1)}
             </div>
-            <p className="text-[13px] font-medium text-muted">Loved by India · Premium-rated</p>
+            <p className="text-[13px] font-medium text-muted">
+              {workspace.ratings_count
+                ? `${workspace.ratings_count.toLocaleString("en-IN")} ${workspace.ratings_source ? `${workspace.ratings_source} ` : ""}reviews`
+                : "Loved by India · Premium-rated"}
+            </p>
           </div>
         </div>
       ) : null}

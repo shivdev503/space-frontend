@@ -21,6 +21,38 @@ import { buildPageMetadataFromSeo } from "@/lib/seo-metadata";
 import { seoPageTitleOrFallback } from "@/lib/seo-page-title";
 import { coworkingBrandedTitle, coworkingCitySeo, coworkingListingSeo } from "@/lib/seo-templates";
 import { getSeoBySlug } from "@/services/seo-content";
+import { displayCityName } from "@/utils/format";
+import { NON_OPERATOR_BRAND_SLUGS, brandCitySlug, loadBrandPageData } from "@/services/brand-api";
+import type { BrandMore } from "@/modules/coworking/components/coworking-detail/coworking-detail-brand-more";
+import type { CoworkingModel } from "@/types/coworking-workspace.model";
+
+/** The operator's other centres for the detail page; never waits more than `ms` (shown on a later visit). */
+async function loadBrandMore(workspace: CoworkingModel.WorkSpace, ms = 600): Promise<BrandMore | null> {
+  const slug = workspace.brand?.slug?.trim().toLowerCase();
+  if (!slug || NON_OPERATOR_BRAND_SLUGS.has(slug)) return null;
+  const data = await Promise.race([
+    loadBrandPageData(slug).catch(() => null),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), ms)),
+  ]);
+  const citySlug = brandCitySlug(workspace);
+  const base = {
+    brandName: workspace.brand?.name?.trim() || slug,
+    brandSlug: slug,
+    cityName: displayCityName(workspace.location?.city?.name) || citySlug,
+    citySlug,
+  };
+  if (!data) return { ...base, inCity: [], total: 0, cityCount: 0, known: false };
+  const inCity = data.workspaces.filter((w) => w.id !== workspace.id && w.slug !== workspace.slug && brandCitySlug(w) === citySlug);
+  return {
+    ...base,
+    brandName: data.brand.name || base.brandName,
+    inCity,
+    // Count this centre even when the brand list leaves it out (e.g. hidden from listings).
+    total: data.workspaces.length + (data.workspaces.some((w) => w.id === workspace.id || w.slug === workspace.slug) ? 0 : 1),
+    cityCount: data.cities.length,
+    known: true,
+  };
+}
 
 export async function generateMetadata({
   params,
@@ -92,13 +124,17 @@ export default async function CoworkingSegmentPage({
   if (!workspace) notFound();
 
   const cityId = workspace.location?.city?.id?.trim();
-  const similarWorkspaces = cityId
-    ? (await loadCoworkingWorkspacesList(cityId, 10)).data
-        .filter((w) => w.id !== workspace.id)
-        .slice(0, 6)
-    : [];
+  const [list, brandMore] = await Promise.all([
+    cityId ? loadCoworkingWorkspacesList(cityId, 16) : Promise.resolve(null),
+    loadBrandMore(workspace),
+  ]);
+  // Centres already shown under "Explore more from {brand}" aren't repeated as similar spaces.
+  const brandIds = new Set((brandMore?.inCity ?? []).map((w) => w.id));
+  const similarWorkspaces = (list?.data ?? [])
+    .filter((w) => w.id !== workspace.id && !brandIds.has(w.id))
+    .slice(0, 6);
 
   return (
-    <CoworkingDetailPage workspace={workspace} similarWorkspaces={similarWorkspaces} />
+    <CoworkingDetailPage workspace={workspace} similarWorkspaces={similarWorkspaces} brandMore={brandMore} />
   );
 }

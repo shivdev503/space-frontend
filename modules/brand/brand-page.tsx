@@ -95,7 +95,7 @@ export function BrandPage({ data, workspaces, activeCity }: BrandPageProps) {
       <section className="pb-14 sm:pb-20">
         <Container>
           {workspaces.length > 0 ? (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
               {workspaces.map((ws) => (
                 <CoworkingCard key={ws.id || ws._id} workspace={coworkingCardRow(ws)} className="h-full" />
               ))}

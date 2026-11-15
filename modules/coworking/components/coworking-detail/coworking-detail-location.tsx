@@ -1,98 +1,84 @@
-import { Building2, Landmark, MapPin, TrainFront } from "lucide-react";
+import { Bus, CarTaxiFront, MapPin, Ship, TrainFront, TramFront } from "lucide-react";
 
 import { buildMapsLink, normalizeMapCoordinates } from "@/lib/space-detail-map";
 import { workspaceAddress } from "@/modules/coworking/components/coworking-detail-header";
 import {
   CoworkingDetailBlock,
-  CoworkingDetailEyebrow,
-  CoworkingDetailSectionSub,
   CoworkingDetailSectionTitle,
 } from "@/modules/coworking/components/coworking-detail/coworking-detail-ui";
-import { NEARBY_LANDMARKS_BY_CITY } from "@/modules/space-detail/nearby-landmarks";
 import { SpaceDetailLeafletMap } from "@/modules/space-detail/components/space-detail-leaflet-map-dynamic";
 import type { SpaceDetailLocationHighlight } from "@/modules/space-detail/components/space-detail-location-highlights";
 import { SpaceDetailLocationHighlights } from "@/modules/space-detail/components/space-detail-location-highlights";
 import { SpaceDetailNearbyStripDynamic } from "@/modules/space-detail/components/space-detail-nearby-strip-dynamic";
-import { workspaceDescriptionText } from "@/lib/coworking-workspace-content";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
-import { toTitleCase } from "@/utils/format";
+import { displayCityName, toTitleCase } from "@/utils/format";
 
-import { workspaceCitySlugish } from "../coworking-detail-header";
 
-function nearMetro(workspace: CoworkingModel.WorkSpace): boolean {
-  if (workspace.location?.metro_detail?.is_near_metro) return true;
-  const hay = [
-    ...(workspace.amenties ?? []).map((a) => a.name),
-    workspaceDescriptionText(workspace),
-  ]
-    .join(" ")
-    .toLowerCase();
-  return hay.includes("metro");
+type LocationLike = CoworkingModel.Location & Record<string, unknown>;
+
+const text = (v: unknown) => (typeof v === "string" ? v.trim() : typeof v === "number" ? String(v) : "");
+
+/** "0.15" → "0.15 km"; values that already carry a unit ("500 m", "2 km walk") are kept. */
+function distanceLabel(v: unknown): string {
+  const d = text(v);
+  if (!d) return "";
+  return /^\d+(\.\d+)?$/.test(d) ? `${d} km` : d;
 }
+
+/** Transport saved on the listing: [flag, name field, distance field]. Only rows with a name are shown. */
+const TRANSPORT = [
+  { flag: "is_near_metro", name: "landmark", distance: "landmark_distance", label: "Metro station", icon: TrainFront },
+  { flag: "is_bus_stop", name: "bus_stop_landmark", distance: "bus_stop_distance", label: "Bus stop", icon: Bus },
+  { flag: "is_taxi_stand", name: "taxi_stand_landmark", distance: "taxi_stand_distance", label: "Taxi stand", icon: CarTaxiFront },
+  { flag: "is_tram", name: "tram_landmark", distance: "tram_distance", label: "Tram stop", icon: TramFront },
+  { flag: "is_ferry_stop", name: "ferry_stop_landmark", distance: "ferry_stop_distance", label: "Ferry stop", icon: Ship },
+] as const;
 
 function buildConnectivityHighlights(
   workspace: CoworkingModel.WorkSpace,
   micro: string,
   city: string,
-  citySlug: string,
 ): SpaceDetailLocationHighlight[] {
-  const landmarks =
-    NEARBY_LANDMARKS_BY_CITY[citySlug] ?? [toTitleCase(micro), toTitleCase(city), "Business District"];
-  const metroNearby = nearMetro(workspace);
-
-  return [
-    {
-      icon: MapPin,
-      title: micro,
-      sub: city ? `${toTitleCase(city)}, India` : "India",
-    },
-    ...(metroNearby
-      ? [
-          {
-            icon: TrainFront,
-            title: workspace.location?.metro_detail?.name || "Nearest metro connectivity",
-            sub: landmarks[0] ? `Near ${landmarks[0]}` : "Quick metro access",
-            tag: "Near Metro",
-          },
-        ]
-      : []),
-    {
-      icon: Landmark,
-      title: "Landmark",
-      sub: landmarks[0] || toTitleCase(micro),
-    },
-    {
-      icon: Building2,
-      title: "Business hub",
-      sub: "Surrounded by MNCs & startups",
-    },
+  const loc = (workspace.location ?? {}) as LocationLike;
+  const rows: SpaceDetailLocationHighlight[] = [
+    { icon: MapPin, title: toTitleCase(micro), sub: city ? `${city}, India` : "India" },
   ];
+  for (const t of TRANSPORT) {
+    const name = text(loc[t.name]);
+    if (!loc[t.flag] || !name) continue;
+    const dist = distanceLabel(loc[t.distance]);
+    rows.push({ icon: t.icon, title: name, sub: dist ? `${t.label} · ${dist} away` : t.label });
+  }
+  // Older listings keep the metro on `metro_detail`.
+  const md = loc.metro_detail;
+  if (md?.is_near_metro && text(md.name) && !rows.some((r) => r.icon === TrainFront)) {
+    const dist = distanceLabel(md.distance);
+    rows.push({ icon: TrainFront, title: text(md.name), sub: dist ? `Metro station · ${dist} away` : "Metro station" });
+  }
+  return rows;
 }
 
 export function CoworkingDetailLocation({ workspace }: { workspace: CoworkingModel.WorkSpace }) {
   const address = workspaceAddress(workspace);
-  const micro = workspace.location?.micro_location?.name?.trim() || "Location";
-  const city = workspace.location?.city?.name?.trim() || "";
+  // Area names like "MG Road Gurugram" repeat the city that follows them in the heading.
+  const micro =
+    (workspace.location?.micro_location?.name?.trim() || "").replace(/\s+(gurugram|gurgaon)$/i, "").trim() ||
+    "Location";
+  const city = displayCityName(workspace.location?.city?.name);
   const coordinates = normalizeMapCoordinates(
     workspace.location?.latitude,
     workspace.location?.longitude,
   );
   const mapsLink = buildMapsLink(coordinates, address || `${micro}, ${city}`);
-  const citySlug = workspaceCitySlugish(workspace);
-  const highlightRows = buildConnectivityHighlights(workspace, micro, city, citySlug);
+  const highlightRows = buildConnectivityHighlights(workspace, micro, city);
   const displayAddress = address || `${micro}, ${city}`;
 
   return (
     <CoworkingDetailBlock id="location">
-      <CoworkingDetailEyebrow>Location &amp; connectivity</CoworkingDetailEyebrow>
       <CoworkingDetailSectionTitle>
         {toTitleCase(micro)}
-        {city ? `, ${toTitleCase(city)}` : ""}
+        {city ? `, ${city}` : ""}
       </CoworkingDetailSectionTitle>
-      <CoworkingDetailSectionSub className="mb-0">
-        A prime micro-market with quick access to the metro, expressway and the city&apos;s commercial
-        hubs.
-      </CoworkingDetailSectionSub>
 
       {displayAddress ? (
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">{displayAddress}</p>

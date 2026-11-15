@@ -297,7 +297,7 @@ export function CoworkingDetailLeadQuiz({
     <div className="border-b border-[#EEF0ED] bg-gradient-to-b from-[#EDF7EE] to-white px-5 pb-4 pt-5 sm:px-6">
       <p className="text-[13px] font-semibold text-muted">{config.priceLabel}</p>
       <p className="mt-0.5 text-[28px] font-extrabold tracking-[-0.03em] text-ink sm:text-[32px]">
-        {startingFrom > 0 ? formatCurrency(startingFrom) : "On request"}{" "}
+        {startingFrom > 0 ? formatCurrency(startingFrom) : "Price on request"}{" "}
         {startingFrom > 0 ? (
           <span className="text-[15px] font-semibold text-muted">{priceSuffix}</span>
         ) : null}

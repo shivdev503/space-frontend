@@ -1,12 +1,12 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import {
   CoworkingDetailBlock,
-  CoworkingDetailEyebrow,
   CoworkingDetailSectionTitle,
 } from "@/modules/coworking/components/coworking-detail/coworking-detail-ui";
 import { workspaceDescriptionHtml } from "@/lib/coworking-workspace-content";
@@ -21,10 +21,22 @@ function plainDescription(raw: string): string {
     .replace(/<\/p>/gi, "\n")
     .replace(/<[^>]+>/g, "")
     .replace(/&nbsp;/g, " ")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;|&apos;/g, "'")
+    .replace(/&amp;/g, "&")
     .trim();
 }
 
-export function CoworkingDetailAbout({ workspace }: { workspace: CoworkingModel.WorkSpace }) {
+export function CoworkingDetailAbout({
+  workspace,
+  brandLink = null,
+}: {
+  workspace: CoworkingModel.WorkSpace;
+  /** "Explore all {brand} centres" link, when the space belongs to an operator. */
+  brandLink?: { href: string; label: string } | null;
+}) {
   const [open, setOpen] = useState(false);
   const micro = workspace.location?.micro_location?.name?.trim() || "this location";
   const city = workspace.location?.city?.name?.trim() || "";
@@ -50,7 +62,6 @@ export function CoworkingDetailAbout({ workspace }: { workspace: CoworkingModel.
 
   return (
     <CoworkingDetailBlock>
-      <CoworkingDetailEyebrow>About the space</CoworkingDetailEyebrow>
       <CoworkingDetailSectionTitle>
         A premium {brandName} address on {toTitleCase(micro)}
       </CoworkingDetailSectionTitle>
@@ -69,11 +80,29 @@ export function CoworkingDetailAbout({ workspace }: { workspace: CoworkingModel.
             {brandName.slice(0, 4)}
           </div>
         )}
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-lg font-extrabold text-ink">{brandName}</p>
           <p className="text-[13.5px] text-muted">{brandLine}</p>
         </div>
+        {brandLink ? (
+          <Link
+            href={brandLink.href}
+            className="hidden shrink-0 items-center gap-1.5 rounded-full bg-[color:var(--color-brand)] px-4 py-2 text-[14px] font-semibold text-white transition hover:bg-[color:var(--color-accent)] sm:inline-flex"
+          >
+            {brandLink.label}
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
+        ) : null}
       </div>
+      {brandLink ? (
+        <Link
+          href={brandLink.href}
+          className="mt-3 inline-flex items-center gap-1.5 text-[15px] font-bold text-[color:var(--color-brand)] sm:hidden"
+        >
+          {brandLink.label}
+          <ArrowRight className="h-4 w-4" aria-hidden />
+        </Link>
+      ) : null}
 
       <div
         className={cn(

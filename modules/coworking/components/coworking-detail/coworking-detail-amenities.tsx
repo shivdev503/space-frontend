@@ -1,7 +1,6 @@
 import { pickAmenityIcon } from "@/modules/space-detail/components/amenities-list";
 import {
   CoworkingDetailBlock,
-  CoworkingDetailEyebrow,
   CoworkingDetailSectionSub,
   CoworkingDetailSectionTitle,
 } from "@/modules/coworking/components/coworking-detail/coworking-detail-ui";
@@ -28,7 +27,6 @@ export function CoworkingDetailAmenities({
 
   return (
     <CoworkingDetailBlock id="amenities">
-      <CoworkingDetailEyebrow>What&apos;s included</CoworkingDetailEyebrow>
       <CoworkingDetailSectionTitle>Amenities &amp; facilities</CoworkingDetailSectionTitle>
       <CoworkingDetailSectionSub className="mb-6">
         Everything your team needs to plug in and get to work from day one.

@@ -16,6 +16,7 @@ import { isCoworkingUserApiProxyEnabled, resolveApiBaseUrl } from "@/services/en
 import { type RawRecord, loadCoworkingWorkspaceRows } from "@/services/sitemap-inventory";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import type { SeoContent } from "@/types/seo.model";
+import { displayCityName } from "@/utils/format";
 
 const PAGE_SIZE = 50;
 const REQUEST_TIMEOUT_MS = 30_000;
@@ -107,7 +108,7 @@ function citiesOf(workspaces: CoworkingModel.WorkSpace[]): BrandCity[] {
   const byCity = new Map<string, BrandCity>();
   for (const ws of workspaces) {
     const slug = citySlugOf(ws);
-    const name = ws.location?.city?.name?.trim();
+    const name = displayCityName(ws.location?.city?.name);
     if (!slug || !name) continue;
     const entry = byCity.get(slug) ?? { slug, name, count: 0 };
     entry.count += 1;
@@ -127,8 +128,50 @@ async function fetchBrandPageData(rawSlug: string): Promise<BrandPageData | null
   return { brand: brandInfoFrom(rows[0], slug), workspaces, cities: citiesOf(workspaces) };
 }
 
-/** Deduped per request (metadata + page share one load). */
-export const loadBrandPageData = cache(fetchBrandPageData);
+/**
+ * Brand data shared across requests: the API takes ~2 s for a brand, so each brand is kept for
+ * 10 minutes and then refreshed in the background while the last copy keeps being served.
+ * Failed loads are never stored (the previous copy stays); only the first request per brand waits.
+ */
+const BRAND_TTL_MS = 10 * 60_000;
+const BRAND_CACHE_MAX = 300;
+const brandStore = new Map<string, { at: number; data: BrandPageData | null }>();
+const brandInflight = new Map<string, Promise<BrandPageData | null>>();
+
+function refreshBrand(slug: string): Promise<BrandPageData | null> {
+  let p = brandInflight.get(slug);
+  if (!p) {
+    p = fetchBrandPageData(slug)
+      .then((data) => {
+        brandStore.delete(slug);
+        brandStore.set(slug, { at: Date.now(), data });
+        if (brandStore.size > BRAND_CACHE_MAX) brandStore.delete(brandStore.keys().next().value as string);
+        return data;
+      })
+      .finally(() => brandInflight.delete(slug));
+    brandInflight.set(slug, p);
+  }
+  return p;
+}
+
+async function loadSharedBrandPageData(rawSlug: string): Promise<BrandPageData | null> {
+  const slug = rawSlug.trim().toLowerCase();
+  if (!slug) return null;
+  const hit = brandStore.get(slug);
+  if (hit) {
+    if (Date.now() - hit.at >= BRAND_TTL_MS) void refreshBrand(slug).catch(() => undefined);
+    return hit.data;
+  }
+  return refreshBrand(slug);
+}
+
+/** Deduped per request (metadata + page share one load), shared across requests for 10 minutes. */
+export const loadBrandPageData = cache(loadSharedBrandPageData);
+
+/** Canonical city slug of a centre (e.g. "gurgaon"), as used by `/brand/{slug}?city=`. */
+export function brandCitySlug(ws: CoworkingModel.WorkSpace): string {
+  return citySlugOf(ws);
+}
 
 /** Filter a brand's centres to one city (canonical city slug), or all when `city` is empty. */
 export function brandWorkspacesInCity(

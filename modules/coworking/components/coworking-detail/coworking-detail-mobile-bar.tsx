@@ -21,7 +21,7 @@ export function CoworkingDetailMobileBar({
       <p className="text-xs font-semibold text-muted">
         From{" "}
         <b className="block text-xl font-extrabold tracking-[-0.02em] text-ink">
-          {startingFrom > 0 ? formatCurrency(startingFrom) : "On request"}
+          {startingFrom > 0 ? formatCurrency(startingFrom) : "Price on request"}
           {startingFrom > 0 ? (
             <span className="text-[13px] font-semibold text-muted">{priceSuffix}</span>
           ) : null}

@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+import { nearbyFromSnapshot } from "@/lib/nearby-snapshot";
 import { queryOverpassNearby } from "@/lib/pg-nearby";
 import type { PgNearbyPlace } from "@/types/pg.model";
 
@@ -37,7 +38,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ places: hit.places });
   }
 
-  const places = await queryOverpassNearby({ lat, lng }, limit);
+  // Saved snapshot first (instant); live Overpass only for places it doesn't cover.
+  const places = nearbyFromSnapshot({ lat, lng }, limit) ?? (await queryOverpassNearby({ lat, lng }, limit));
   if (cache.size >= MAX_ENTRIES) cache.clear();
   cache.set(key, {
     places: places ?? [],
