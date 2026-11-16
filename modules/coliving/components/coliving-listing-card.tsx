@@ -1,6 +1,7 @@
 "use client";
 
 import { RemoteImage } from "@/components/ui/remote-image";
+import { verifiedOnDate } from "@/lib/verified";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Heart, Star } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -28,13 +29,14 @@ function ColivingListingCardCarousel({
   name,
   altBase,
   href,
-  verified,
+  verifiedOn,
 }: {
   images: string[];
   name: string;
   altBase: string;
   href: string;
-  verified: boolean;
+  /** "16 Nov 2026" when verified by the team. */
+  verifiedOn: string | null;
 }) {
   const railRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
@@ -96,9 +98,9 @@ function ColivingListingCardCarousel({
         ))}
       </div>
 
-      {verified ? (
+      {verifiedOn ? (
         <span className="pointer-events-none absolute left-3 top-3 z-20 rounded-md bg-[rgba(34,34,34,0.72)] px-2 py-1 text-[0.7rem] font-semibold text-white backdrop-blur-sm">
-          Verified
+          ✓ Verified on {verifiedOn}
         </span>
       ) : null}
 
@@ -182,7 +184,7 @@ export function ColivingListingCard({ pg, className }: ColivingListingCardProps)
         name={pg.name}
         altBase={listingAltBase(pg.name, "PG", pg.locality, pg.city)}
         href={href}
-        verified={pg.verified}
+        verifiedOn={verifiedOnDate(pg.verified_at)}
       />
 
       <Link href={href} className="mt-3 block min-w-0 space-y-0.5">

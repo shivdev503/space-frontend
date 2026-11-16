@@ -1,4 +1,6 @@
-import { MapPin, Star } from "lucide-react";
+import { Check, MapPin, Star } from "lucide-react";
+
+import { verifiedExplanation, verifiedOnDate } from "@/lib/verified";
 
 import {
   workspaceAddress,
@@ -44,6 +46,15 @@ export function CoworkingDetailHero({ workspace }: { workspace: CoworkingModel.W
             {landmark ? ` · Near ${landmark}` : null}
           </span>
         </p>
+        {verifiedOnDate(workspace.verified_at) ? (
+          <p className="mt-2.5 flex items-start gap-1.5 text-[13.5px] leading-snug text-muted">
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[color:var(--color-brand-soft)] px-2.5 py-0.5 font-semibold text-[color:var(--color-brand)]">
+              <Check className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden />
+              Verified on {verifiedOnDate(workspace.verified_at)}
+            </span>
+            <span className="hidden pt-0.5 sm:inline">{verifiedExplanation(workspace.verified_at, workspace.verified_method)}</span>
+          </p>
+        ) : null}
         <div className="mt-4 flex flex-wrap items-center gap-2.5">
           <ShortlistHeart item={toCompareItem(workspace)} variant="button" />
           <CompareToggle item={toCompareItem(workspace)} variant="button" />

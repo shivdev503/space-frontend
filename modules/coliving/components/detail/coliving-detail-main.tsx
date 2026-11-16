@@ -181,7 +181,8 @@ export function ColivingDetailMain({ pg }: ColivingDetailMainProps) {
         <ColivingHostSection
           hostName={pg.name.split(/[·,]/)[0]?.trim() || pg.postedBy || pg.name}
           hostInitials={hostInitials}
-          verified={pg.verified}
+          verifiedAt={pg.verified_at}
+          verifiedMethod={pg.verified_method}
           subtitle={[pg.type, pg.preferredGuests ? `For ${guestsLabel(pg.preferredGuests).toLowerCase()}` : "", pg.contactSchedule].filter(Boolean).join(" · ")}
           tags={buildHostTags(pg)}
         />

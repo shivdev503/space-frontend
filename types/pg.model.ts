@@ -101,6 +101,9 @@ export interface PgDetail {
   /** Rewritten listing copy (HTML) — preferred over `description` when present. */
   new_description?: string;
   verified: boolean;
+  /** Set when the SpaceWallah team verified the listing ("Verified on <date>"). */
+  verified_at?: string | null;
+  verified_method?: string;
   /** False when the page should not be in Google (weak/template content, or set in the admin). */
   index_in_google?: boolean;
   status: string;
@@ -131,6 +134,7 @@ export type PgListParams = {
   minPrice?: number;
   maxPrice?: number;
   verified?: boolean;
+  verified_at?: string | null;
   foodIncluded?: boolean;
   parking?: boolean;
   preferredGuest?: string;

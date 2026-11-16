@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { verifiedExplanation, verifiedOnDate } from "@/lib/verified";
 import { RemoteImage } from "@/components/ui/remote-image";
 import Link from "next/link";
 import {
@@ -44,17 +45,21 @@ const FOOD_IMAGE =
 export function ColivingHostSection({
   hostName,
   hostInitials,
-  verified,
+  verifiedAt,
+  verifiedMethod,
   subtitle,
   tags,
 }: {
   hostName: string;
   hostInitials: string;
-  verified?: boolean;
+  verifiedAt?: string | null;
+  verifiedMethod?: string;
   subtitle: string;
   tags: string[];
 }) {
   const { focusLeadQuiz } = useColivingLeadQuiz();
+  const verifiedOn = verifiedOnDate(verifiedAt);
+  const verified = Boolean(verifiedOn);
 
   return (
     <div className="border-b border-slate-200/80 pb-6 max-lg:pt-1 lg:rounded-2xl lg:border lg:bg-white lg:p-6 lg:shadow-soft">
@@ -78,7 +83,9 @@ export function ColivingHostSection({
             {verified ? (
               <>
                 <span className="text-slate-300"> · </span>
-                <span className="font-normal text-ink/85">Listed by verified agent</span>
+                <span className="font-normal text-ink/85" title={verifiedExplanation(verifiedAt, verifiedMethod)}>
+                  Verified by SpaceWallah on {verifiedOn}
+                </span>
               </>
             ) : null}
           </h3>

@@ -5,6 +5,7 @@ import { Check, ChevronLeft, Heart, MapPin, Share2 } from "lucide-react";
 
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { listingTrail } from "@/lib/breadcrumb-trails";
+import { verifiedExplanation, verifiedOnDate } from "@/lib/verified";
 
 export type ColivingPropertyHeaderProps = {
   name: string;
@@ -14,7 +15,9 @@ export type ColivingPropertyHeaderProps = {
   address: string;
   rating: number;
   reviewCount: number;
-  verified: boolean;
+  /** ISO date when the team verified the listing; no badge without it. */
+  verifiedAt?: string | null;
+  verifiedMethod?: string;
   shareSlug: string;
 };
 
@@ -39,9 +42,11 @@ export function ColivingPropertyHeader({
   address,
   rating,
   reviewCount,
-  verified,
+  verifiedAt,
+  verifiedMethod,
   shareSlug,
 }: ColivingPropertyHeaderProps) {
+  const verifiedOn = verifiedOnDate(verifiedAt);
   const { primary: titlePrimary, accent: titleAccent } = getTitleParts(name, locality);
   const ratingLabel = rating > 0 ? rating.toFixed(2) : "—";
   const breadcrumbLabel = locality.trim() || city;
@@ -94,10 +99,13 @@ export function ColivingPropertyHeader({
 
           <div className="mt-3 flex flex-col gap-2.5 sm:mt-4 lg:flex-row lg:flex-wrap lg:items-center lg:gap-3">
             <div className="flex flex-wrap items-center gap-2.5 text-sm text-ink/90">
-              {verified ? (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--color-brand)]/20 bg-[color:var(--color-brand-soft)] px-2.5 py-1 text-xs font-medium text-[color:var(--color-brand)]">
+              {verifiedOn ? (
+                <span
+                  title={verifiedExplanation(verifiedAt, verifiedMethod)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--color-brand)]/20 bg-[color:var(--color-brand-soft)] px-2.5 py-1 text-xs font-medium text-[color:var(--color-brand)]"
+                >
                   <Check className="h-3 w-3" strokeWidth={2.5} aria-hidden />
-                  Verified
+                  Verified on {verifiedOn}
                 </span>
               ) : null}
               <span className="inline-flex items-center gap-1 font-medium">

@@ -218,6 +218,9 @@ export namespace CoworkingModel {
     ratings_source?: string;
     /** Centre size in sq ft. */
     area_sqft?: number;
+    /** Set when the SpaceWallah team verified the listing ("Verified on <date>"). */
+    verified_at?: string | null;
+    verified_method?: string;
     is_favorite: boolean;
     price_type: string;
     starting_price: number;

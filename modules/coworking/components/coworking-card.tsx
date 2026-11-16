@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Star } from "lucide-react";
+import { Check, MapPin, Star } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 
 import { ContactFormModal } from "@/components/contact/contact-form-modal";
+import { verifiedExplanation, verifiedOnDate } from "@/lib/verified";
 import { ListingPhotoCarousel } from "@/components/ui/listing-photo-carousel";
 import {
   workspaceCitySlugish,
@@ -110,6 +111,15 @@ export function CoworkingCard({
               <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
               <p className="line-clamp-1">{micro}</p>
             </div>
+            {verifiedOnDate(workspace.verified_at) ? (
+              <p
+                className="flex items-center gap-1 text-[0.78rem] font-semibold text-[color:var(--color-brand)] sm:text-[0.82rem]"
+                title={verifiedExplanation(workspace.verified_at, workspace.verified_method)}
+              >
+                <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={2.5} aria-hidden />
+                Verified on {verifiedOnDate(workspace.verified_at)}
+              </p>
+            ) : null}
           </div>
 
           <div className="flex items-center justify-between gap-3">

@@ -19,7 +19,8 @@ export function ColivingDetailHeader({ pg, slug }: ColivingDetailHeaderProps) {
       address={pg.address}
       rating={pg.rating}
       reviewCount={pg.reviews.length}
-      verified={pg.verified}
+      verifiedAt={pg.verified_at}
+      verifiedMethod={pg.verified_method}
       shareSlug={slug}
     />
   );
