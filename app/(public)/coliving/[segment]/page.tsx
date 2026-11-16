@@ -38,7 +38,9 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const pgRes = await loadPgDetail(segment);
   if (pgRes?.data) {
     const pg = pgRes.data;
-    return buildMetadataWithCmsSeoFallback(`/coliving/${pgRes.slug}`, colivingListingSeo(pg));
+    const metadata = await buildMetadataWithCmsSeoFallback(`/coliving/${pgRes.slug}`, colivingListingSeo(pg));
+    // Weak or template-only PG pages stay out of Google until improved; links on them still count.
+    return pg.index_in_google === false ? { ...metadata, robots: { index: false, follow: true } } : metadata;
   }
 
   notFound();

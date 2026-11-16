@@ -272,5 +272,6 @@ export async function collectOfficeSpaceSitemapEntries(): Promise<SitemapUrlEntr
 }
 
 export async function collectColivingSpacesSitemapEntries(): Promise<SitemapUrlEntry[]> {
-  return detailEntries("coliving", await loadColivingInventory());
+  // Only PG pages Google should index; noindex ones are still linked from their city and area pages.
+  return detailEntries("coliving", (await loadColivingInventory()).filter((item) => item.indexable !== false));
 }

@@ -101,6 +101,8 @@ export interface PgDetail {
   /** Rewritten listing copy (HTML) — preferred over `description` when present. */
   new_description?: string;
   verified: boolean;
+  /** False when the page should not be in Google (weak/template content, or set in the admin). */
+  index_in_google?: boolean;
   status: string;
   rooms: PgRoom[];
   rentRange: PgRentRange;

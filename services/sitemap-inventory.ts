@@ -31,6 +31,8 @@ export type InventorySpace = {
   brandSlug?: string;
   /** Real last-modified time when the API provides one. */
   updatedAt?: Date;
+  /** False for PG pages kept out of Google (noindex); they stay in area counts but not in the sitemap. */
+  indexable?: boolean;
 };
 
 const PG_CITY_TO_ROUTE: Record<string, string> = {
@@ -189,6 +191,7 @@ export const loadColivingInventory = cachedLoader(async () => {
       cityName: pg.city?.trim() || undefined,
       localityName: pg.locality?.trim() || undefined,
       updatedAt: parseDate(raw.updated_on, raw.updatedAt, raw.added_on),
+      indexable: raw.index_in_google !== false,
     });
   }
   return out;
