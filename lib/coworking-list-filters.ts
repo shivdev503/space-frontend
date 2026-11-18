@@ -20,7 +20,8 @@ export const DEFAULT_COWORKING_LIST_FILTERS: CoworkingListFilterState = {
   minPrice: "",
   maxPrice: "",
   priceRange: "",
-  sortBy: "starting_price",
+  // "priority" = the order the team sets in the admin (Priority coworking), as the API returns it.
+  sortBy: "priority",
   orderBy: "1",
 };
 
@@ -38,6 +39,7 @@ export const COWORKING_PRICE_RANGE_OPTIONS: {
 ];
 
 export const COWORKING_SORT_OPTIONS = [
+  { value: "priority:1", label: "Recommended", sortBy: "priority", orderBy: "1" as const },
   { value: "starting_price:1", label: "Price: low to high", sortBy: "starting_price", orderBy: "1" as const },
   { value: "starting_price:-1", label: "Price: high to low", sortBy: "starting_price", orderBy: "-1" as const },
 ];
@@ -111,7 +113,8 @@ export function coworkingFiltersToApiParams(
   if (Number.isFinite(max) && max > 0 && filters.maxPrice.trim()) out.maxPrice = max;
 
   const includeSort = options?.includeSortInRequest ?? true;
-  if (includeSort && filters.sortBy.trim()) {
+  // "priority" is the API's own order, so there is nothing to send.
+  if (includeSort && filters.sortBy.trim() && filters.sortBy !== "priority") {
     out.sortBy = filters.sortBy.trim();
     out.orderBy = filters.orderBy === "1" ? 1 : -1;
   }

@@ -210,7 +210,7 @@ export function CoworkingFiltersModal({
 
                 <section>
                   <h3 className="text-base font-semibold tracking-[-0.02em] text-slate-950">Sort by</h3>
-                  <p className="mt-1 text-sm text-slate-500">Order results by price</p>
+                  <p className="mt-1 text-sm text-slate-500">Recommended order, or by price</p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {COWORKING_SORT_OPTIONS.map((opt) => (
                       <FilterChip

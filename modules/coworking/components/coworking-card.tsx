@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Check, MapPin, Star } from "lucide-react";
+import { BadgeCheck, MapPin, Star } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 
 import { ContactFormModal } from "@/components/contact/contact-form-modal";
@@ -52,6 +52,7 @@ export function CoworkingCard({
   const rating = workspaceRating(workspace);
   const price = workspace.starting_price ?? 0;
   const micro = cardLocationLine(workspace);
+  const verifiedOn = verifiedOnDate(workspace.verified_at);
   const spaceId = workspace.id || workspace._id || workspace.slug;
   const photoRef = useRef<HTMLDivElement>(null);
   const images = useMemo(() => cardImages(workspace), [workspace]);
@@ -90,7 +91,7 @@ export function CoworkingCard({
           ) : null}
         </div>
 
-        <div className="mt-1.5 flex flex-col gap-1.5 sm:mt-3 sm:gap-2">
+        <div className="mt-1.5 flex flex-1 flex-col gap-1.5 sm:mt-3 sm:gap-2">
           <div className="space-y-0.5 sm:space-y-1">
             <div className="flex items-start justify-between gap-3">
               <Link
@@ -107,22 +108,27 @@ export function CoworkingCard({
               ) : null}
             </div>
 
-            <div className="flex items-start gap-2 text-[0.85rem] text-muted sm:text-[0.92rem]">
-              <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
-              <p className="line-clamp-1">{micro}</p>
+            {/* "Verified" (date in the tooltip) shares the location row (right side, like the rating above it), so every
+                card has the same rows and no gap opens under cards without it. */}
+            <div className="flex items-center justify-between gap-2 text-[0.85rem] text-muted sm:text-[0.92rem]">
+              <div className="flex min-w-0 items-center gap-2" title={micro}>
+                <MapPin className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+                <p className="truncate">{micro}</p>
+              </div>
+              {verifiedOn ? (
+                <p
+                  className="flex shrink-0 items-center gap-1 text-[0.75rem] font-semibold text-[color:var(--color-brand)] sm:text-[0.78rem]"
+                  title={verifiedExplanation(workspace.verified_at, workspace.verified_method)}
+                >
+                  <BadgeCheck className="h-3.5 w-3.5 shrink-0" strokeWidth={2.25} aria-hidden />
+                  Verified
+                  <span className="sr-only"> on {verifiedOn}</span>
+                </p>
+              ) : null}
             </div>
-            {verifiedOnDate(workspace.verified_at) ? (
-              <p
-                className="flex items-center gap-1 text-[0.78rem] font-semibold text-[color:var(--color-brand)] sm:text-[0.82rem]"
-                title={verifiedExplanation(workspace.verified_at, workspace.verified_method)}
-              >
-                <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={2.5} aria-hidden />
-                Verified on {verifiedOnDate(workspace.verified_at)}
-              </p>
-            ) : null}
           </div>
 
-          <div className="flex items-center justify-between gap-3">
+          <div className="mt-auto flex items-center justify-between gap-3">
             <p className="min-w-0 text-[0.88rem] text-ink sm:text-[0.95rem]">
               {price > 0 ? (
                 <>
