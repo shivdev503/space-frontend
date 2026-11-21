@@ -13,6 +13,18 @@ RELEASE_ID="$1"
 TARBALL="$2"
 RELEASE="$APP_DIR/releases/$RELEASE_ID"
 KEEP=5
+PAGE_CACHE=/var/cache/nginx/spacewallah
+
+# Cached pages point at this build's JS files, which the next build no longer serves: empty the
+# nginx page cache (deploy/nginx-page-cache.conf) whenever a different build goes live.
+purge_page_cache() {
+  [ -d "$PAGE_CACHE" ] || return 0
+  if sudo -n find "$PAGE_CACHE" -mindepth 1 -delete 2>/dev/null; then
+    echo "Emptied page cache"
+  else
+    echo "WARNING: could not empty $PAGE_CACHE (needs passwordless sudo); cached pages may load old JS for up to 10 minutes" >&2
+  fi
+}
 
 mkdir -p "$RELEASE"
 tar -xzf "$TARBALL" -C "$RELEASE"
@@ -27,6 +39,7 @@ pm2 startOrReload "$RELEASE/ecosystem.config.cjs" --update-env
 for _ in $(seq 1 30); do
   if curl -fsS -o /dev/null http://127.0.0.1:3000/; then
     pm2 save >/dev/null
+    purge_page_cache
     echo "Live: $RELEASE_ID"
     # Keep the newest releases for quick rollback, delete the rest.
     ls -1dt "$APP_DIR"/releases/* | tail -n +$((KEEP + 1)) | xargs -r rm -rf
@@ -41,5 +54,6 @@ if [ -n "$PREVIOUS" ] && [ "$PREVIOUS" != "$RELEASE" ]; then
   echo "Rolling back to $PREVIOUS" >&2
   ln -sfn "$PREVIOUS" "$APP_DIR/current"
   pm2 startOrReload "$PREVIOUS/ecosystem.config.cjs" --update-env
+  purge_page_cache
 fi
 exit 1
