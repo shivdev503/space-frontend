@@ -159,7 +159,7 @@ export async function collectCityPagesSitemapEntries(): Promise<SitemapUrlEntry[
   return sortByLoc(entries);
 }
 
-type LocalityCandidate = { vertical: SpaceVertical; city: string; locality: string; entry: SitemapUrlEntry };
+type LocalityCandidate = Pick<LocalityPage, "vertical" | "city" | "locality">;
 
 /**
  * Does the locality page itself find listings? The sitemap groups listings by their own area name,
@@ -198,19 +198,45 @@ async function filterWithLimit<T>(items: T[], limit: number, check: (item: T) =>
   return items.filter((_, i) => keep[i]);
 }
 
+/** One area page that exists and shows listings (what the locality sitemap lists). */
+export type LocalityPage = {
+  vertical: SpaceVertical;
+  city: string;
+  /** URL segment, e.g. "sector-44". */
+  locality: string;
+  /** Area name as most listings spell it, e.g. "Sector 44". */
+  name: string;
+  /** Live listings in the area. */
+  count: number;
+  /** Slugs of those listings. */
+  slugs: string[];
+  entry: SitemapUrlEntry;
+};
+
+/** The spelling most listings in a group use. */
+function commonName(names: Array<string | undefined>): string {
+  const counts = new Map<string, number>();
+  for (const n of names) if (n) counts.set(n, (counts.get(n) ?? 0) + 1);
+  let best = "";
+  let bestCount = 0;
+  for (const [n, c] of counts) if (c > bestCount) [best, bestCount] = [n, c];
+  return best;
+}
+
 /**
  * `/{vertical}/{city}/{locality}` — coworking, managed office and coliving localities with at least
  * {@link MIN_LISTINGS_FOR_LOCALITY_PAGE} live listings whose page actually shows them.
  * Checked once an hour (the page checks call the API), then served from memory.
+ * Shared by the locality sitemap and the "Browse by area" links on city pages.
  */
-export const collectLocalityPagesSitemapEntries = cachedLoader(async (): Promise<SitemapUrlEntry[]> => {
+export const collectLocalityPages = cachedLoader(async (): Promise<LocalityPage[]> => {
   const [coworking, managedOffice, coliving] = await Promise.all([
     loadCoworkingInventory(),
     loadManagedOfficeInventory(),
     loadColivingInventory(),
   ]);
 
-  const candidates: LocalityCandidate[] = [];
+  const candidates: LocalityPage[] = [];
   const inventoryByVertical: Array<[SpaceVertical, InventorySpace[]]> = [
     ["coworking", coworking],
     ["office-space", managedOffice],
@@ -232,6 +258,9 @@ export const collectLocalityPagesSitemapEntries = cachedLoader(async (): Promise
           vertical,
           city,
           locality,
+          name: commonName(group.map((item) => item.localityName)),
+          count: group.length,
+          slugs: group.map((item) => item.slug),
           entry: {
             loc: toAbsoluteUrl(
               `/${verticalPath(vertical)}/${encodeURIComponent(city)}/${encodeURIComponent(locality)}`,
@@ -243,9 +272,12 @@ export const collectLocalityPagesSitemapEntries = cachedLoader(async (): Promise
     }
   }
 
-  const live = await filterWithLimit(candidates, 6, localityPageHasListings);
-  return sortByLoc(live.map((c) => c.entry));
+  return filterWithLimit(candidates, 6, localityPageHasListings);
 });
+
+export async function collectLocalityPagesSitemapEntries(): Promise<SitemapUrlEntry[]> {
+  return sortByLoc((await collectLocalityPages()).map((c) => c.entry));
+}
 
 /** `/{vertical}/{slug}` for each live listing; slugs that collide with a city page are skipped. */
 function detailEntries(vertical: SpaceVertical, items: InventorySpace[]): SitemapUrlEntry[] {
@@ -273,5 +305,16 @@ export async function collectOfficeSpaceSitemapEntries(): Promise<SitemapUrlEntr
 
 export async function collectColivingSpacesSitemapEntries(): Promise<SitemapUrlEntry[]> {
   // Only PG pages Google should index; noindex ones are still linked from their city and area pages.
-  return detailEntries("coliving", (await loadColivingInventory()).filter((item) => item.indexable !== false));
+  return detailEntries("coliving", (await loadColivingInventory()).filter(isIndexablePg));
+}
+
+/**
+ * A PG page Google should index: not switched off in admin, and in a city that has a city page.
+ * PGs elsewhere (Faridabad, Dehradun…) have nothing linking to them but each other, so they are
+ * `noindex` until their city has enough PGs for a city page.
+ */
+export function isIndexablePg(item: Pick<InventorySpace, "indexable" | "cityId" | "cityName">): boolean {
+  if (item.indexable === false) return false;
+  const city = citySlugOf(item as InventorySpace);
+  return city != null && isCityPage("coliving", city);
 }

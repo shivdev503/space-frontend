@@ -9,6 +9,7 @@ import { buildPgColivingCityPageParams } from "@/lib/pg-list-priority";
 import { buildPgListParamsFromSearchParams } from "@/lib/pg-list-params";
 import { seoFaqsOrFallback } from "@/lib/seo-page-faqs";
 import { seoPageTitleOrFallback } from "@/lib/seo-page-title";
+import { isIndexablePg } from "@/lib/sitemap-public-urls";
 import { colivingCitySeo, colivingListingSeo } from "@/lib/seo-templates";
 import { ColivingCityPage } from "@/modules/coliving/coliving-city-page";
 import { ColivingDetailPage } from "@/modules/coliving/coliving-detail-page";
@@ -39,8 +40,10 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   if (pgRes?.data) {
     const pg = pgRes.data;
     const metadata = await buildMetadataWithCmsSeoFallback(`/coliving/${pgRes.slug}`, colivingListingSeo(pg));
-    // Weak or template-only PG pages stay out of Google until improved; links on them still count.
-    return pg.index_in_google === false ? { ...metadata, robots: { index: false, follow: true } } : metadata;
+    // Weak or template-only PG pages stay out of Google until improved, and so do PGs in cities without
+    // a city page (nothing links to them but each other); links on them still count.
+    const indexable = isIndexablePg({ indexable: pg.index_in_google !== false, cityName: pg.city?.trim() });
+    return indexable ? metadata : { ...metadata, robots: { index: false, follow: true } };
   }
 
   notFound();

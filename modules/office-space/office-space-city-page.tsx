@@ -2,6 +2,7 @@ import { ListingItemListJsonLd } from "@/components/seo/listing-json-ld";
 import { cityTrail } from "@/lib/breadcrumb-trails";
 import { Container } from "@/components/ui/container";
 import { CityPageFaqSection } from "@/modules/city-pages/components/city-page-faq-section";
+import { CityDirectorySection } from "@/modules/city-pages/components/city-directory-section";
 import { CityPageHero } from "@/modules/city-pages/components/city-page-hero";
 import { CityPageLeadCtaBand } from "@/modules/city-pages/components/city-page-lead-cta-band";
 import { PopularLocalitiesRail } from "@/modules/city-pages/components/popular-localities-rail";
@@ -35,6 +36,7 @@ export function OfficeSpaceCityPage({ data }: { data: CityPageData }) {
           <ManagedOfficeCityListing data={data} />
         </Container>
       </section>
+      <CityDirectorySection vertical={data.vertical} citySlug={data.city.slug} cityName={data.city.name} />
       <CityPageLeadCtaBand
         title={data.leadCta.title}
         description={data.leadCta.description}

@@ -22,6 +22,8 @@ const PG_CONCURRENCY = 8;
 
 export type InventorySpace = {
   slug: string;
+  /** Listing name as shown on the site (used for directory links on city pages). */
+  name?: string;
   cityId?: string;
   cityName?: string;
   localityName?: string;
@@ -29,6 +31,8 @@ export type InventorySpace = {
   localityId?: string;
   /** Operator brand slug (workspaces only), e.g. "awfis". */
   brandSlug?: string;
+  /** Operator brand name (workspaces only), e.g. "Awfis". */
+  brandName?: string;
   /** Real last-modified time when the API provides one. */
   updatedAt?: Date;
   /** False for PG pages kept out of Google (noindex); they stay in area counts but not in the sitemap. */
@@ -113,11 +117,13 @@ function workspaceToInventory(row: RawRecord): InventorySpace | null {
   const location = isRecord(row.location) ? row.location : {};
   return {
     slug,
+    name: str(row.name) || undefined,
     cityId: refId(location.city) || undefined,
     cityName: refName(location.city) || undefined,
     localityName: refName(location.micro_location) || str(location.micro_location_string) || undefined,
     localityId: refId(location.micro_location) || undefined,
     brandSlug: (isRecord(row.brand) ? str(row.brand.slug) : "") || undefined,
+    brandName: (isRecord(row.brand) ? str(row.brand.name) : "") || undefined,
     updatedAt: parseDate(row.updated_on, row.updatedAt),
   };
 }
@@ -188,6 +194,7 @@ export const loadColivingInventory = cachedLoader(async () => {
     const raw = pg as unknown as RawRecord;
     out.push({
       slug,
+      name: pg.name?.trim() || undefined,
       cityName: pg.city?.trim() || undefined,
       localityName: pg.locality?.trim() || undefined,
       updatedAt: parseDate(raw.updated_on, raw.updatedAt, raw.added_on),

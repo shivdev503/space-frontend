@@ -4,6 +4,7 @@ import {
   type VirtualOfficeCatalogCity,
 } from "@/lib/virtual-office-city-catalog";
 import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
+import { CityDirectorySection } from "@/modules/city-pages/components/city-directory-section";
 import { VoCityPageExperience } from "@/modules/virtual-office/components/city-page/vo-city-page-experience";
 import { listHomepageCitiesFromAvailable } from "@/services/homepage-available-cities";
 import { getSeoBySlug } from "@/services/seo-content";
@@ -35,12 +36,16 @@ export async function VirtualOfficeCityPage({ data }: { data: CityPageData }) {
   const seo = await getSeoBySlug(pathnameToSeoSlug(`/virtual-office/${data.city.slug}`));
 
   return (
-    <VoCityPageExperience
-      data={data}
-      catalog={catalog}
-      cityDisplay={cityDisplay}
-      otherCities={otherCities}
-      reviews={seo?.reviews ?? []}
-    />
+    <>
+      <VoCityPageExperience
+        data={data}
+        catalog={catalog}
+        cityDisplay={cityDisplay}
+        otherCities={otherCities}
+        reviews={seo?.reviews ?? []}
+      />
+      {/* Every provider in the city as a plain link: the cards above load in the browser, 6 at a time. */}
+      <CityDirectorySection vertical="virtual-office" citySlug={currentSlug} cityName={cityDisplay} />
+    </>
   );
 }
