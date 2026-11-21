@@ -54,22 +54,22 @@ export function buildPageMetadataFromSeo(pathname: string, seo: SeoContent): Met
 
   return {
     title: { absolute: documentTitle },
-    description: seo.description,
+    description: seo.description?.trim() || undefined,
     keywords: kw?.length ? kw : undefined,
     robots: parseRobots(seo.robots),
     alternates: { canonical },
     openGraph: {
       type: "website",
-      title: (seo.open_graph?.title || seo.title).trim(),
-      description: (seo.open_graph?.description || seo.description).trim(),
+      title: (seo.open_graph?.title || seo.title || documentTitle).trim(),
+      description: (seo.open_graph?.description || seo.description || "").trim() || undefined,
       url: canonical,
       siteName: APP_NAME,
       images: ogImage ? [{ url: ogImage }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: (seo.twitter?.title || seo.title).trim(),
-      description: (seo.twitter?.description || seo.description).trim(),
+      title: (seo.twitter?.title || seo.title || documentTitle).trim(),
+      description: (seo.twitter?.description || seo.description || "").trim() || undefined,
       images: twImage ? [twImage] : undefined,
     },
   };

@@ -57,7 +57,7 @@ export function VerticalLocationPage({
     <>
       <ListingItemListJsonLd
         name={data.title}
-        items={(data.initialCoworkingListing?.rows ?? []).map((w) => ({ name: w.name, href: `/coworking/${w.slug}` }))}
+        items={(data.initialCoworkingListing?.rows ?? []).map((w) => ({ name: w.name, href: `/coworking/${w.slug.trim()}` }))}
       />
       <section className="relative overflow-hidden pb-4 pt-10 sm:pb-6 sm:pt-14">
         <div className="absolute inset-x-0 top-0 -z-10 h-[24rem] bg-[radial-gradient(circle_at_top_left,rgba(48,88,215,0.12),transparent_30%),linear-gradient(180deg,#f8fbff_0%,#ffffff_94%)]" />

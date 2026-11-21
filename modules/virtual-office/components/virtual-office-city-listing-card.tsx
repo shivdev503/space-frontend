@@ -61,7 +61,7 @@ export function VirtualOfficeCityListingCard({
     }),
     [workspace],
   );
-  const href = `/virtual-office/${workspace.slug}`;
+  const href = `/virtual-office/${workspace.slug.trim()}`;
   const popular = isPopularWorkspace(workspace);
 
   return (

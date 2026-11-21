@@ -78,7 +78,7 @@ export function CoworkingCard({
           <ListingPhotoCarousel
             ref={photoRef}
             images={images}
-            href={`/coworking/${workspace.slug}`}
+            href={`/coworking/${workspace.slug.trim()}`}
             name={workspace.name}
             altBase={listingAltBase(workspace.name, "coworking space", workspace.location?.micro_location?.name, workspace.location?.city?.name)}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
@@ -99,7 +99,7 @@ export function CoworkingCard({
           <div className="space-y-0.5 sm:space-y-1">
             <div className="flex items-start justify-between gap-3">
               <Link
-                href={`/coworking/${workspace.slug}`}
+                href={`/coworking/${workspace.slug.trim()}`}
                 className="min-w-0 text-[0.9rem] font-semibold leading-snug text-ink sm:text-[0.98rem]"
               >
                 <span className="line-clamp-1">{workspace.name}</span>

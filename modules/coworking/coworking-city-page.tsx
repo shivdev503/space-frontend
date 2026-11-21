@@ -14,7 +14,7 @@ export function CoworkingCityPage({ data }: { data: CityPageData }) {
     <>
       <ListingItemListJsonLd
         name={data.title}
-        items={(data.initialCoworkingListing?.rows ?? []).map((w) => ({ name: w.name, href: `/coworking/${w.slug}` }))}
+        items={(data.initialCoworkingListing?.rows ?? []).map((w) => ({ name: w.name, href: `/coworking/${w.slug.trim()}` }))}
       />
       <CityPageHero title={data.title} breadcrumbs={cityTrail(data.vertical, data.city.name)}>
         {data.catalogCityId ? (
