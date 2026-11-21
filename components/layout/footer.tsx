@@ -79,7 +79,9 @@ function LinkRow({
  * Upper footer — promo layout (logo, links, business plans, contact, socials)
  * on the existing cream page background. City grid is in {@link FooterMarketingSection}.
  */
-export function Footer() {
+export function Footer({ hasBlog = false }: { hasBlog?: boolean } = {}) {
+  // An empty blog is noindex, so it is not linked until it has posts.
+  const companyLinks = hasBlog ? COMPANY_LINKS : COMPANY_LINKS.filter((item) => item.href !== "/blog");
   return (
     <footer
       className="relative overflow-hidden border-t border-slate-900/[0.06]"
@@ -137,7 +139,7 @@ export function Footer() {
                 Company
               </p>
               <ul className="mt-3 space-y-2">
-                {COMPANY_LINKS.map((item) => (
+                {companyLinks.map((item) => (
                   <li key={item.href + item.label}>
                     <Link
                       href={item.href}

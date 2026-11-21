@@ -38,7 +38,7 @@ function VerticalLinkList({
  * Structured SEO + navigation block — one column per space vertical, cities listed under each.
  * Renders **below** CMS `SeoFooterContentSection` and above the compact `Footer`.
  */
-export function FooterMarketingSection() {
+export function FooterMarketingSection({ cityPages = null }: { cityPages?: Record<string, string[]> | null } = {}) {
   const year = new Date().getFullYear();
 
   return (
@@ -49,7 +49,7 @@ export function FooterMarketingSection() {
     >
       <Container className="py-12 sm:py-14 lg:py-16">
         <div className="grid gap-10 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4 lg:gap-8 xl:gap-12">
-          {footerVerticalColumns.map((column) => (
+          {footerVerticalColumns(cityPages).map((column) => (
             <nav key={column.title} aria-label={column.ariaLabel}>
               <p className={groupTitleClass}>{column.title}</p>
               <div className="mt-4">

@@ -9,6 +9,7 @@ import { SeoFaqsSection } from "@/components/seo/seo-faqs-section";
 import { SeoFooterContentSection } from "@/components/seo/seo-footer-content-section";
 import { getFallbackSeoContent } from "@/lib/seo-fallbacks";
 import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
+import type { FooterLinkData } from "@/lib/footer-links";
 import { normalizeSeoFromResponse } from "@/lib/seo-normalize";
 import { isFaqOwningHubPath, isVerticalDetailPagePath } from "@/lib/vertical-detail-route";
 import type { SeoContent } from "@/types/seo.model";
@@ -53,9 +54,12 @@ function samePath(a: string, b: string): boolean {
 export function SeoCmsRouteSections({
   initialSeo = null,
   initialPathname = "",
+  footerLinks = { cityPages: null, hasBlog: false },
 }: {
   initialSeo?: SeoContent | null;
   initialPathname?: string;
+  /** Which footer links lead to indexable pages (resolved on the server). */
+  footerLinks?: FooterLinkData;
 } = {}) {
   const pathname = usePathname() || "/";
   const pathSeg = pathname.split("?")[0] ?? "/";
@@ -93,8 +97,8 @@ export function SeoCmsRouteSections({
   if (isDetailPage) {
     return (
       <>
-        <Footer />
-        <FooterMarketingSection />
+        <Footer hasBlog={footerLinks.hasBlog} />
+        <FooterMarketingSection cityPages={footerLinks.cityPages} />
       </>
     );
   }
@@ -112,8 +116,8 @@ export function SeoCmsRouteSections({
           demoteHeadings={pathSeg === "/"}
         />
       ) : null}
-      <Footer />
-      <FooterMarketingSection />
+      <Footer hasBlog={footerLinks.hasBlog} />
+      <FooterMarketingSection cityPages={footerLinks.cityPages} />
       {showBelowFooterFaqs ? <SeoFaqsSection faqs={seo.faqs} /> : null}
     </>
   );
