@@ -170,7 +170,7 @@ export function ColivingCityListing({
       ) : (
         <div className={`grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${pending ? "opacity-60" : ""}`}>
           {items.map((pg, index) => (
-            <ColivingListingCard key={pgListingReactKey(pg, index)} pg={pg} />
+            <ColivingListingCard key={pgListingReactKey(pg, index)} pg={pg} priority={index === 0} />
           ))}
         </div>
       )}

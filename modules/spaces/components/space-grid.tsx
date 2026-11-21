@@ -44,8 +44,9 @@ export function SpaceGrid({
       }
     >
       {useCoworkingWorkspaces
-        ? coworkingWorkspaces!.map((ws) => (
-            <CoworkingCard key={ws.id || ws._id} workspace={ws} />
+        ? coworkingWorkspaces!.map((ws, index) => (
+            // The first card's photo is the page's largest paint (LCP): load it at once, not lazily.
+            <CoworkingCard key={ws.id || ws._id} workspace={ws} priority={index === 0} />
           ))
         : spaces.map((space) => <VerticalSpaceCard key={space.id} space={space} />)}
     </div>

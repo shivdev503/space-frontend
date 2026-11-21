@@ -61,8 +61,8 @@ export function ManagedOfficeCityListing({ data }: { data: CityPageData }) {
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-        {rows.slice(0, visibleCount).map((office) => (
-          <ManagedOfficeCard key={office.id} office={office} />
+        {rows.slice(0, visibleCount).map((office, index) => (
+          <ManagedOfficeCard key={office.id} office={office} priority={index === 0} />
         ))}
       </div>
       {rows.length > visibleCount ? (

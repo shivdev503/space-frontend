@@ -68,6 +68,7 @@ export function ListingPhotoCarousel({
   sizes,
   className,
   ref,
+  priority = false,
 }: {
   images: string[];
   href: string;
@@ -76,6 +77,8 @@ export function ListingPhotoCarousel({
   sizes: string;
   className?: string;
   ref?: React.Ref<HTMLDivElement>;
+  /** First card in view on load: its first photo is the page's largest paint, so load it at once. */
+  priority?: boolean;
 }) {
   const railRef = useRef<HTMLDivElement>(null);
   const indexRef = useRef(0);
@@ -171,6 +174,7 @@ export function ListingPhotoCarousel({
                 draggable={false}
                 className="select-none object-cover transition duration-700 group-hover:scale-[1.02]"
                 sizes={sizes}
+                priority={priority && i === 0}
               />
             ) : null}
           </Link>

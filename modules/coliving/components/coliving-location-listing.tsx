@@ -36,7 +36,7 @@ export function ColivingLocationListing({
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {items.map((pg, index) => (
-        <ColivingListingCard key={pgListingReactKey(pg, index)} pg={pg} />
+        <ColivingListingCard key={pgListingReactKey(pg, index)} pg={pg} priority={index === 0} />
       ))}
     </div>
   );

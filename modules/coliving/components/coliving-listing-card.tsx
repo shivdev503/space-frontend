@@ -22,6 +22,8 @@ const MAX_CAROUSEL_IMAGES = 6;
 type ColivingListingCardProps = {
   pg: PgDetail;
   className?: string;
+  /** First card in view on load: its first photo is the page's largest paint, so load it at once. */
+  priority?: boolean;
 };
 
 function ColivingListingCardCarousel({
@@ -30,6 +32,7 @@ function ColivingListingCardCarousel({
   altBase,
   href,
   verifiedOn,
+  priority = false,
 }: {
   images: string[];
   name: string;
@@ -37,6 +40,7 @@ function ColivingListingCardCarousel({
   href: string;
   /** "16 Nov 2026" when verified by the team. */
   verifiedOn: string | null;
+  priority?: boolean;
 }) {
   const railRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
@@ -93,6 +97,7 @@ function ColivingListingCardCarousel({
               className="object-cover"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               draggable={false}
+              priority={priority && i === 0}
             />
           </Link>
         ))}
@@ -166,7 +171,7 @@ function ColivingListingCardCarousel({
   );
 }
 
-export function ColivingListingCard({ pg, className }: ColivingListingCardProps) {
+export function ColivingListingCard({ pg, className, priority = false }: ColivingListingCardProps) {
   const href = colivingDetailHref(pg);
   const images = useMemo(() => {
     const sorted = pgImagesSorted(pg.images).slice(0, MAX_CAROUSEL_IMAGES);
@@ -185,6 +190,7 @@ export function ColivingListingCard({ pg, className }: ColivingListingCardProps)
         altBase={listingAltBase(pg.name, "PG", pg.locality, pg.city)}
         href={href}
         verifiedOn={verifiedOnDate(pg.verified_at)}
+        priority={priority}
       />
 
       <Link href={href} className="mt-3 block min-w-0 space-y-0.5">

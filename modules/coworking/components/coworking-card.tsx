@@ -44,9 +44,12 @@ function cardLocationLine(workspace: CoworkingModel.WorkSpace): string {
 export function CoworkingCard({
   workspace,
   className,
+  priority = false,
 }: {
   workspace: CoworkingModel.WorkSpace;
   className?: string;
+  /** First card in view on load: its first photo is the page's largest paint, so load it at once. */
+  priority?: boolean;
 }) {
   const [quoteOpen, setQuoteOpen] = useState(false);
   const rating = workspaceRating(workspace);
@@ -80,6 +83,7 @@ export function CoworkingCard({
             altBase={listingAltBase(workspace.name, "coworking space", workspace.location?.micro_location?.name, workspace.location?.city?.name)}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="aspect-[16/11] rounded-lg sm:aspect-square sm:rounded-2xl"
+            priority={priority}
           />
 
           {workspace.slug ? (

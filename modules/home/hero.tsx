@@ -1,14 +1,18 @@
 "use client";
 
-import Image from "next/image";
 import { BadgeCheck, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
+import { preload } from "react-dom";
 
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { FadeIn } from "@/components/ui/fade-in";
 import { SearchBar } from "@/modules/home/components/search-bar";
 import { HomepageData } from "@/types";
+
+const HERO_DESKTOP_SRC = "/background-hero.webp";
+const HERO_MOBILE_SRC = "/background-hero-mobile.webp";
+const HERO_MOBILE_MEDIA = "(max-width: 640px)";
 
 type HomeHeroProps = {
   searchOptions: HomepageData["searchOptions"];
@@ -17,6 +21,9 @@ type HomeHeroProps = {
 
 export function HomeHero({ searchOptions, featuredSpaces }: HomeHeroProps) {
   void featuredSpaces;
+  // The hero photo is the home page's largest paint: fetch the right one for the screen at once.
+  preload(HERO_MOBILE_SRC, { as: "image", media: HERO_MOBILE_MEDIA, fetchPriority: "high" });
+  preload(HERO_DESKTOP_SRC, { as: "image", media: "(min-width: 641px)", fetchPriority: "high" });
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -32,14 +39,18 @@ export function HomeHero({ searchOptions, featuredSpaces }: HomeHeroProps) {
   return (
     <section className="relative min-h-[70vh]">
       <div className="absolute inset-0 overflow-hidden">
-        <Image
-          src="/background-hero.webp"
-          alt="Workspace background"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
+        {/* Phones get a 640px centre crop (23 KB) instead of the 1700px desktop image (52 KB);
+            only the middle shows on a narrow screen anyway. */}
+        <picture>
+          <source media={HERO_MOBILE_MEDIA} srcSet={HERO_MOBILE_SRC} />
+          {/* eslint-disable-next-line @next/next/no-img-element -- art-directed <picture>; images are unoptimized anyway */}
+          <img
+            src={HERO_DESKTOP_SRC}
+            alt="Workspace background"
+            className="absolute inset-0 h-full w-full object-cover"
+            fetchPriority="high"
+          />
+        </picture>
         <div className="absolute inset-0 bg-[rgba(0,0,0,0.36)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.32)_0%,rgba(0,0,0,0.2)_38%,rgba(0,0,0,0.31)_68%,rgba(0,0,0,0.49)_100%)]" />
         <div className="absolute inset-x-0 bottom-0 h-[26rem] bg-[linear-gradient(180deg,transparent_0%,rgba(0,0,0,0.14)_28%,rgba(0,0,0,0.4)_100%)]" />

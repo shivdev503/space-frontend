@@ -96,8 +96,8 @@ export function BrandPage({ data, workspaces, activeCity }: BrandPageProps) {
         <Container>
           {workspaces.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-              {workspaces.map((ws) => (
-                <CoworkingCard key={ws.id || ws._id} workspace={coworkingCardRow(ws)} className="h-full" />
+              {workspaces.map((ws, index) => (
+                <CoworkingCard key={ws.id || ws._id} workspace={coworkingCardRow(ws)} className="h-full" priority={index === 0} />
               ))}
             </div>
           ) : (

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { Inter } from "next/font/google";
 import { Suspense, type ReactNode } from "react";
+import { preconnect } from "react-dom";
 
 import "./globals.css";
 
@@ -43,6 +44,9 @@ export default function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
+  // Listing photos come from the image CDN: open that connection while the HTML is still arriving,
+  // so the first photo (usually the page's largest paint) starts downloading sooner.
+  preconnect("https://img.spacewallah.com");
   return (
     // Browser extensions (Grammarly, ColorZilla, password managers) add attributes to <html>/<body>
     // before React hydrates; ignore those attribute differences on these two tags only.

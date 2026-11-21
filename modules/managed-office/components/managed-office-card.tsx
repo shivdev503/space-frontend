@@ -22,9 +22,12 @@ const LISTING_IMAGE_FALLBACK =
 export function ManagedOfficeCard({
   office,
   className,
+  priority = false,
 }: {
   office: ManagedOfficeModel.ManagedOffice;
   className?: string;
+  /** First card in view on load: its photo is the page's largest paint, so load it at once. */
+  priority?: boolean;
 }) {
   const href = `/managed-office/${office.slug}`;
   const image = managedOfficeImages(office).images[0] || LISTING_IMAGE_FALLBACK;
@@ -43,6 +46,7 @@ export function ManagedOfficeCard({
             fill
             className="object-cover transition duration-700 group-hover:scale-[1.02]"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            priority={priority}
           />
           {office.is_new_launch ? (
             <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-slate-950/85 px-3 py-1 text-[0.72rem] font-semibold text-white shadow-lg backdrop-blur-sm">
