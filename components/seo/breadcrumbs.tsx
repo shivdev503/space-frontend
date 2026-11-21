@@ -16,9 +16,13 @@ export type BreadcrumbItem = {
   href?: string;
 };
 
-/** BreadcrumbList structured data; the last item without `href` is the current page. */
+/**
+ * BreadcrumbList structured data; the last item without `href` is the current page. A middle step
+ * without a page (`href` missing) is left out: Google needs a URL on every step but the last.
+ */
 export function BreadcrumbJsonLd({ items }: { items: BreadcrumbItem[] }) {
-  const list = items.filter((item) => item.name.trim());
+  const named = items.filter((item) => item.name.trim());
+  const list = named.filter((item, index) => item.href || index === named.length - 1);
   if (list.length < 2) return null;
   const json = JSON.stringify({
     "@context": "https://schema.org",

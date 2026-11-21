@@ -1,21 +1,24 @@
 "use client";
 
 import { ColivingPropertyHeader } from "@/modules/coliving/components/detail/coliving-property-header";
-import { slugifyPgName } from "@/lib/pg-slug";
 import type { PgDetail } from "@/types/pg.model";
 
 type ColivingDetailHeaderProps = {
   pg: PgDetail;
   slug: string;
+  /** City and area page links, or null when that page does not exist (see ColivingDetailPage). */
+  cityHref: string | null;
+  localityHref: string | null;
 };
 
-export function ColivingDetailHeader({ pg, slug }: ColivingDetailHeaderProps) {
+export function ColivingDetailHeader({ pg, slug, cityHref, localityHref }: ColivingDetailHeaderProps) {
   return (
     <ColivingPropertyHeader
       name={pg.name}
       locality={pg.locality}
       city={pg.city}
-      citySlug={slugifyPgName(pg.city)}
+      cityHref={cityHref}
+      localityHref={localityHref}
       address={pg.address}
       rating={pg.rating}
       reviewCount={pg.reviews.length}

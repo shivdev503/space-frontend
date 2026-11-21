@@ -11,7 +11,10 @@ export type ColivingPropertyHeaderProps = {
   name: string;
   locality: string;
   city: string;
-  citySlug: string;
+  /** City page link, or null when the city has no PG page. */
+  cityHref: string | null;
+  /** Area page link, or null when the area has no PG page. */
+  localityHref: string | null;
   address: string;
   rating: number;
   reviewCount: number;
@@ -38,7 +41,8 @@ export function ColivingPropertyHeader({
   name,
   locality,
   city,
-  citySlug,
+  cityHref,
+  localityHref,
   address,
   rating,
   reviewCount,
@@ -50,6 +54,8 @@ export function ColivingPropertyHeader({
   const { primary: titlePrimary, accent: titleAccent } = getTitleParts(name, locality);
   const ratingLabel = rating > 0 ? rating.toFixed(2) : "—";
   const breadcrumbLabel = locality.trim() || city;
+  // Back to the area page when it exists, else the city page; plain text when neither exists.
+  const backHref = (locality.trim() ? localityHref : null) ?? cityHref;
   const sharePath = `/coliving/${shareSlug.trim()}`;
 
   function handleShare() {
@@ -67,12 +73,13 @@ export function ColivingPropertyHeader({
         className="flex items-center gap-1.5 pb-3 pt-0.5 text-[0.8125rem] leading-tight lg:hidden"
         aria-label="Back to area"
       >
-        <Link
-          href={`/coliving/${citySlug}`}
-          className="shrink-0 text-muted transition hover:text-ink"
-        >
-          {breadcrumbLabel}
-        </Link>
+        {backHref ? (
+          <Link href={backHref} className="shrink-0 text-muted transition hover:text-ink">
+            {breadcrumbLabel}
+          </Link>
+        ) : (
+          <span className="shrink-0 text-muted">{breadcrumbLabel}</span>
+        )}
         <ChevronLeft className="h-3.5 w-3.5 shrink-0 text-slate-300" aria-hidden />
         <span className="min-w-0 truncate font-medium text-ink">{name}</span>
       </nav>
@@ -80,7 +87,7 @@ export function ColivingPropertyHeader({
       <Breadcrumbs
         className="hidden pb-2 pt-1 lg:block lg:text-[0.8125rem]"
         separator="›"
-        items={listingTrail("coliving", { name, cityName: city, localityName: locality })}
+        items={listingTrail("coliving", { name, cityName: city, localityName: locality }, { cityHref, localityHref })}
       />
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-5">

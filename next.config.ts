@@ -17,6 +17,18 @@ const nextConfig: NextConfig = {
         destination: "/:vertical/gurgaon/:path*",
         permanent: true,
       },
+      // Other city spellings that were linked (PG pages used the stored city name) or typed by users.
+      {
+        source: "/:vertical(coworking|virtual-office|managed-office|coliving)/bengaluru/:path*",
+        destination: "/:vertical/bangalore/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:vertical(coworking|virtual-office|managed-office|coliving)/new-delhi/:path*",
+        destination: "/:vertical/delhi/:path*",
+        permanent: true,
+      },
+      { source: "/:vertical(coworking|virtual-office|managed-office|coliving)/navi-mumbai", destination: "/:vertical/mumbai", permanent: true },
       { source: "/office-space/gurugram/:path*", destination: "/managed-office/gurgaon/:path*", permanent: true },
       { source: "/office-space", destination: "/managed-office", permanent: true },
       { source: "/office-space/:path*", destination: "/managed-office/:path*", permanent: true },

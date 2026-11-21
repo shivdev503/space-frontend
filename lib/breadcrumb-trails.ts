@@ -53,22 +53,29 @@ export function localityTrail(
   ];
 }
 
-/** Home › Vertical › City › Locality › Listing (city / locality links only when known). */
+/**
+ * Home › Vertical › City › Locality › Listing (city / locality links only when known).
+ * `links`, when given, says which city and area pages exist: a null link shows that name as plain
+ * text (and leaves it out of the structured data) instead of linking to a page that 404s.
+ */
 export function listingTrail(
   vertical: SpaceVertical,
   listing: { name: string; cityName?: string; cityId?: string; localityName?: string },
+  links?: { cityHref: string | null; localityHref: string | null },
 ): BreadcrumbItem[] {
   const base = `/${verticalPath(vertical)}`;
   const citySlug = routeCitySlug(listing.cityName, listing.cityId);
   const items = hub(vertical);
   if (citySlug && listing.cityName?.trim()) {
     const cityLabel = citySlug === "gurgaon" ? "Gurugram" : toTitleCase(listing.cityName.trim());
-    items.push({ name: cityLabel, href: `${base}/${citySlug}` });
+    const cityHref = links ? links.cityHref ?? undefined : `${base}/${citySlug}`;
+    items.push({ name: cityLabel, href: cityHref });
     const locality = listing.localityName?.trim();
     const localitySlug = locality ? slugifyMicroLocationName(locality) : "";
     // Virtual office has no locality pages.
     if (locality && localitySlug && vertical !== "virtual-office") {
-      items.push({ name: toTitleCase(locality), href: `${base}/${citySlug}/${localitySlug}` });
+      const localityHref = links ? links.localityHref ?? undefined : `${base}/${citySlug}/${localitySlug}`;
+      items.push({ name: toTitleCase(locality), href: localityHref });
     }
   }
   items.push({ name: listing.name });

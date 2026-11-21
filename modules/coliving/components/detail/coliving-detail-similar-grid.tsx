@@ -5,8 +5,7 @@ import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { ColivingListingCard } from "@/modules/coliving/components/coliving-listing-card";
-import { pgListingReactKey, slugifyPgName } from "@/lib/pg-slug";
-import { slugifyMicroLocationName } from "@/services/location-api";
+import { pgListingReactKey } from "@/lib/pg-slug";
 import type { PgDetail } from "@/types/pg.model";
 import { cn } from "@/utils/cn";
 
@@ -14,30 +13,21 @@ import { ColivingAccent, ColivingEyebrow } from "./coliving-detail-ui";
 
 type ColivingDetailSimilarGridProps = {
   items: PgDetail[];
-  city: string;
-  citySlug?: string;
+  /** "Browse all listings" target: the area page, else the city page, else /coliving (pages that exist). */
+  browseHref: string;
   locality: string;
-  /** URL segment for `/coliving/[city]/[locality]` — defaults to slugified locality name. */
-  localitySlug?: string;
   currentName: string;
 };
 
 export function ColivingDetailSimilarGrid({
   items,
-  city,
-  citySlug,
+  browseHref,
   locality,
-  localitySlug,
   currentName,
 }: ColivingDetailSimilarGridProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-
-  const resolvedCitySlug = citySlug ?? slugifyPgName(city);
-  const resolvedLocalitySlug =
-    localitySlug?.trim() || slugifyMicroLocationName(locality) || slugifyPgName(locality);
-  const localityHref = `/coliving/${encodeURIComponent(resolvedCitySlug)}/${encodeURIComponent(resolvedLocalitySlug)}`;
 
   const filtered = items.filter((pg) => pg.name !== currentName).slice(0, 12);
 
@@ -92,7 +82,7 @@ export function ColivingDetailSimilarGrid({
             </h2>
           </div>
           <Link
-            href={localityHref}
+            href={browseHref}
             className="inline-flex shrink-0 items-center gap-1.5 border-b border-ink pb-0.5 text-sm font-medium text-ink transition hover:text-[color:var(--color-brand)]"
           >
             Browse all listings
