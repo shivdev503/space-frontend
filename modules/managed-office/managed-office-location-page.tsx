@@ -5,7 +5,8 @@ import { PopularLocalitiesRail } from "@/modules/city-pages/components/popular-l
 import { Breadcrumb } from "@/modules/location-pages/components/breadcrumb";
 import { FAQSection } from "@/modules/location-pages/components/faq-section";
 import { ManagedOfficeCard } from "@/modules/managed-office/components/managed-office-card";
-import { managedOfficeCardRow } from "@/modules/managed-office/managed-office-format";
+import { PageNumbers } from "@/modules/city-pages/components/page-numbers";
+import { MANAGED_OFFICE_PAGE_SIZE, managedOfficeCardRow } from "@/modules/managed-office/managed-office-format";
 import type { ManagedOfficeLocality } from "@/services/managed-office-location";
 import type { CityPageData, FAQItem } from "@/types";
 
@@ -15,6 +16,9 @@ type ManagedOfficeLocationPageProps = {
   localities: ManagedOfficeLocality[];
   title: string;
   faqs: FAQItem[];
+  /** `?page=N` of the office list, and how many pages there are. */
+  listingPage?: number;
+  totalPages?: number;
 };
 
 /** `/managed-office/{city}/{locality}`: every office in the locality, in the same layout as the city page. */
@@ -24,6 +28,8 @@ export function ManagedOfficeLocationPage({
   localities,
   title,
   faqs,
+  listingPage = 1,
+  totalPages = 1,
 }: ManagedOfficeLocationPageProps) {
   const { city, catalogCityId, leadCta, vertical } = cityData;
   const others = localities
@@ -60,10 +66,17 @@ export function ManagedOfficeLocationPage({
       <section className="pb-14 sm:pb-20">
         <Container>
           <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-            {locality.offices.map((office) => (
-              <ManagedOfficeCard key={office.id} office={managedOfficeCardRow(office)} />
-            ))}
+            {locality.offices
+              .slice((listingPage - 1) * MANAGED_OFFICE_PAGE_SIZE, listingPage * MANAGED_OFFICE_PAGE_SIZE)
+              .map((office) => (
+                <ManagedOfficeCard key={office.id} office={managedOfficeCardRow(office)} />
+              ))}
           </div>
+          <PageNumbers
+            page={listingPage}
+            totalPages={totalPages}
+            basePath={`/managed-office/${city.slug}/${locality.slug}`}
+          />
         </Container>
       </section>
 

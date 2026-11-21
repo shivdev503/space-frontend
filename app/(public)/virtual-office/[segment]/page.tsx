@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { WorkspacePlaceJsonLd } from "@/components/seo/listing-json-ld";
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
+import { pageFromSearchParams, withPageMetadata } from "@/lib/pagination-metadata";
 import { buildPageMetadataFromSeo } from "@/lib/seo-metadata";
 import { virtualOfficeCitySeo, virtualOfficeListingSeo } from "@/lib/seo-templates";
 import {
@@ -14,26 +15,38 @@ import {
 import { VerticalCityPage } from "@/modules/city-pages/vertical-city-page";
 import { VirtualOfficeDetailPage } from "@/modules/virtual-office/virtual-office-detail-page";
 import { getVerticalCityPageContent } from "@/services/cities";
-import { loadCoworkingWorkspaceDetail } from "@/services/coworking-api";
+import {
+  coworkingCardRow,
+  loadCoworkingWorkspaceDetail,
+  loadCoworkingWorkspacesPageForCity,
+} from "@/services/coworking-api";
 import { getSimilarSpaces, resolveVerticalSegment } from "@/services/spaces";
 import type { SeoContent } from "@/types/seo.model";
 import { toTitleCase } from "@/utils/format";
 
+type SearchParams = Record<string, string | string[] | undefined>;
+
+/** Virtual office providers per city page (`?page=N`). */
+const VO_CITY_PAGE_SIZE = 12;
+
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ segment: string }>;
+  searchParams: Promise<SearchParams>;
 }): Promise<Metadata> {
-  const { segment } = await params;
+  const [{ segment }, sp] = await Promise.all([params, searchParams]);
   const cityPage = await getVerticalCityPageContent("virtual-office", segment);
 
   if (cityPage) {
     const catalog = getVirtualOfficeCityCatalogBySlug(cityPage.city.slug);
     const cityName = getVirtualOfficeCityDisplayName(cityPage.city.slug, catalog?.name ?? cityPage.city.name);
-    return buildMetadataWithCmsSeoFallback(
+    const metadata = await buildMetadataWithCmsSeoFallback(
       `/virtual-office/${cityPage.city.slug}`,
       virtualOfficeCitySeo(cityName, catalog ? getCityLowestMonthlyPrice(catalog) : null),
     );
+    return withPageMetadata(metadata, sp);
   }
 
   const workspace = await loadCoworkingWorkspaceDetail(segment);
@@ -57,10 +70,12 @@ export async function generateMetadata({
 
 export default async function VirtualOfficeSegmentPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ segment: string }>;
+  searchParams: Promise<SearchParams>;
 }) {
-  const { segment } = await params;
+  const [{ segment }, sp] = await Promise.all([params, searchParams]);
   const result = await resolveVerticalSegment("virtual-office", segment);
 
   if (result.type === "city") {
@@ -70,7 +85,12 @@ export default async function VirtualOfficeSegmentPage({
       notFound();
     }
 
-    return <VerticalCityPage data={cityData} />;
+    const page = pageFromSearchParams(sp);
+    const initialVirtualOfficeListing = await loadVirtualOfficeCityPage(cityData.catalogCityId, page);
+    // A page number past the end is not a page.
+    if (page > 1 && !initialVirtualOfficeListing) notFound();
+
+    return <VerticalCityPage data={{ ...cityData, initialVirtualOfficeListing }} />;
   }
 
   const workspace = await loadCoworkingWorkspaceDetail(result.space.slug);
@@ -90,4 +110,23 @@ export default async function VirtualOfficeSegmentPage({
       />
     </>
   );
+}
+
+/** One page of a city's virtual office providers; undefined when none load (the client then fetches). */
+async function loadVirtualOfficeCityPage(catalogCityId: string | undefined, page: number) {
+  if (!catalogCityId?.trim()) return undefined;
+  try {
+    const payload = await loadCoworkingWorkspacesPageForCity(catalogCityId, VO_CITY_PAGE_SIZE, page, undefined, true);
+    const rows = (payload.data ?? []).map(coworkingCardRow);
+    if (rows.length === 0) return undefined;
+    const total = payload.meta?.totalRecords ?? payload.meta?.total;
+    return {
+      rows,
+      totalRecords: typeof total === "number" && Number.isFinite(total) ? total : rows.length,
+      query: "",
+      page,
+    };
+  } catch {
+    return undefined;
+  }
 }

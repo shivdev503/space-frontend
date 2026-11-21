@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useRef, useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { PageNumbers } from "@/modules/city-pages/components/page-numbers";
 import { SpaceGrid } from "@/modules/spaces/components/space-grid";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import { Space } from "@/types";
@@ -25,7 +26,9 @@ export function Pagination({
   cardVariant = "default",
 }: PaginationProps) {
   const pageSize = 24;
-  const [visibleCount, setVisibleCount] = useState(pageSize);
+  const [page, setPage] = useState(1);
+  const pathname = usePathname();
+  const topRef = useRef<HTMLDivElement>(null);
 
   const useVirtualOffice = Boolean(virtualOfficeWorkspaces?.length);
   const useCoworkingWorkspaces = Boolean(coworkingWorkspaces?.length) && !useVirtualOffice;
@@ -51,17 +54,16 @@ export function Pagination({
     );
   }
 
-  const visibleVirtualOffice = useVirtualOffice
-    ? virtualOfficeWorkspaces!.slice(0, visibleCount)
-    : null;
-  const visibleCoworking = useCoworkingWorkspaces
-    ? coworkingWorkspaces!.slice(0, visibleCount)
-    : null;
-  const visibleSpaces = spaces.slice(0, visibleCount);
-  const hasMore = visibleCount < totalCount;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const current = Math.min(page, totalPages);
+  const start = (current - 1) * pageSize;
+  const end = current * pageSize;
+  const visibleVirtualOffice = useVirtualOffice ? virtualOfficeWorkspaces!.slice(start, end) : null;
+  const visibleCoworking = useCoworkingWorkspaces ? coworkingWorkspaces!.slice(start, end) : null;
+  const visibleSpaces = spaces.slice(start, end);
 
   return (
-    <div>
+    <div ref={topRef} className="scroll-mt-24">
       <SpaceGrid
         spaces={useCoworkingWorkspaces || useVirtualOffice ? [] : visibleSpaces}
         coworkingWorkspaces={visibleCoworking}
@@ -69,17 +71,15 @@ export function Pagination({
         ctaLabel={ctaLabel}
         variant={cardVariant}
       />
-      {hasMore ? (
-        <div className="mt-8 flex justify-center">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => setVisibleCount((current) => current + pageSize)}
-          >
-            Load More
-          </Button>
-        </div>
-      ) : null}
+      <PageNumbers
+        page={current}
+        totalPages={totalPages}
+        basePath={pathname}
+        onNavigate={(target) => {
+          setPage(target);
+          topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }}
+      />
     </div>
   );
 }

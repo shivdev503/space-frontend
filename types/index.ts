@@ -226,6 +226,10 @@ export type CityPageData = {
   initialOfficeSpaces?: OfficeSpaceModel.OfficeSpace[];
   /** Managed office cards (`/api/user/managedOffices`) loaded on the server, so the HTML contains them. */
   initialManagedOffices?: ManagedOfficeModel.ManagedOffice[];
+  /** Virtual office providers for this `?page=N`, loaded on the server so the HTML contains them. */
+  initialVirtualOfficeListing?: InitialCoworkingListing;
+  /** Listing page from `?page=N` (city pages paged on the server). */
+  listingPage?: number;
   filters: {
     budgets: SearchOption[];
     teamSizes: SearchOption[];

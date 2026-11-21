@@ -3,22 +3,29 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
+import { pageFromSearchParams, withPageMetadata } from "@/lib/pagination-metadata";
 import { pathnameToSeoSlug } from "@/lib/pathname-to-seo-slug";
 import { seoFaqsOrFallback } from "@/lib/seo-page-faqs";
 import { seoPageTitleOrFallback } from "@/lib/seo-page-title";
 import { colivingLocalitySeo } from "@/lib/seo-templates";
 import { ColivingLocationPage } from "@/modules/coliving/coliving-location-page";
-import { getColivingLocationPageContent, loadColivingLocalityPgs } from "@/services/coliving-location";
+import {
+  COLIVING_LOCALITY_PAGE_SIZE,
+  getColivingLocationPageContent,
+  loadColivingLocalityPgs,
+  loadColivingLocalityPgsPage,
+} from "@/services/coliving-location";
 import { colivingMarketStats } from "@/services/market-stats";
 import { colivingAreaInsights } from "@/services/area-insights";
 import { getSeoBySlug } from "@/services/seo-content";
 
 type PageProps = {
   params: Promise<{ segment: string; location: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { segment, location } = await params;
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
+  const [{ segment, location }, sp] = await Promise.all([params, searchParams]);
   const page = await getColivingLocationPageContent(segment, location);
 
   if (!page) notFound();
@@ -31,11 +38,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     colivingLocalitySeo(page.locationName, page.city.name, stats),
   );
   // A real locality with no PGs yet is a thin page.
-  return pgList.totalRecords === 0 ? { ...metadata, robots: { index: false, follow: true } } : metadata;
+  return pgList.totalRecords === 0
+    ? { ...metadata, robots: { index: false, follow: true } }
+    : withPageMetadata(metadata, sp);
 }
 
-export default async function ColivingLocationRoute({ params }: PageProps) {
-  const { segment, location } = await params;
+export default async function ColivingLocationRoute({ params, searchParams }: PageProps) {
+  const [{ segment, location }, sp] = await Promise.all([params, searchParams]);
+  const pgPage = pageFromSearchParams(sp);
   const data = await getColivingLocationPageContent(segment, location);
 
   if (!data) {
@@ -44,10 +54,13 @@ export default async function ColivingLocationRoute({ params }: PageProps) {
 
   const pathname = `/coliving/${segment}/${location}`;
   const [pgList, seo, insights] = await Promise.all([
-    loadColivingLocalityPgs(data),
+    loadColivingLocalityPgsPage(data, pgPage),
     getSeoBySlug(pathnameToSeoSlug(pathname)),
     colivingAreaInsights(data.citySlug, data.city.name, data.locationName, data.locationSlug),
   ]);
+
+  // A page number past the end is not a page.
+  if (pgPage > 1 && pgList.data.length === 0) notFound();
 
   return (
     <ColivingLocationPage
@@ -59,6 +72,8 @@ export default async function ColivingLocationRoute({ params }: PageProps) {
       }}
       pgList={pgList.data}
       pgTotal={pgList.totalRecords}
+      pgPage={pgPage}
+      pgTotalPages={Math.max(1, Math.ceil(pgList.totalRecords / COLIVING_LOCALITY_PAGE_SIZE))}
       insights={insights}
     />
   );

@@ -110,3 +110,6 @@ export function managedOfficeHours(office: ManagedOfficeModel.ManagedOffice): { 
     return [];
   });
 }
+
+/** Managed offices per listing page (`?page=N`) on city and area pages. */
+export const MANAGED_OFFICE_PAGE_SIZE = 24;

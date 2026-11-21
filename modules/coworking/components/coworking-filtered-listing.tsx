@@ -3,7 +3,6 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 
-import { Button } from "@/components/ui/button";
 import {
   applyCoworkingListFiltersClient,
   COWORKING_LIST_PAGE_SIZE,
@@ -15,6 +14,7 @@ import {
   parseCoworkingListFiltersFromSearchParams,
   type CoworkingListFilterState,
 } from "@/lib/coworking-list-filters";
+import { PageNumbers } from "@/modules/city-pages/components/page-numbers";
 import { PopularLocalitiesRail } from "@/modules/city-pages/components/popular-localities-rail";
 import { CoworkingFiltersModal } from "@/modules/coworking/components/coworking-filters-modal";
 import { CoworkingListingToolbar } from "@/modules/coworking/components/coworking-listing-toolbar";
@@ -42,6 +42,11 @@ type CoworkingFilteredListingProps = {
     fallbackLocations: { name: string; slug: string }[];
   };
 };
+
+function pageFromUrl(sp: URLSearchParams): number {
+  const n = Number.parseInt(sp.get("page") ?? "", 10);
+  return Number.isFinite(n) && n > 1 ? n : 1;
+}
 
 function resolveTotalRecords(
   meta: CoworkingModel.WorkSpacesListResponse["meta"],
@@ -75,11 +80,13 @@ export function CoworkingFilteredListing({
   const [totalRecords, setTotalRecords] = useState(initialListing?.totalRecords ?? 0);
   const [page, setPage] = useState(initialListing?.page ?? 1);
   const [seedMode, setSeedMode] = useState(false);
-  const [seedVisibleCount, setSeedVisibleCount] = useState(PAGE_SIZE);
+  const [seedPage, setSeedPage] = useState(1);
   const [loading, setLoading] = useState(needsRemote && !initialListing);
   /** Server page 1 is still valid until the URL's filters change. */
   const usingInitialRef = useRef(Boolean(initialListing));
-  const [loadingMore, setLoadingMore] = useState(false);
+  /** Set when this component changed the URL itself (page links): the rows are already loading. */
+  const skipUrlFetchRef = useRef(false);
+  const listTopRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -95,12 +102,11 @@ export function CoworkingFilteredListing({
   }, [catalogCityId, seedSpaces, filters]);
 
   const fetchPage = useCallback(
-    async (nextFilters: CoworkingListFilterState, pageNum: number, append: boolean) => {
+    async (nextFilters: CoworkingListFilterState, pageNum: number) => {
       if (!catalogCityId) return;
 
       setError(null);
-      if (append) setLoadingMore(true);
-      else setLoading(true);
+      setLoading(true);
 
       try {
         const includeSortInRequest = searchParams.has("sortBy");
@@ -121,14 +127,14 @@ export function CoworkingFilteredListing({
           setSeedMode(false);
           setTotalRecords(total);
           setPage(pageNum);
-          setRows((prev) => (append ? [...prev, ...list] : list));
+          setRows(list);
         } else if (seedSpaces.length && pageNum === 1) {
           setSeedMode(true);
           setTotalRecords(seedFilteredRows.length);
           setPage(1);
-          setSeedVisibleCount(PAGE_SIZE);
+          setSeedPage(1);
           setRows([]);
-        } else if (!append) {
+        } else {
           setSeedMode(false);
           setTotalRecords(0);
           setPage(1);
@@ -139,19 +145,16 @@ export function CoworkingFilteredListing({
           setSeedMode(true);
           setTotalRecords(seedFilteredRows.length);
           setPage(1);
-          setSeedVisibleCount(PAGE_SIZE);
+          setSeedPage(1);
           setRows([]);
           setError(null);
         } else {
           setError("Could not load coworking spaces. Please try again.");
-          if (!append) {
-            setRows([]);
-            setTotalRecords(0);
-          }
+          setRows([]);
+          setTotalRecords(0);
         }
       } finally {
         setLoading(false);
-        setLoadingMore(false);
       }
     },
     [catalogCityId, microLocationId, searchParams, seedSpaces.length, seedFilteredRows.length],
@@ -170,8 +173,13 @@ export function CoworkingFilteredListing({
         const seeded = seedSpaces.map((s) => mapSeedSpaceToCoworkingWorkspace(s, catalogCityId));
         const filtered = applyCoworkingListFiltersClient(seeded, parsed) as CoworkingModel.WorkSpace[];
         setTotalRecords(filtered.length);
-        setSeedVisibleCount(PAGE_SIZE);
+        setSeedPage(1);
       }
+      return;
+    }
+
+    if (skipUrlFetchRef.current) {
+      skipUrlFetchRef.current = false;
       return;
     }
 
@@ -182,8 +190,10 @@ export function CoworkingFilteredListing({
       }
     }
 
+    // Back/forward or a shared link: show the page the URL asks for.
+    const urlPage = pageFromUrl(new URLSearchParams(searchParams.toString()));
     startTransition(() => {
-      void fetchPage(parsed, 1, false);
+      void fetchPage(parsed, urlPage);
     });
   }, [searchParams, needsRemote, catalogCityId, microLocationId, fetchPage, seedSpaces, initialListing]);
 
@@ -207,33 +217,41 @@ export function CoworkingFilteredListing({
   }, [applyFilters]);
 
   const displayedRows = seedMode
-    ? seedFilteredRows.slice(0, seedVisibleCount)
+    ? seedFilteredRows.slice((seedPage - 1) * PAGE_SIZE, seedPage * PAGE_SIZE)
     : rows;
 
   const resultCount = seedMode ? seedFilteredRows.length : totalRecords;
-  const hasMore = seedMode
-    ? seedVisibleCount < seedFilteredRows.length
-    : page * PAGE_SIZE < totalRecords;
+  const currentPage = seedMode ? seedPage : page;
+  const totalPages = Math.max(1, Math.ceil(resultCount / PAGE_SIZE));
   const showGrid = !loading && !pending;
-  const gridPending = loadingMore;
 
-  const handleLoadMore = useCallback(() => {
-    if (seedMode) {
-      setSeedVisibleCount((current) => current + PAGE_SIZE);
-      return;
-    }
-    if (loading || loadingMore || !hasMore) return;
-    void fetchPage(filters, page + 1, true);
-  }, [seedMode, loading, loadingMore, hasMore, fetchPage, filters, page]);
+  /** Filters (and sort) carried on every page link. */
+  const pageQuery = useMemo(
+    () => Object.fromEntries(coworkingFiltersToSearchParams(filters).entries()),
+    [filters],
+  );
 
-  const nextPageHref = useMemo(() => {
-    const qs = coworkingFiltersToSearchParams(filters);
-    qs.set("page", String(page + 1));
-    return `${listBasePath}?${qs}`;
-  }, [filters, listBasePath, page]);
+  const goToPage = useCallback(
+    (target: number) => {
+      listTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (seedMode) {
+        setSeedPage(target);
+        return;
+      }
+      if (loading) return;
+      const qs = coworkingFiltersToSearchParams(filters);
+      if (target > 1) qs.set("page", String(target));
+      skipUrlFetchRef.current = true;
+      // A history entry per page (Back returns to the previous page) without a server round trip;
+      // Next keeps useSearchParams in sync with pushState.
+      window.history.pushState(null, "", qs.toString() ? `${listBasePath}?${qs}` : listBasePath);
+      void fetchPage(filters, target);
+    },
+    [seedMode, loading, filters, listBasePath, fetchPage],
+  );
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div ref={listTopRef} className="scroll-mt-24 space-y-4 sm:space-y-6">
       {showPopularLocalities && popularLocalities ? (
         <PopularLocalitiesRail
           catalogCityId={popularLocalities.catalogCityId}
@@ -266,7 +284,7 @@ export function CoworkingFilteredListing({
       {error ? (
         <div className="rounded-2xl border border-red-200/80 bg-red-50 px-5 py-4 text-sm text-red-800">
           <p>{error}</p>
-          <button type="button" onClick={() => void fetchPage(filters, 1, false)} className="mt-2 font-semibold underline">
+          <button type="button" onClick={() => void fetchPage(filters, page)} className="mt-2 font-semibold underline">
             Retry
           </button>
         </div>
@@ -289,28 +307,22 @@ export function CoworkingFilteredListing({
       ) : null}
 
       {showGrid && displayedRows.length > 0 ? (
-        <div className={gridPending ? "opacity-60 transition-opacity" : undefined}>
+        <div>
           <SpaceGrid
             spaces={[]}
             coworkingWorkspaces={displayedRows}
             ctaLabel="View Details"
             variant="airbnb"
           />
-          {hasMore ? (
-            <div className="mt-8 flex justify-center">
-              {/* A real link for crawlers; visitors stay on the page and the next rows load in place. */}
-              <Button
-                href={nextPageHref}
-                variant="secondary"
-                onLinkClick={(event) => {
-                  event.preventDefault();
-                  handleLoadMore();
-                }}
-              >
-                {loadingMore ? "Loading…" : "Load more"}
-              </Button>
-            </div>
-          ) : null}
+          {/* Real links for crawlers; visitors stay on the page and the rows load in place. */}
+          <PageNumbers
+            page={currentPage}
+            totalPages={totalPages}
+            basePath={listBasePath}
+            query={pageQuery}
+            onNavigate={goToPage}
+            disabled={loading}
+          />
         </div>
       ) : null}
     </div>

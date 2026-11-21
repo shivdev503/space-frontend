@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState, useTransition, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 
-import { Button } from "@/components/ui/button";
+import { PageNumbers } from "@/modules/city-pages/components/page-numbers";
 import { ColivingCityFiltersModal } from "@/modules/coliving/components/coliving-city-filters-modal";
 import { ColivingCityListingToolbar } from "@/modules/coliving/components/coliving-city-listing-toolbar";
 import { buildPgColivingCityPageParams } from "@/lib/pg-list-priority";
@@ -62,8 +62,9 @@ export function ColivingCityListing({
     [filters],
   );
 
+  /** `history`: "replace" for filter changes, "push" for page links (Back returns to the last page), "none" when the URL already changed. */
   const load = useCallback(
-    (nextFilters: PgFilterState, nextPage: number) => {
+    (nextFilters: PgFilterState, nextPage: number, history: "replace" | "push" | "none" = "replace") => {
       startTransition(async () => {
         setError(null);
         try {
@@ -79,7 +80,10 @@ export function ColivingCityListing({
           setPage(nextPage);
           const qs = filtersToSearchParams({ ...nextFilters, city: cityName }, nextPage);
           const base = `/coliving/${data.city.slug}`;
-          router.replace(qs.toString() ? `${base}?${qs}` : base, { scroll: false });
+          const href = qs.toString() ? `${base}?${qs}` : base;
+          if (history === "replace") router.replace(href, { scroll: false });
+          // pushState: a history entry without a server round trip (Next keeps useSearchParams in sync).
+          else if (history === "push") window.history.pushState(null, "", href);
         } catch {
           setError("Could not load listings. Please try again.");
         }
@@ -88,10 +92,16 @@ export function ColivingCityListing({
     [cityName, data.catalogCityId, data.city.slug, router],
   );
 
+  const pageRef = useRef(page);
+  pageRef.current = page;
   useEffect(() => {
-    const parsed = parseFiltersFromSearchParams(new URLSearchParams(searchParams.toString()));
-    setFilters({ ...parsed, city: cityName });
-  }, [searchParams, cityName]);
+    const sp = new URLSearchParams(searchParams.toString());
+    const parsed = { ...parseFiltersFromSearchParams(sp), city: cityName };
+    setFilters(parsed);
+    // Back/forward between pages: show the page the URL now asks for.
+    const urlPage = Math.max(1, Number.parseInt(sp.get("page") ?? "1", 10) || 1);
+    if (urlPage !== pageRef.current) load(parsed, urlPage, "none");
+  }, [searchParams, cityName, load]);
 
   const applyFilters = useCallback(
     (nextFilters: PgFilterState) => {
@@ -109,19 +119,24 @@ export function ColivingCityListing({
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const pageHref = (target: number) => {
-    const qs = filtersToSearchParams(filters, target);
+  const listTopRef = useRef<HTMLDivElement>(null);
+  const pageQuery = useMemo(() => {
+    const qs = filtersToSearchParams(filters, 1);
     qs.delete("city"); // The path already carries the city.
-    const base = `/coliving/${data.city.slug}`;
-    return qs.toString() ? `${base}?${qs}` : base;
-  };
-  const goToPage = (target: number) => (event: MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-    if (!pending) load(filters, target);
+    qs.delete("page");
+    return Object.fromEntries(qs.entries());
+  }, [filters]);
+  const goToPage = (target: number) => {
+    listTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!pending) {
+      setPage(target); // So the URL change below is not read as Back/forward.
+      pageRef.current = target;
+      load(filters, target, "push");
+    }
   };
 
   return (
-    <div className="space-y-6">
+    <div ref={listTopRef} className="scroll-mt-24 space-y-6">
       <ColivingCityListingToolbar
         filters={filters}
         activeFilterCount={activeFilterCount}
@@ -175,28 +190,14 @@ export function ColivingCityListing({
         </div>
       )}
 
-      {totalPages > 1 ? (
-        <div className="flex flex-wrap justify-center gap-2 pt-4">
-          {page > 1 ? (
-            <Button href={pageHref(page - 1)} variant="secondary" onLinkClick={goToPage(page - 1)}>
-              Previous
-            </Button>
-          ) : (
-            <Button type="button" variant="secondary" disabled>
-              Previous
-            </Button>
-          )}
-          {page < totalPages ? (
-            <Button href={pageHref(page + 1)} variant="secondary" onLinkClick={goToPage(page + 1)}>
-              Next
-            </Button>
-          ) : (
-            <Button type="button" variant="secondary" disabled>
-              Next
-            </Button>
-          )}
-        </div>
-      ) : null}
+      <PageNumbers
+        page={page}
+        totalPages={totalPages}
+        basePath={`/coliving/${data.city.slug}`}
+        query={pageQuery}
+        onNavigate={goToPage}
+        disabled={pending}
+      />
     </div>
   );
 }

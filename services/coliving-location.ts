@@ -130,6 +130,25 @@ export function loadColivingLocalityPgs(page: LocationPageData) {
   return fetchLocalityPgs(catalogCityId, page.city.name, page.locationName);
 }
 
+/** PGs shown per page on a locality page (`?page=N`). */
+export const COLIVING_LOCALITY_PAGE_SIZE = 48;
+
+const fetchLocalityPgsPage = cache(
+  (catalogCityId: string | undefined, cityName: string, localityName: string, pageNum: number) =>
+    fetchPgList(
+      buildPgColivingLocationPageParams(catalogCityId, cityName, localityName, {
+        limit: COLIVING_LOCALITY_PAGE_SIZE,
+        page: pageNum,
+      }),
+    ),
+);
+
+/** One page of a locality page's PG list. Throws when the API fails. */
+export function loadColivingLocalityPgsPage(page: LocationPageData, pageNum: number) {
+  const catalogCityId = page.catalogCityId ?? getCatalogCityIdBySlug(page.citySlug) ?? undefined;
+  return fetchLocalityPgsPage(catalogCityId, page.city.name, page.locationName, pageNum);
+}
+
 /** A locality page exists when the catalog knows the locality or a PG is listed in it. */
 export async function colivingLocalityExists(citySlug: string, locationSegment: string): Promise<boolean> {
   const page = await getColivingLocationPageContent(citySlug, locationSegment);

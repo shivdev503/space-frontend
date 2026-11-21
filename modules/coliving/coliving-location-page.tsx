@@ -6,6 +6,7 @@ import { LeadCTA } from "@/modules/city-pages/components/lead-cta";
 import { PopularLocalitiesRail } from "@/modules/city-pages/components/popular-localities-rail";
 import { Breadcrumb } from "@/modules/location-pages/components/breadcrumb";
 import { FAQSection } from "@/modules/location-pages/components/faq-section";
+import { PageNumbers } from "@/modules/city-pages/components/page-numbers";
 import { ColivingLocationListing } from "@/modules/coliving/components/coliving-location-listing";
 import { AreaInsightsSection } from "@/modules/location-pages/components/area-insights-section";
 import type { AreaInsights } from "@/services/area-insights";
@@ -18,10 +19,14 @@ export function ColivingLocationPage({
   pgList,
   pgTotal,
   insights = null,
+  pgPage = 1,
+  pgTotalPages = 1,
 }: {
   data: LocationPageData;
   pgList: PgDetail[];
   pgTotal: number;
+  pgPage?: number;
+  pgTotalPages?: number;
   insights?: AreaInsights | null;
 }) {
   const catalogCityId = data.catalogCityId ?? getCatalogCityIdBySlug(data.citySlug) ?? "";
@@ -72,6 +77,7 @@ export function ColivingLocationPage({
             locality={data.locationName}
             city={data.city.name}
           />
+          <PageNumbers page={pgPage} totalPages={pgTotalPages} basePath={`/coliving/${data.citySlug}/${data.locationSlug}`} />
           {pgTotal === 0 ? (
             <p className="mt-6 text-center text-sm text-muted">
               <Link href={`/coliving/${data.citySlug}`} className="font-medium text-[color:var(--color-brand)] underline">

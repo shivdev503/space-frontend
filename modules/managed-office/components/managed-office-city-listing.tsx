@@ -2,19 +2,17 @@
 
 import { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { PageNumbers } from "@/modules/city-pages/components/page-numbers";
 import { ManagedOfficeCard } from "@/modules/managed-office/components/managed-office-card";
+import { MANAGED_OFFICE_PAGE_SIZE as PAGE_SIZE } from "@/modules/managed-office/managed-office-format";
 import { SpaceGridSkeleton } from "@/modules/spaces/components/space-grid-skeleton";
 import { managedOfficesByCity } from "@/services/managed-office-api";
 import type { CityPageData } from "@/types";
 import type { ManagedOfficeModel } from "@/types/managed-office.model";
 
-const PAGE_SIZE = 24;
-
 export function ManagedOfficeCityListing({ data }: { data: CityPageData }) {
   const initialOffices = data.initialManagedOffices;
   const [offices, setOffices] = useState<ManagedOfficeModel.ManagedOffice[] | null>(initialOffices ?? null);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   // Server-loaded offices (in the HTML for crawlers) skip the client fetch.
   const needsRemote = Boolean(data.catalogCityId) && !initialOffices;
   const [loading, setLoading] = useState(needsRemote);
@@ -27,7 +25,6 @@ export function ManagedOfficeCityListing({ data }: { data: CityPageData }) {
 
     setLoading(true);
     setOffices(null);
-    setVisibleCount(PAGE_SIZE);
     let cancelled = false;
 
     managedOfficesByCity(data.catalogCityId!, 60)
@@ -58,20 +55,17 @@ export function ManagedOfficeCityListing({ data }: { data: CityPageData }) {
     );
   }
 
+  // Paged on the server (`?page=N`): each page is its own URL with its own HTML.
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const page = Math.min(Math.max(1, data.listingPage ?? 1), totalPages);
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-        {rows.slice(0, visibleCount).map((office, index) => (
+        {rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((office, index) => (
           <ManagedOfficeCard key={office.id} office={office} priority={index === 0} />
         ))}
       </div>
-      {rows.length > visibleCount ? (
-        <div className="mt-8 flex justify-center">
-          <Button type="button" variant="secondary" onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}>
-            Load More
-          </Button>
-        </div>
-      ) : null}
+      <PageNumbers page={page} totalPages={totalPages} basePath={`/managed-office/${data.city.slug}`} />
     </>
   );
 }
