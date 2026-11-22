@@ -7,7 +7,7 @@ import { CoworkingHeroSearch } from "@/modules/coworking/homepage/coworking-hero
 import { cn } from "@/utils/cn";
 
 const TRUST_PILLS = [
-  "1000+ coworking spaces",
+  "750+ coworking spaces",
   "Real pricing",
   "Zero brokerage",
   "Free expert consultation",
@@ -84,7 +84,7 @@ export function CoworkingHero({ cities, className }: CoworkingHeroProps) {
         </h1>
 
         <p className="mt-6 max-w-[560px] text-base leading-relaxed text-muted sm:text-[19px]">
-          1000+ coworking spaces. Real pricing. Zero brokerage. The destination for teams done with
+          750+ coworking spaces. Real pricing. Zero brokerage. The destination for teams done with
           mediocre offices.
         </p>
 

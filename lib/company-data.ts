@@ -3,6 +3,7 @@ export const COMPANY = {
   brand: "SpaceWallah",
   legalName: "Spacewallah Enterprises",
   gstin: "09NEHPK6300D1ZI",
+  founder: { name: "Komal Raj", role: "Founder", photo: "/komal-raj-founder.webp" },
   office: {
     street: "Unit 309, 3rd Floor, Tower A, ElevenBay (formerly SAS Tower)",
     area: "Near Medanta Hospital, Medicity, Sector 38",

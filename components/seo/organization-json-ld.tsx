@@ -18,6 +18,14 @@ export function OrganizationJsonLd({ aboutPath }: { aboutPath?: string } = {}) {
         name: APP_NAME,
         legalName: COMPANY.legalName,
         taxID: COMPANY.gstin,
+        founder: {
+          "@type": "Person",
+          "@id": `${siteUrl}/#founder`,
+          name: COMPANY.founder.name,
+          jobTitle: COMPANY.founder.role,
+          image: absoluteUrl(COMPANY.founder.photo),
+          worksFor: { "@id": organizationId },
+        },
         address: {
           "@type": "PostalAddress",
           streetAddress: `${COMPANY.office.street}, ${COMPANY.office.area}`,

@@ -65,7 +65,7 @@ export function getFallbackSeoContent(pathname: string, slug: string): SeoConten
 
   if (v === "coworking") {
     return {
-      title: `Coworking Space in India | 1000+ Verified Spaces | ${APP_NAME}`,
+      title: `Coworking Space in India | 750+ Spaces | ${APP_NAME}`,
       description: coworking.description,
       path: p,
       footer_title: `Coworking on ${APP_NAME}`,

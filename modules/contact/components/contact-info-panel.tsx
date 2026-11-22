@@ -5,6 +5,7 @@ import {
   Instagram,
   Linkedin,
   Mail,
+  MapPin,
   Phone,
 } from "lucide-react";
 import Link from "next/link";
@@ -18,6 +19,7 @@ import {
   CONTACT_SOCIAL_LINKS,
   CONTACT_TRUST_POINTS,
 } from "@/lib/contact-data";
+import { COMPANY, OFFICE_MAP_HREF } from "@/lib/company-data";
 import { verticals } from "@/utils/constants";
 import { cn } from "@/utils/cn";
 
@@ -76,6 +78,25 @@ export function ContactInfoPanel() {
           {CONTACT_EMAIL}
         </a>
         <p className="mt-1 text-xs text-slate-500">We typically respond within one business day</p>
+      </InfoCard>
+
+      <InfoCard icon={MapPin} title="Office address">
+        <p className="font-semibold text-ink">{COMPANY.legalName}</p>
+        <address className="mt-1 not-italic">
+          {COMPANY.office.street}
+          <br />
+          {COMPANY.office.area}
+          <br />
+          {COMPANY.office.city}, {COMPANY.office.state} {COMPANY.office.postalCode}
+        </address>
+        <a
+          href={OFFICE_MAP_HREF}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-1.5 inline-block font-semibold text-[color:var(--color-brand)] hover:underline"
+        >
+          Get directions
+        </a>
       </InfoCard>
 
       <InfoCard icon={Clock3} title="Working hours">

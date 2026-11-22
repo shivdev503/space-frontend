@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildMetadata(
   "About Us: Who Runs SpaceWallah | SpaceWallah",
-  "SpaceWallah is run by Spacewallah Enterprises from Sector 38, Gurugram. See what we do, how we earn, our office address and company details.",
+  "Meet SpaceWallah founder Komal Raj and Spacewallah Enterprises in Sector 38, Gurugram: what we do, how we earn, and our company details.",
   "/about-us",
 );
 

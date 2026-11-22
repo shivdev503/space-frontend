@@ -1,4 +1,5 @@
 import { ArrowRight, BedDouble, Building2, FileText, Mail, MapPin, Phone, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
@@ -69,7 +70,7 @@ const H2 = "font-display text-2xl font-semibold tracking-[-0.02em] text-ink sm:t
 const LINK = "font-medium text-[color:var(--color-brand)] hover:underline";
 
 export function AboutPage({ stats }: { stats: AboutStat[] }) {
-  const { office, registered } = COMPANY;
+  const { founder, office, registered } = COMPANY;
 
   return (
     <>
@@ -101,6 +102,27 @@ export function AboutPage({ stats }: { stats: AboutStat[] }) {
               ))}
             </dl>
           ) : null}
+        </Container>
+      </section>
+
+      <section id="founder" className="scroll-mt-28 bg-[#f9f8f5] py-10 sm:py-14">
+        <Container className="max-w-[1100px]">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-10">
+            <Image
+              src={founder.photo}
+              alt={`${founder.name}, ${founder.role.toLowerCase()} of ${COMPANY.brand}`}
+              width={640}
+              height={640}
+              className="aspect-square w-full max-w-[280px] shrink-0 rounded-2xl object-cover"
+            />
+            <div>
+              <h2 className={H2}>Our founder</h2>
+              <p className="mt-4 text-xl font-semibold text-ink">{founder.name}</p>
+              <p className="mt-1 text-[0.95rem] text-muted">
+                {founder.role}, {COMPANY.brand}
+              </p>
+            </div>
+          </div>
         </Container>
       </section>
 
