@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 
 import {
   buildGeocodeQuery,
-  cityMapCenter,
   geocodeAddress,
   type MapCoordinates,
 } from "@/lib/space-detail-map";
@@ -66,9 +65,6 @@ export function SpaceDetailNearbyStripDynamic({
       let center: MapCoordinates | null = coordinates ?? null;
       if (!center) {
         center = await geocodeAddress(buildGeocodeQuery(address, locality, city));
-      }
-      if (!center && city.trim()) {
-        center = cityMapCenter(city);
       }
 
       if (!center) {

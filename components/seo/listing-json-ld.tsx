@@ -1,3 +1,4 @@
+import { isPlaceholderPin } from "@/lib/listing-pin";
 import { absoluteUrl } from "@/components/seo/breadcrumbs";
 import { pgImagesSorted } from "@/services/pg-mapper";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
@@ -19,7 +20,7 @@ function geoCoordinates(latitude: unknown, longitude: unknown) {
   const lat = Number(latitude);
   const lng = Number(longitude);
   // The API stores 0 when a listing has no map pin.
-  if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat === 0 || lng === 0) return undefined;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat === 0 || lng === 0 || isPlaceholderPin(lng)) return undefined;
   return { "@type": "GeoCoordinates", latitude: lat, longitude: lng };
 }
 
@@ -170,7 +171,7 @@ export function BuildingPlaceJsonLd({
           ...(city ? { addressLocality: clean(city) } : {}),
           addressCountry: "IN",
         },
-        ...(latitude != null && longitude != null
+        ...(latitude != null && longitude != null && !isPlaceholderPin(longitude)
           ? { geo: { "@type": "GeoCoordinates", latitude, longitude } }
           : {}),
       }}

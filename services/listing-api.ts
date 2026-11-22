@@ -448,6 +448,7 @@ const DEFAULT_HOURS_OF_OPERATION = {
   sunday: { ...EMPTY_DAY },
 };
 
+// No coordinates: the form has no map, and a default pin would put every new listing in one place.
 const DEFAULT_LOCATION: ListingModel.WorkSpaceLocation = {
   name: "",
   address: "",
@@ -469,8 +470,6 @@ const DEFAULT_LOCATION: ListingModel.WorkSpaceLocation = {
   tram_landmark: "",
   tram_distance: "",
   micro_location_string: "",
-  latitude: 13.08673,
-  longitude: 80.204496,
   is_near_metro: false,
   is_bus_stop: false,
   is_ferry_stop: false,

@@ -1,3 +1,5 @@
+import { metroStationName } from "@/lib/metro-station";
+import { operatorBrandName } from "@/lib/operator-brand";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import type { ManagedOfficeModel } from "@/types/managed-office.model";
 import { toTitleCase } from "@/utils/format";
@@ -17,7 +19,7 @@ type Office = ManagedOfficeModel.ManagedOffice;
  */
 export function managedOfficeTitle(office: Office): string {
   const name = office.name?.trim() || "Managed office";
-  const brand = office.brand?.name?.trim() || "";
+  const brand = operatorBrandName(office.brand);
   const building = office.location?.building_name?.replace(/\s+/g, " ").trim() || "";
   const locality = managedOfficeLocality(office);
   const isBrandOnly = Boolean(brand) && name.toLowerCase() === brand.toLowerCase();
@@ -82,9 +84,12 @@ export function managedOfficeHoursSummary(office: Office): string {
 }
 
 export function managedOfficeMetro(office: Office): { name: string; distance: string } | null {
-  const name = office.location?.metro_stop_landmark?.trim() || "";
-  if (!name) return null;
-  return { name: /metro/i.test(name) ? name : `${name} Metro`, distance: office.location?.metro_stop_distance?.trim() || "" };
+  const saved = office.location?.metro_stop_landmark?.trim() || "";
+  // Saved as "MG Road, Yellow": station, then line.
+  const [, station = saved, line = ""] = /^(.*?),\s*(yellow|blue|rapid metro|aqua|magenta|violet|pink)(?: line)?$/i.exec(saved) ?? [];
+  if (!metroStationName(station, managedOfficeCityName(office))) return null;
+  const suffix = line ? ` (${/rapid/i.test(line) ? "Rapid Metro" : `${toTitleCase(line)} Line`})` : "";
+  return { name: `${/\bmetro\b/i.test(station) ? station : `${station} Metro`}${suffix}`, distance: office.location?.metro_stop_distance?.trim() || "" };
 }
 
 /**
@@ -101,6 +106,9 @@ export function managedOfficeAsLocationWorkspace(office: Office): CoworkingModel
       address: office.location?.address1?.trim() || office.location?.address?.trim() || "",
       micro_location: { name: managedOfficeLocality(office) },
       city: { name: managedOfficeCityName(office), id: office.location?.city?.id },
+      // Already checked above, so the raw landmark fields must not add a second, unchecked station.
+      is_near_metro: false,
+      metro_stop_landmark: "",
       metro_detail: metro ? { is_near_metro: true, name: metro.name } : { is_near_metro: false, name: "" },
     },
   } as unknown as CoworkingModel.WorkSpace;

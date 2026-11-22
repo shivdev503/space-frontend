@@ -2,7 +2,7 @@ import type { OfficeSpaceModel } from "@/types/office-space.model";
 import type { ListingModel } from "@/types/listing.model";
 
 import type { OfficeWizardState } from "../components/office-wizard/use-office-wizard";
-import { emptyLocation } from "../components/wizard/shared-location-step";
+import { emptyLocation, keptLocationFields } from "../components/wizard/shared-location-step";
 import { mapListingImagesFromApi } from "./map-listing-images";
 
 /**
@@ -43,6 +43,7 @@ export function mapOfficeSpaceToOfficeWizardState(
     amenities: Array.isArray(amenties) ? amenties : [],
     location: {
       ...emptyLocation,
+      kept: keptLocationFields(loc),
       cityId,
       cityName,
       microLocationId: microId,
@@ -50,8 +51,9 @@ export function mapOfficeSpaceToOfficeWizardState(
       address: String(loc?.address1 ?? loc?.address ?? "").trim(),
       metroLandmark: String(loc?.landmark ?? "").trim(),
       nearByLandmark: String(
-        (loc as { metro_stop_landmark?: string } | undefined)?.metro_stop_landmark
-          ?? loc?.metro_detail?.name
+        (loc as { nearby_landmark?: string } | undefined)?.nearby_landmark
+          // Listings saved before `nearby_landmark` existed kept it in the metro field.
+          ?? (loc as { metro_stop_landmark?: string } | undefined)?.metro_stop_landmark
           ?? "",
       ).trim(),
     },

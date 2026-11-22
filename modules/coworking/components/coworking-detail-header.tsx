@@ -1,5 +1,6 @@
 import { MapPin, Star } from "lucide-react";
 
+import { operatorBrandName } from "@/lib/operator-brand";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import { formatCurrency, toTitleCase } from "@/utils/format";
 
@@ -32,7 +33,7 @@ export function CoworkingDetailHeader({ workspace }: { workspace: CoworkingModel
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--color-brand)]">
-            {workspace.brand?.name || "Coworking"}
+            {operatorBrandName(workspace.brand) || "Coworking"}
           </p>
           <h1 className="mt-3 font-display text-4xl leading-tight text-ink sm:text-5xl">{workspace.name}</h1>
           <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted">

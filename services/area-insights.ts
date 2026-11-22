@@ -4,6 +4,7 @@
  * area page says something different and true (instead of the same template text on every page).
  */
 
+import { coworkingMetro, metroStationShortName } from "@/lib/metro-station";
 import { cache } from "react";
 
 import { buildPgColivingLocationPageParams } from "@/lib/pg-list-priority";
@@ -317,8 +318,8 @@ async function computeCoworkingInsights(citySlug: string, cityName: string, loca
   // One name per station: "Huda City Center" and "Huda City Centre" are the same stop.
   const metroByKey = new Map<string, string>();
   for (const sp of spaces) {
-    const loc = sp.location as unknown as { metro_stop_landmark?: string; landmark?: string; is_near_metro?: boolean };
-    const name = (loc?.metro_stop_landmark || (loc?.is_near_metro ? loc?.landmark : "") || "").trim();
+    const saved = coworkingMetro(sp.location)?.name;
+    const name = saved ? metroStationShortName(saved) : "";
     const key = name.toLowerCase().replace(/centre/g, "center").replace(/metro|station/g, "").replace(/[^a-z0-9]/g, "");
     if (name && key && !metroByKey.has(key)) metroByKey.set(key, name);
   }

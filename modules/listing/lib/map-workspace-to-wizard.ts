@@ -2,7 +2,7 @@ import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import type { ListingModel } from "@/types/listing.model";
 
 import type { CoworkingHoursState, CoworkingWizardState, DeskTypeSelection } from "../components/coworking-wizard/types";
-import { emptyLocation } from "../components/wizard/shared-location-step";
+import { emptyLocation, keptLocationFields } from "../components/wizard/shared-location-step";
 import { mapListingImagesFromApi } from "./map-listing-images";
 
 const defaultHours: CoworkingHoursState = {
@@ -116,6 +116,7 @@ export function mapWorkSpaceToCoworkingWizardState(ws: CoworkingModel.WorkSpace)
     hours: mapApiHours(ws.hours_of_operation as Record<string, CoworkingModel.WorkingHours> | undefined),
     location: {
       ...emptyLocation,
+      kept: keptLocationFields(loc),
       cityId,
       cityName,
       microLocationId: microId,
@@ -123,8 +124,9 @@ export function mapWorkSpaceToCoworkingWizardState(ws: CoworkingModel.WorkSpace)
       address: String(loc?.address1 ?? loc?.address ?? "").trim(),
       metroLandmark: String(loc?.landmark ?? "").trim(),
       nearByLandmark: String(
-        (loc as { metro_stop_landmark?: string } | undefined)?.metro_stop_landmark
-          ?? loc?.metro_detail?.name
+        (loc as { nearby_landmark?: string } | undefined)?.nearby_landmark
+          // Listings saved before `nearby_landmark` existed kept it in the metro field.
+          ?? (loc as { metro_stop_landmark?: string } | undefined)?.metro_stop_landmark
           ?? "",
       ).trim(),
     },

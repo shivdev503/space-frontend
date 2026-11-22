@@ -87,11 +87,14 @@ export function SpaceDetailLeafletMap({
         maxZoom: 19,
       }).addTo(map);
 
-      const marker = L.marker([center.lat, center.lng], { icon: MARKER_ICON }).addTo(map);
-      marker.bindPopup(`<strong>${escapeHtml(name)}</strong><br/>${escapeHtml(locality)}, ${escapeHtml(city)}`);
+      // Without a saved pin the map only shows the neighbourhood: a marker would claim an exact address.
+      if (coordinates) {
+        const marker = L.marker([center.lat, center.lng], { icon: MARKER_ICON }).addTo(map);
+        marker.bindPopup(`<strong>${escapeHtml(name)}</strong><br/>${escapeHtml(locality)}, ${escapeHtml(city)}`);
+        markerRef.current = marker;
+      }
 
       mapRef.current = map;
-      markerRef.current = marker;
       setReady(true);
 
       requestAnimationFrame(() => map.invalidateSize());
@@ -123,7 +126,7 @@ export function SpaceDetailLeafletMap({
           <div className="absolute inset-0 z-[1] animate-pulse bg-[#ebe6dc]" aria-hidden />
         ) : null}
 
-        {showOverlayCard ? (
+        {showOverlayCard && coordinates ? (
           <div className="pointer-events-none absolute left-1/2 top-[42%] z-[2] w-[min(16rem,calc(100%-2rem))] -translate-x-1/2 -translate-y-full">
             <div className="rounded-xl border border-slate-200/80 bg-white px-3.5 py-2.5 shadow-md">
               <div className="flex items-center gap-2.5">

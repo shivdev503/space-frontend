@@ -10,6 +10,7 @@ import {
   CoworkingDetailEyebrow,
   CoworkingDetailSectionTitle,
 } from "@/modules/coworking/components/coworking-detail/coworking-detail-ui";
+import { operatorBrandName } from "@/lib/operator-brand";
 import type { ManagedOfficeModel } from "@/types/managed-office.model";
 import { cn } from "@/utils/cn";
 import { toTitleCase } from "@/utils/format";
@@ -35,7 +36,7 @@ export function ManagedOfficeDetailAbout({ office }: { office: ManagedOfficeMode
   const locality = managedOfficeLocality(office);
   const city = managedOfficeCityName(office);
   const building = office.location?.building_name?.replace(/\s+/g, " ").trim() || "";
-  const brandName = office.brand?.name?.trim() || "";
+  const brandName = operatorBrandName(office.brand);
   const brandLine =
     office.brand?.brand_tag_line?.trim() || office.brand?.logo_tag_line?.trim() || "Managed office operator";
   const logo = toSpaceImageCdnUrl(office.brand?.image?.s3_link ?? "");

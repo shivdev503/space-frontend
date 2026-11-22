@@ -1,5 +1,6 @@
 import { Bus, CarTaxiFront, MapPin, Ship, TrainFront, TramFront } from "lucide-react";
 
+import { coworkingMetro } from "@/lib/metro-station";
 import { buildMapsLink, normalizeMapCoordinates } from "@/lib/space-detail-map";
 import { workspaceAddress } from "@/modules/coworking/components/coworking-detail-header";
 import {
@@ -27,7 +28,6 @@ function distanceLabel(v: unknown): string {
 
 /** Transport saved on the listing: [flag, name field, distance field]. Only rows with a name are shown. */
 const TRANSPORT = [
-  { flag: "is_near_metro", name: "landmark", distance: "landmark_distance", label: "Metro station", icon: TrainFront },
   { flag: "is_bus_stop", name: "bus_stop_landmark", distance: "bus_stop_distance", label: "Bus stop", icon: Bus },
   { flag: "is_taxi_stand", name: "taxi_stand_landmark", distance: "taxi_stand_distance", label: "Taxi stand", icon: CarTaxiFront },
   { flag: "is_tram", name: "tram_landmark", distance: "tram_distance", label: "Tram stop", icon: TramFront },
@@ -43,17 +43,16 @@ function buildConnectivityHighlights(
   const rows: SpaceDetailLocationHighlight[] = [
     { icon: MapPin, title: toTitleCase(micro), sub: city ? `${city}, India` : "India" },
   ];
+  const metro = coworkingMetro(loc);
+  if (metro) {
+    const dist = distanceLabel(metro.distance);
+    rows.push({ icon: TrainFront, title: metro.name, sub: dist ? `Metro station · ${dist} away` : "Metro station" });
+  }
   for (const t of TRANSPORT) {
     const name = text(loc[t.name]);
     if (!loc[t.flag] || !name) continue;
     const dist = distanceLabel(loc[t.distance]);
     rows.push({ icon: t.icon, title: name, sub: dist ? `${t.label} · ${dist} away` : t.label });
-  }
-  // Older listings keep the metro on `metro_detail`.
-  const md = loc.metro_detail;
-  if (md?.is_near_metro && text(md.name) && !rows.some((r) => r.icon === TrainFront)) {
-    const dist = distanceLabel(md.distance);
-    rows.push({ icon: TrainFront, title: text(md.name), sub: dist ? `Metro station · ${dist} away` : "Metro station" });
   }
   return rows;
 }

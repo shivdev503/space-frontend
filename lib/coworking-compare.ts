@@ -1,3 +1,4 @@
+import { coworkingMetro } from "@/lib/metro-station";
 import { workspaceAddress, workspaceCitySlugish, workspaceRating } from "@/modules/coworking/components/coworking-detail-header";
 import { spaceImageUrl, toSpaceImageCdnUrl } from "@/lib/space-image-url";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
@@ -162,7 +163,7 @@ export function toCompareSpace(workspace: CoworkingModel.WorkSpace): CompareSpac
     rating: workspaceRating(workspace),
     startingPrice,
     plans,
-    nearMetro: Boolean(location?.metro_detail?.is_near_metro || (location as { is_near_metro?: boolean })?.is_near_metro),
+    nearMetro: coworkingMetro(location) !== null,
     hours: compareHours(workspace),
     amenities: compareAmenities(workspace),
   };

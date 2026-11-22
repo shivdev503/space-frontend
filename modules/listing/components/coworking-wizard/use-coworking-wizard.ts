@@ -216,9 +216,11 @@ export function buildCoworkingPayload(
       order: img.order,
     })),
     location: {
+      ...state.location.kept,
       address1: state.location.address,
       landmark: state.location.metroLandmark,
-      metro_stop_landmark: state.location.nearByLandmark,
+      metro_stop_landmark: state.location.metroLandmark,
+      nearby_landmark: state.location.nearByLandmark,
       country: DEFAULT_COUNTRY_ID,
       city: state.location.cityId,
       micro_location: state.location.microLocationId,

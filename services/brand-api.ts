@@ -6,6 +6,7 @@
  * in which case the full (cached) coworking list is filtered by brand instead.
  */
 
+import { NON_OPERATOR_BRAND_SLUGS } from "@/lib/operator-brand";
 import { cache } from "react";
 
 import { toSpaceImageCdnUrl } from "@/lib/space-image-url";
@@ -22,7 +23,7 @@ const PAGE_SIZE = 50;
 const REQUEST_TIMEOUT_MS = 30_000;
 
 /** Catch-all bucket for independent spaces — not an operator, so it gets no brand page. */
-export const NON_OPERATOR_BRAND_SLUGS: ReadonlySet<string> = new Set(["other-coworking"]);
+export { NON_OPERATOR_BRAND_SLUGS };
 
 export type BrandInfo = {
   slug: string;

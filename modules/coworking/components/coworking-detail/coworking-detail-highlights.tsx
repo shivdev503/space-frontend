@@ -1,5 +1,6 @@
 import { Armchair, Clock, TrainFront, Users } from "lucide-react";
 
+import { coworkingMetro } from "@/lib/metro-station";
 import {
   filterCoworkingPlansForStartingPrice,
 } from "@/services/workspace-plan-pricing";
@@ -11,10 +12,11 @@ function highlightItems(workspace: CoworkingModel.WorkSpace) {
   const amenities = (workspace.amenties ?? []).map((a) => a.name.toLowerCase()).join(" ");
   const hours = workspace.hours_of_operation ?? {};
   const open24 = Object.values(hours).some((h) => h?.is_open_24);
+  const metro = coworkingMetro(workspace.location);
   const nearMetro =
-    workspace.location?.metro_detail?.is_near_metro ||
-    amenities.includes("metro") ||
-    workspaceDescriptionText(workspace).toLowerCase().includes("metro");
+    metro !== null ||
+    /\bmetro\b/.test(amenities) ||
+    /\bmetro station\b/i.test(workspaceDescriptionText(workspace));
 
   return [
     {
@@ -31,9 +33,7 @@ function highlightItems(workspace: CoworkingModel.WorkSpace) {
       icon: TrainFront,
       title: nearMetro ? "Near Metro" : "Prime Location",
       sub: nearMetro
-        ? workspace.location?.metro_detail?.name ||
-          (typeof workspace.location?.landmark === "string" && workspace.location.landmark) ||
-          "Quick connectivity"
+        ? metro?.name || "Quick connectivity"
         : workspace.location?.micro_location?.name || "Business district",
     },
     {

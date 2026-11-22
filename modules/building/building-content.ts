@@ -1,3 +1,6 @@
+import { coworkingMetro, metroStationShortName } from "@/lib/metro-station";
+import { operatorBrandName } from "@/lib/operator-brand";
+import { managedOfficeMetro } from "@/modules/managed-office/components/detail/managed-office-detail-facts";
 import { managedOfficeStartingPrice } from "@/modules/managed-office/managed-office-format";
 import type { Building } from "@/services/building-api";
 import type { FAQItem } from "@/types";
@@ -29,6 +32,14 @@ function withoutBuilding(name: string, buildingName: string): string {
   return stripped || name.trim();
 }
 
+/** "400 m" → 0.4, "1.1km" → 1.1; ranges and walking times → undefined. */
+function kilometres(value: string): number | undefined {
+  const m = /^(\d+(?:\.\d+)?)\s*(km|kms|m)$/i.exec(value.trim());
+  if (!m) return undefined;
+  const n = Number(m[1]) / (m[2].toLowerCase() === "m" ? 1000 : 1);
+  return n > 0 && n < 20 ? n : undefined;
+}
+
 export function buildingFacts(
   workspaces: CoworkingModel.WorkSpace[],
   offices: ManagedOfficeModel.ManagedOffice[],
@@ -36,21 +47,25 @@ export function buildingFacts(
 ): BuildingFacts {
   const operators = new Set<string>();
   for (const ws of workspaces) {
-    const brand = ws.brand?.name?.trim();
-    operators.add(brand && !/other coworking/i.test(brand) ? brand : withoutBuilding(ws.name, buildingName));
+    operators.add(operatorBrandName(ws.brand) || withoutBuilding(ws.name, buildingName));
   }
-  for (const o of offices) operators.add((o.brand?.name || withoutBuilding(o.name, buildingName)).trim());
+  for (const o of offices) operators.add((operatorBrandName(o.brand) || withoutBuilding(o.name, buildingName)).trim());
 
   const cw = workspaces.map((w) => w.starting_price).filter(positive);
   const mo = offices.map(managedOfficeStartingPrice).filter(positive);
 
   let metro: BuildingFacts["metro"] = null;
   for (const ws of workspaces) {
-    const m = ws.location?.metro_detail;
-    if (!m?.name?.trim()) continue;
-    if (!metro || (positive(m.distance) && (!positive(metro.distance) || m.distance < metro.distance))) {
-      metro = { name: m.name.trim(), distance: positive(m.distance) ? m.distance : undefined };
+    const m = coworkingMetro(ws.location);
+    if (!m) continue;
+    const km = kilometres(m.distance);
+    if (!metro || (km !== undefined && (metro.distance === undefined || km < metro.distance))) {
+      metro = { name: metroStationShortName(m.name), distance: km };
     }
+  }
+  if (!metro) {
+    const office = offices.map(managedOfficeMetro).find(Boolean);
+    if (office) metro = { name: metroStationShortName(office.name), distance: kilometres(office.distance) };
   }
 
   return {

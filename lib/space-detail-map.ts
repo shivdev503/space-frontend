@@ -1,3 +1,5 @@
+import { isPlaceholderPin } from "@/lib/listing-pin";
+
 export type MapCoordinates = {
   lat: number;
   lng: number;
@@ -32,6 +34,7 @@ export function normalizeMapCoordinates(
 ): MapCoordinates | null {
   if (lat == null || lng == null) return null;
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (isPlaceholderPin(lng)) return null;
   if (Math.abs(lat) < 0.0001 && Math.abs(lng) < 0.0001) return null;
   return { lat, lng };
 }

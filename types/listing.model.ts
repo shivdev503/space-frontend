@@ -192,6 +192,7 @@ export namespace ListingModel {
     landmark: string;
     landmark_distance: string;
     metro_stop_landmark?: string;
+    nearby_landmark?: string;
     bus_stop_landmark?: string;
     bus_stop_distance?: string;
     ferry_stop_landmark?: string;
@@ -201,8 +202,8 @@ export namespace ListingModel {
     tram_landmark?: string;
     tram_distance?: string;
     micro_location_string?: string;
-    latitude: number;
-    longitude: number;
+    latitude?: number;
+    longitude?: number;
     is_near_metro?: boolean;
     is_bus_stop?: boolean;
     is_ferry_stop?: boolean;

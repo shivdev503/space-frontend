@@ -3,6 +3,7 @@ import {
   CoworkingDetailEyebrow,
   CoworkingDetailSectionTitle,
 } from "@/modules/coworking/components/coworking-detail/coworking-detail-ui";
+import { operatorBrandName } from "@/lib/operator-brand";
 import type { ManagedOfficeModel } from "@/types/managed-office.model";
 import { cn } from "@/utils/cn";
 import { toTitleCase } from "@/utils/format";
@@ -34,7 +35,7 @@ export function ManagedOfficeDetailSpecs({ office }: { office: ManagedOfficeMode
 
   const rows = (
     [
-      ["Operator", office.brand?.name?.trim() ?? ""],
+      ["Operator", operatorBrandName(office.brand)],
       ["Building", office.location?.building_name?.replace(/\s+/g, " ").trim() ?? ""],
       ["Centre type", office.centre_type ? CENTRE_TYPE[office.centre_type] ?? toTitleCase(office.centre_type) : ""],
       ["Office type", managedOfficeSeatTypes(office).join(", ")],

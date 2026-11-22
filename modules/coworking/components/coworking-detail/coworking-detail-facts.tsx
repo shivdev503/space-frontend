@@ -65,10 +65,22 @@ export function openingHoursLines(hours: CoworkingModel.WorkSpace["hours_of_oper
 
 type Fact = { icon: ComponentType<{ className?: string }>; label: string; value: string | string[] };
 
+/** Imports put the state, city, area, centre name or page slug in the building field: those aren't buildings. */
+function buildingName(value: unknown, notBuildings: (string | undefined)[]): string {
+  if (typeof value !== "string") return "";
+  const name = value.replace(/\s+/g, " ").replace(/[\s,]+$/, "").trim();
+  if (!name || /\/[a-z0-9]+-[a-z0-9-]+/.test(name)) return "";
+  const key = (v?: string) => (v ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (notBuildings.some((v) => v && key(v) === key(name))) return "";
+  return /^(haryana|maharashtra|madhya pradesh|delhi|new delhi|uttar pradesh|gujarat|karnataka|rajasthan|tamil nadu|telangana|commercial complex|business center|business centre)$/i.test(name)
+    ? ""
+    : name;
+}
+
 /** Building, floor, size, seats and opening hours — only the ones the space has. */
 export function CoworkingDetailFacts({ workspace }: { workspace: CoworkingModel.WorkSpace }) {
   const loc = workspace.location;
-  const building = typeof loc?.name1 === "string" ? loc.name1.trim() : "";
+  const building = buildingName(loc?.name1, [workspace.name, workspace.slug, loc?.city?.name, loc?.micro_location?.name]);
   const floor = loc?.floor !== undefined && loc?.floor !== null ? String(loc.floor).trim() : "";
   const area = Number(workspace.area_sqft) || 0;
   const seats = Number(workspace.no_of_seats) || 0;

@@ -10,6 +10,7 @@ import {
   CoworkingDetailSectionTitle,
 } from "@/modules/coworking/components/coworking-detail/coworking-detail-ui";
 import { workspaceDescriptionHtml } from "@/lib/coworking-workspace-content";
+import { operatorBrandName } from "@/lib/operator-brand";
 import type { CoworkingModel } from "@/types/coworking-workspace.model";
 import { cn } from "@/utils/cn";
 import { toTitleCase } from "@/utils/format";
@@ -40,7 +41,8 @@ export function CoworkingDetailAbout({
   const [open, setOpen] = useState(false);
   const micro = workspace.location?.micro_location?.name?.trim() || "this location";
   const city = workspace.location?.city?.name?.trim() || "";
-  const brandName = workspace.brand?.name?.trim() || "Coworking operator";
+  const brandName = operatorBrandName(workspace.brand);
+  const centreName = workspace.name?.trim() || "this space";
   const brandLine =
     workspace.brand?.brand_tag_line?.trim() ||
     workspace.brand?.logo_tag_line?.trim() ||
@@ -52,7 +54,7 @@ export function CoworkingDetailAbout({
     const text = plainDescription(workspaceDescriptionHtml(workspace));
     if (!text) {
       return [
-        `${workspace.name} offers flexible coworking on ${toTitleCase(micro)}${city ? `, ${toTitleCase(city)}` : ""} with desks, meeting rooms, and managed office support.`,
+        `${workspace.name} offers flexible coworking in ${toTitleCase(micro)}${city ? `, ${toTitleCase(city)}` : ""} with desks, meeting rooms, and managed office support.`,
       ];
     }
     return text.split(/\n+/).filter(Boolean);
@@ -63,9 +65,16 @@ export function CoworkingDetailAbout({
   return (
     <CoworkingDetailBlock>
       <CoworkingDetailSectionTitle>
-        A premium {brandName} address on {toTitleCase(micro)}
+        {brandName
+          ? `A premium ${brandName} address in ${toTitleCase(micro)}`
+          : `About ${centreName}${
+              workspace.location?.micro_location?.name?.trim() && !centreName.toLowerCase().includes(micro.toLowerCase())
+                ? `, ${toTitleCase(micro)}`
+                : ""
+            }`}
       </CoworkingDetailSectionTitle>
 
+      {brandName ? (
       <div className="mt-5 flex items-center gap-4 rounded-[14px] border border-[#E7E9E6] bg-[#F3F1EA] p-4">
         {logo ? (
           <Image
@@ -94,6 +103,7 @@ export function CoworkingDetailAbout({
           </Link>
         ) : null}
       </div>
+      ) : null}
       {brandLink ? (
         <Link
           href={brandLink.href}

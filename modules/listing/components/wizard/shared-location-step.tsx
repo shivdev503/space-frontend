@@ -4,6 +4,8 @@ import { useCallback } from "react";
 
 import type { ListingModel } from "@/types/listing.model";
 
+import { isPlaceholderPin } from "@/lib/listing-pin";
+
 import { AsyncSearchSelect, type AsyncOption } from "./async-search-select";
 import { DEFAULT_COUNTRY_ID } from "./constants";
 import { Field, TextArea, TextInput } from "./fields";
@@ -17,9 +19,33 @@ export type LocationFormState = {
   address: string;
   /** maps to upstream `location.landmark` */
   metroLandmark: string;
-  /** maps to upstream `location.metro_stop_landmark` */
+  /** maps to upstream `location.nearby_landmark` */
   nearByLandmark: string;
+  /** When editing: fields the form doesn't show (pin, building, floor…), sent back unchanged. */
+  kept?: Record<string, unknown>;
 };
+
+const NOT_KEPT = new Set(["city", "micro_location", "address", "id", "_id"]);
+
+/** Saved location fields to send back on an edit; the API replaces the whole `location`. */
+export function keptLocationFields(location: unknown): Record<string, unknown> {
+  if (!location || typeof location !== "object") return {};
+  const kept: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(location)) {
+    // Refs arrive populated; `state` is the only one the form doesn't set.
+    if (key === "state" && value && typeof value === "object") {
+      const ref = value as { _id?: string; id?: string };
+      if (ref._id || ref.id) kept.state = ref._id || ref.id;
+    } else if (["string", "number", "boolean"].includes(typeof value) && !NOT_KEPT.has(key)) {
+      kept[key] = value;
+    }
+  }
+  if (isPlaceholderPin(kept.longitude)) {
+    delete kept.latitude;
+    delete kept.longitude;
+  }
+  return kept;
+}
 
 export const emptyLocation: LocationFormState = {
   cityId: "",
@@ -152,6 +178,10 @@ export function SharedLocationStep({ value, onChange, disabled }: Props) {
                 cityName: opt?.label ?? "",
                 microLocationId: "",
                 microLocationName: "",
+                // Another city: the saved pin and state no longer apply.
+                ...(value.kept && opt?.value !== value.cityId
+                  ? { kept: { ...value.kept, latitude: undefined, longitude: undefined, state: undefined } }
+                  : {}),
               });
             }}
             fetcher={fetchCities}

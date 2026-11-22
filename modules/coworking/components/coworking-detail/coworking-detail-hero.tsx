@@ -15,9 +15,11 @@ import { toTitleCase } from "@/utils/format";
 export function CoworkingDetailHero({ workspace }: { workspace: CoworkingModel.WorkSpace }) {
   const micro = workspace.location?.micro_location?.name?.trim();
   const city = workspace.location?.city?.name?.trim();
-  const landmark =
+  const saved =
     workspace.location?.metro_detail?.name?.trim() ||
     (typeof workspace.location?.landmark === "string" ? workspace.location.landmark.trim() : "");
+  // "NA", "No" and "Near …" are saved in this field.
+  const landmark = /^(na|n\/a|no|none|nil|-)$/i.test(saved) ? "" : saved.replace(/^near(\s+by)?\s+/i, "");
   const rating = workspaceRating(workspace);
   const locParts = [micro || workspaceAddress(workspace), city].filter(Boolean);
   const locLine = locParts.join(", ");
