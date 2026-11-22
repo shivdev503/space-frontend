@@ -109,6 +109,16 @@ export function getFallbackSeoContent(pathname: string, slug: string): SeoConten
       footer_description: `<p>List coworking spaces, managed offices and PG or coliving homes on ${APP_NAME}, track each listing's status and leads, and update availability, all from one place.</p>`,
     };
   }
+  if (p === "/about-us") {
+    // The page is itself "About SpaceWallah": no generic block repeating it underneath.
+    return {
+      title: `About Us | ${APP_NAME}`,
+      description: `Who runs ${APP_NAME}, how it works, and the office address and company details.`,
+      path: p,
+      footer_title: "",
+      footer_description: "",
+    };
+  }
   return {
     title: `${APP_NAME} | Workspace & office search`,
     description:

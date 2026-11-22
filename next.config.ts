@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
       },
       { source: "/:vertical(coworking|virtual-office|managed-office|coliving)/navi-mumbai", destination: "/:vertical/mumbai", permanent: true },
       { source: "/office-space/gurugram/:path*", destination: "/managed-office/gurgaon/:path*", permanent: true },
+      { source: "/about", destination: "/about-us", permanent: true },
       { source: "/office-space", destination: "/managed-office", permanent: true },
       { source: "/office-space/:path*", destination: "/managed-office/:path*", permanent: true },
       // Indexed locality with no managed offices: its listings live on the city page.

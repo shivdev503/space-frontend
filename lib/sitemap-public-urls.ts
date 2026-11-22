@@ -76,6 +76,7 @@ export function buildMainPagesSitemapEntries(): SitemapUrlEntry[] {
     { loc: `${b}/managed-office`, changefreq: "weekly", priority: 0.8 },
     { loc: `${b}/coliving`, changefreq: "weekly", priority: 0.8 },
     { loc: `${b}/list-your-space`, changefreq: "monthly", priority: 0.5 },
+    { loc: `${b}/about-us`, changefreq: "monthly", priority: 0.5 },
     { loc: `${b}/contact`, changefreq: "monthly", priority: 0.4 },
     { loc: `${b}/privacy-policy`, changefreq: "yearly", priority: 0.2 },
     { loc: `${b}/terms`, changefreq: "yearly", priority: 0.2 },

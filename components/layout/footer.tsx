@@ -44,6 +44,7 @@ const PRIMARY_LINKS = [
 ] as const;
 
 const COMPANY_LINKS = [
+  { label: "About Us", href: "/about-us" },
   { label: "List Your Space", href: "/list-your-space" },
   { label: "Blog", href: "/blog" },
   { label: "Contact Us", href: "/contact" },
