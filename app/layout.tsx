@@ -8,6 +8,7 @@ import "./globals.css";
 
 import { GtmPageView } from "@/components/analytics/gtm-page-view";
 import { GTM_ID, isGtmEnabled } from "@/lib/gtm";
+import { shareImages } from "@/lib/share-image";
 import { resolveAppUrl } from "@/services/env-config";
 import { APP_NAME } from "@/utils/constants";
 
@@ -26,6 +27,9 @@ export const metadata: Metadata = {
   },
   description:
     "Discover coworking spaces, virtual offices, and managed offices across India with a premium lead-generation experience.",
+  // For pages without their own Open Graph block (compare, shortlist, 404).
+  openGraph: { siteName: APP_NAME, type: "website", images: shareImages() },
+  twitter: { card: "summary_large_image", images: shareImages() },
   manifest: "/site.webmanifest",
   // app/favicon.ico (16/32/48) is added by Next automatically. Google Search wants a square icon
   // whose size is a multiple of 48px; iOS ignores SVG touch icons, so both get PNGs.

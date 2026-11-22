@@ -9,7 +9,7 @@ import type { CoworkingModel } from "@/types/coworking-workspace.model";
 const MAX_SPACES = 30;
 
 export const metadata: Metadata = {
-  title: "Your Shortlist | SpaceWallah",
+  title: { absolute: "Your Shortlist | SpaceWallah" },
   description: "Coworking spaces you saved on SpaceWallah. Get quotes for all of them or share the list.",
   // Personal lists; keep them out of the index.
   robots: { index: false, follow: true },

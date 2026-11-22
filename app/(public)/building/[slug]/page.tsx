@@ -5,11 +5,13 @@ import type { BreadcrumbItem } from "@/components/seo/breadcrumbs";
 import { routeCitySlug } from "@/lib/breadcrumb-trails";
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
 import { collectLocalityPages } from "@/lib/sitemap-public-urls";
+import { managedOfficeImages } from "@/modules/managed-office/managed-office-format";
 import { buildingFacts, buildingSeo } from "@/modules/building/building-content";
 import { BuildingPage } from "@/modules/building/building-page";
 import { buildingDistance, loadBuilding, loadBuildingsOrEmpty, type Building } from "@/services/building-api";
 import { getVerticalCityPageContent } from "@/services/cities";
 import { coworkingCardRow, loadCoworkingWorkspacesInBuilding } from "@/services/coworking-api";
+import { buildWorkspaceGalleryMedia } from "@/services/coworking-workspace-mapper";
 import { slugifyMicroLocationName } from "@/services/location-api";
 import { listManagedOffices } from "@/services/managed-office-api";
 import { cache } from "react";
@@ -37,7 +39,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const page = await loadBuildingPage(slug);
   if (!page) notFound();
-  return buildMetadataWithCmsSeoFallback(`/building/${page.building.slug}`, buildingSeo(page.building, page.facts));
+  const { building, facts, workspaces, offices } = page;
+  // The building's own photo, else the first centre's.
+  const photos = [
+    building.image,
+    ...workspaces.flatMap((w) => buildWorkspaceGalleryMedia(w).images),
+    ...offices.flatMap((o) => managedOfficeImages(o).images),
+  ];
+  return buildMetadataWithCmsSeoFallback(`/building/${building.slug}`, buildingSeo(building, facts), photos);
 }
 
 /** Home › Coworking › City › Area › Building, linking only the city and area pages that exist. */

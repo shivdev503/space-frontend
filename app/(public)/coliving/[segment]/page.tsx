@@ -14,6 +14,7 @@ import { colivingCitySeo, colivingListingSeo } from "@/lib/seo-templates";
 import { ColivingCityPage } from "@/modules/coliving/coliving-city-page";
 import { ColivingDetailPage } from "@/modules/coliving/coliving-detail-page";
 import { getVerticalCityPageContent } from "@/services/cities";
+import { pgImagesSorted } from "@/services/pg-mapper";
 import { loadPgDetail, loadPgList } from "@/services/pg-api";
 import { colivingMarketStats } from "@/services/market-stats";
 import { getSeoBySlug } from "@/services/seo-content";
@@ -39,7 +40,11 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const pgRes = await loadPgDetail(segment);
   if (pgRes?.data) {
     const pg = pgRes.data;
-    const metadata = await buildMetadataWithCmsSeoFallback(`/coliving/${pgRes.slug}`, colivingListingSeo(pg));
+    const metadata = await buildMetadataWithCmsSeoFallback(
+      `/coliving/${pgRes.slug}`,
+      colivingListingSeo(pg),
+      pgImagesSorted(pg.images ?? []),
+    );
     // Weak or template-only PG pages stay out of Google until improved, and so do PGs in cities without
     // a city page (nothing links to them but each other); links on them still count.
     const indexable = isIndexablePg({ indexable: pg.index_in_google !== false, cityName: pg.city?.trim() });

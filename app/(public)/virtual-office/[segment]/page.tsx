@@ -20,6 +20,7 @@ import {
   loadCoworkingWorkspaceDetail,
   loadCoworkingWorkspacesPageForCity,
 } from "@/services/coworking-api";
+import { buildWorkspaceGalleryMedia } from "@/services/coworking-workspace-mapper";
 import { getSimilarSpaces, resolveVerticalSegment } from "@/services/spaces";
 import type { SeoContent } from "@/types/seo.model";
 import { toTitleCase } from "@/utils/format";
@@ -54,10 +55,11 @@ export async function generateMetadata({
     const pathname = `/virtual-office/${workspace.slug}`;
     // Per-space virtual office SEO from the API, when it is filled in.
     const virtualSeo = workspace.virtualSeo;
+    const photos = buildWorkspaceGalleryMedia(workspace).images;
     if (virtualSeo?.title?.trim() && virtualSeo.status !== false) {
-      return buildPageMetadataFromSeo(pathname, virtualSeo as unknown as SeoContent);
+      return buildPageMetadataFromSeo(pathname, virtualSeo as unknown as SeoContent, photos);
     }
-    return buildMetadataWithCmsSeoFallback(pathname, virtualOfficeListingSeo(workspace));
+    return buildMetadataWithCmsSeoFallback(pathname, virtualOfficeListingSeo(workspace), photos);
   }
 
   await resolveVerticalSegment("virtual-office", segment);

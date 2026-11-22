@@ -5,7 +5,7 @@ import { CoworkingCompareView } from "@/modules/compare/coworking-compare-view";
 import { loadCoworkingWorkspaceDetail } from "@/services/coworking-api";
 
 export const metadata: Metadata = {
-  title: "Compare Coworking Spaces | SpaceWallah",
+  title: { absolute: "Compare Coworking Spaces | SpaceWallah" },
   description: "Compare coworking spaces side by side: prices, ratings, location, opening hours and amenities.",
   // Every selection is its own URL; keep them out of the index.
   robots: { index: false, follow: true },

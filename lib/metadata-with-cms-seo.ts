@@ -19,14 +19,16 @@ type FallbackMeta = {
 export async function buildMetadataWithCmsSeoFallback(
   pathname: string,
   fallback: FallbackMeta,
+  /** The page's own photos, best first, for the share preview. */
+  photos: ReadonlyArray<string | null | undefined> = [],
 ): Promise<Metadata> {
   const slug = pathnameToSeoSlug(pathname);
   const seo = await getSeoBySlug(slug);
   if (seo) {
-    return buildPageMetadataFromSeo(pathname, seo);
+    return buildPageMetadataFromSeo(pathname, seo, photos);
   }
 
-  const base = buildMetadata(fallback.title, fallback.description, pathname);
+  const base = buildMetadata(fallback.title, fallback.description, pathname, photos);
   const kw = fallback.keywords
     ?.split(",")
     .map((s) => s.trim())

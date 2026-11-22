@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const post = await loadBlogPostBySlug(slug);
   if (!post) notFound();
-  return buildMetadata(post.title, post.excerpt, `/blog/${post.slug}`);
+  return buildMetadata(post.title, post.excerpt, `/blog/${post.slug}`, [post.coverImage]);
 }
 
 export default async function BlogArticlePage({ params }: PageProps) {

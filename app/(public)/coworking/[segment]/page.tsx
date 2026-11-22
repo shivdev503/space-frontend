@@ -12,6 +12,7 @@ import {
   loadInitialCoworkingListing,
 } from "@/services/coworking-api";
 import { coworkingMarketStats } from "@/services/market-stats";
+import { buildWorkspaceGalleryMedia } from "@/services/coworking-workspace-mapper";
 import { resolveVerticalSegment } from "@/services/spaces";
 import { workspaceSeo } from "@/lib/coworking-workspace-content";
 import { buildMetadataWithCmsSeoFallback } from "@/lib/metadata-with-cms-seo";
@@ -78,14 +79,16 @@ export async function generateMetadata({
   if (workspace) {
     const pathname = `/coworking/${workspace.slug}`;
     const spaceSeo = workspaceSeo(workspace);
+    const photos = buildWorkspaceGalleryMedia(workspace).images;
     if (spaceSeo) {
-      return buildPageMetadataFromSeo(pathname, {
-        ...spaceSeo,
-        title: coworkingBrandedTitle(spaceSeo.title, workspace),
-      });
+      return buildPageMetadataFromSeo(
+        pathname,
+        { ...spaceSeo, title: coworkingBrandedTitle(spaceSeo.title, workspace) },
+        photos,
+      );
     }
 
-    return buildMetadataWithCmsSeoFallback(pathname, coworkingListingSeo(workspace));
+    return buildMetadataWithCmsSeoFallback(pathname, coworkingListingSeo(workspace), photos);
   }
 
   notFound();

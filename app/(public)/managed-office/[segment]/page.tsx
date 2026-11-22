@@ -14,7 +14,7 @@ import { VerticalCityPage } from "@/modules/city-pages/vertical-city-page";
 import { ManagedOfficeDetailPage } from "@/modules/managed-office/managed-office-detail-page";
 import { buildingForListing } from "@/services/building-api";
 import { getVerticalCityPageContent } from "@/services/cities";
-import { MANAGED_OFFICE_PAGE_SIZE, managedOfficeCardRow } from "@/modules/managed-office/managed-office-format";
+import { MANAGED_OFFICE_PAGE_SIZE, managedOfficeCardRow, managedOfficeImages } from "@/modules/managed-office/managed-office-format";
 import { loadManagedOfficeDetail, managedOfficesByCity } from "@/services/managed-office-api";
 import { getSeoBySlug } from "@/services/seo-content";
 import type { SeoContent } from "@/types/seo.model";
@@ -53,11 +53,12 @@ export async function generateMetadata({
   if (office) {
     const pathname = `/managed-office/${office.slug}`;
     // Per-office SEO from the API, when it is filled in (new_seo first, like workspaces).
+    const photos = managedOfficeImages(office).images;
     const seo = office.new_seo?.title?.trim() ? office.new_seo : office.seo;
     if (seo?.title?.trim() && seo.status !== false) {
-      return buildPageMetadataFromSeo(pathname, seo as unknown as SeoContent);
+      return buildPageMetadataFromSeo(pathname, seo as unknown as SeoContent, photos);
     }
-    return buildMetadataWithCmsSeoFallback(pathname, managedOfficeListingSeo(office));
+    return buildMetadataWithCmsSeoFallback(pathname, managedOfficeListingSeo(office), photos);
   }
 
   notFound();
