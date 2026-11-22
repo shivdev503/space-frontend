@@ -34,6 +34,8 @@ const nextConfig: NextConfig = {
       { source: "/office-space/:path*", destination: "/managed-office/:path*", permanent: true },
       // Indexed locality with no managed offices: its listings live on the city page.
       { source: "/managed-office/gurgaon/golf-course-road", destination: "/managed-office/gurgaon", permanent: true },
+      // Duplicate coworking listing, rejected in admin: points at the one that stays live.
+      { source: "/:vertical(coworking|virtual-office)/hub-and-oak-coworking-defence-colony", destination: "/:vertical/hub-and-oak-coworking-defence-colony-delhi", permanent: true },
       // Duplicate PG listings that Google had indexed: each points at the listing that stays live.
       { source: "/coliving/guru-kripa-pg-in-sector-18-gurgaon-4", destination: "/coliving/guru-kripa-pg-in-sector-18-gurgaon-3", permanent: true },
       { source: "/coliving/homes-pg-in-sector-48-gurgaon-6", destination: "/coliving/homes-pg-in-sector-48-gurgaon-4", permanent: true },

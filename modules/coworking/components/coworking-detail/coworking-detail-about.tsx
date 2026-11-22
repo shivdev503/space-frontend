@@ -41,7 +41,9 @@ export function CoworkingDetailAbout({
   const [open, setOpen] = useState(false);
   const micro = workspace.location?.micro_location?.name?.trim() || "this location";
   const city = workspace.location?.city?.name?.trim() || "";
-  const brandName = operatorBrandName(workspace.brand);
+  const savedBrand = operatorBrandName(workspace.brand);
+  // Many brands are saved in lower case ("the address", "connekt").
+  const brandName = savedBrand === savedBrand.toLowerCase() ? savedBrand.replace(/(^|\s)([a-z])/g, (word) => word.toUpperCase()) : savedBrand;
   const centreName = workspace.name?.trim() || "this space";
   const brandLine =
     workspace.brand?.brand_tag_line?.trim() ||
@@ -66,7 +68,7 @@ export function CoworkingDetailAbout({
     <CoworkingDetailBlock>
       <CoworkingDetailSectionTitle>
         {brandName
-          ? `A premium ${brandName} address in ${toTitleCase(micro)}`
+          ? `A premium ${brandName} ${/address$/i.test(brandName) ? "centre" : "address"} in ${toTitleCase(micro)}`
           : `About ${centreName}${
               workspace.location?.micro_location?.name?.trim() && !centreName.toLowerCase().includes(micro.toLowerCase())
                 ? `, ${toTitleCase(micro)}`
