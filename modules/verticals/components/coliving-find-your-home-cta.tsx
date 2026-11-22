@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Check, Home, Shield } from "lucide-react";
+import { ArrowRight, Home, Shield } from "lucide-react";
 
 import { Container } from "@/components/ui/container";
 
@@ -9,7 +9,6 @@ const CTA_IMAGE =
   "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1800&q=85";
 
 const TRUST_ITEMS = [
-  { icon: Check, label: "Trusted by 10,000+ residents" },
   { icon: Shield, label: "100% inspected & operator-verified" },
   { icon: Home, label: "Zero brokerage · No spam guarantee" },
 ] as const;
