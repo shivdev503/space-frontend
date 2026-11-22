@@ -137,3 +137,43 @@ export function ListingItemListJsonLd({
     />
   );
 }
+
+/** An office building page: the building as a Place, with address and map position. */
+export function BuildingPlaceJsonLd({
+  name,
+  path,
+  address,
+  city,
+  latitude,
+  longitude,
+  image,
+}: {
+  name: string;
+  path: string;
+  address?: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
+  image?: string;
+}) {
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "Place",
+        name: clean(name),
+        url: absoluteUrl(path),
+        ...(image ? { image } : {}),
+        address: {
+          "@type": "PostalAddress",
+          ...(address ? { streetAddress: clean(address) } : {}),
+          ...(city ? { addressLocality: clean(city) } : {}),
+          addressCountry: "IN",
+        },
+        ...(latitude != null && longitude != null
+          ? { geo: { "@type": "GeoCoordinates", latitude, longitude } }
+          : {}),
+      }}
+    />
+  );
+}

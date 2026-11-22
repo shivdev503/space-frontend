@@ -85,6 +85,8 @@ export type ManagedOfficeListParams = {
   minPrice?: number;
   maxPrice?: number;
   name?: string;
+  /** Office building id (`Building`): the offices in one building. */
+  building?: string;
   limit?: number;
   page?: number;
 };
@@ -110,6 +112,7 @@ export async function listManagedOffices(
         minPrice: params.minPrice,
         maxPrice: params.maxPrice,
         name: params.name?.trim() || undefined,
+        building: params.building?.trim() || undefined,
         limit: params.limit ?? DEFAULT_LIMIT,
         page: params.page ?? 1,
       },

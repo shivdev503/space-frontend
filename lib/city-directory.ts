@@ -1,5 +1,7 @@
 // Server only: used by city page server components, never from a client component.
+import { routeCitySlug } from "@/lib/breadcrumb-trails";
 import { collectLocalityPages, isIndexablePg } from "@/lib/sitemap-public-urls";
+import { loadBuildingsOrEmpty } from "@/services/building-api";
 import { verticalPath } from "@/lib/vertical-path";
 import { NON_OPERATOR_BRAND_SLUGS } from "@/services/brand-api";
 import { EMPTY_CITY_PAGE_FILTERS, getCityPageData } from "@/services/mock-db";
@@ -25,6 +27,8 @@ export type CityDirectory = {
   listings: Array<{ name: string; href: string; area?: string }>;
   /** Operators with centres in the city (coworking only), most centres first. */
   brands: Array<{ name: string; href: string; count: number }>;
+  /** Office buildings with 2+ centres (coworking and managed office city pages), most centres first. */
+  buildings: Array<{ name: string; href: string; count: number; area?: string }>;
 };
 
 /** Never hold a page for the directory: a cold load keeps running for later requests. */
@@ -63,12 +67,16 @@ function byName<T extends { name: string }>(a: T, b: T): number {
 }
 
 async function build(vertical: SpaceVertical): Promise<Built> {
-  const [items, localityPages] = await Promise.all([INVENTORY[vertical](), collectLocalityPages()]);
+  const [items, localityPages, buildings] = await Promise.all([
+    INVENTORY[vertical](),
+    collectLocalityPages(),
+    vertical === "coworking" || vertical === "office-space" ? loadBuildingsOrEmpty() : Promise.resolve([]),
+  ]);
   const segment = verticalPath(vertical);
   const byCity = new Map<string, CityDirectory>();
   const get = (city: string) => {
     let dir = byCity.get(city);
-    if (!dir) byCity.set(city, (dir = { areas: [], listings: [], brands: [] }));
+    if (!dir) byCity.set(city, (dir = { areas: [], listings: [], brands: [], buildings: [] }));
     return dir;
   };
 
@@ -123,7 +131,14 @@ async function build(vertical: SpaceVertical): Promise<Built> {
       .slice(0, MAX_BRANDS);
   }
 
+  for (const b of buildings) {
+    const city = routeCitySlug(b.cityName, b.cityId);
+    if (!city) continue;
+    get(city).buildings.push({ name: b.name, href: `/building/${b.slug}`, count: b.totalCentres, area: b.areaName });
+  }
+
   for (const dir of byCity.values()) {
+    dir.buildings.sort((a, b) => b.count - a.count || byName(a, b));
     dir.areas.sort((a, b) => b.count - a.count || byName(a, b));
     dir.listings.sort((a, b) => byName(a, b) || (a.area ?? "").localeCompare(b.area ?? ""));
   }
@@ -155,7 +170,9 @@ export async function loadCityDirectory(vertical: SpaceVertical, citySlug: strin
     ]);
   }
   const dir = built?.byCity.get(citySlug);
-  if (!dir || (dir.areas.length === 0 && dir.listings.length === 0 && dir.brands.length === 0)) return null;
+  if (!dir || (dir.areas.length === 0 && dir.listings.length === 0 && dir.brands.length === 0 && dir.buildings.length === 0)) {
+    return null;
+  }
   return dir;
 }
 

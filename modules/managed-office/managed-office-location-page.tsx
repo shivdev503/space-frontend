@@ -1,5 +1,6 @@
 import { ListingItemListJsonLd } from "@/components/seo/listing-json-ld";
 import { Container } from "@/components/ui/container";
+import { AreaBuildings } from "@/modules/building/area-buildings";
 import { LeadCTA } from "@/modules/city-pages/components/lead-cta";
 import { PopularLocalitiesRail } from "@/modules/city-pages/components/popular-localities-rail";
 import { Breadcrumb } from "@/modules/location-pages/components/breadcrumb";
@@ -92,6 +93,8 @@ export function ManagedOfficeLocationPage({
           />
         </Container>
       </section>
+
+      <AreaBuildings citySlug={city.slug} areaSlug={locality.slug} areaName={locality.name} />
 
       <FAQSection faqs={faqs} locationName={locality.name} />
     </>

@@ -469,3 +469,21 @@ async function fetchVerticalLocationPageContent(
 /** Vertical location pages (coworking uses catalog + workspaces + micro-locations; others seed-only). */
 export const getVerticalLocationPageContent: typeof fetchVerticalLocationPageContent =
   typeof window === "undefined" ? cache(fetchVerticalLocationPageContent) : fetchVerticalLocationPageContent;
+
+/**
+ * Live coworking centres in one office building (`GET /api/user/workSpaces?building=<id>`),
+ * kept to the building's own centre slugs (so a response that ignores `building` can't leak in).
+ */
+export async function loadCoworkingWorkspacesInBuilding(
+  buildingId: string,
+  slugs: string[],
+): Promise<CoworkingModel.WorkSpace[]> {
+  const id = buildingId.trim();
+  const wanted = new Set(slugs.map((s) => s.trim()));
+  if (!id || wanted.size === 0 || !isCoworkingUserApiProxyEnabled()) return [];
+  const { data } = await getCoworkingAxios().get<unknown>(coworkingApiPaths.workSpaces, {
+    params: { building: id, limit: 100, page: 1 },
+  });
+  const payload = normalizeCoworkingWorkspacesPayload(data, { limit: 100, source: "axios" });
+  return (payload.data ?? []).filter((ws) => wanted.has(String(ws.slug ?? "").trim()));
+}

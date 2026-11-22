@@ -1,6 +1,8 @@
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { WorkspacePlaceJsonLd } from "@/components/seo/listing-json-ld";
 import { Container } from "@/components/ui/container";
+import { InThisBuilding } from "@/modules/building/in-this-building";
+import type { Building } from "@/services/building-api";
 import { listingTrail } from "@/lib/breadcrumb-trails";
 import { listingAltBase } from "@/lib/image-alt";
 import { CoworkingDetailAmenities } from "@/modules/coworking/components/coworking-detail/coworking-detail-amenities";
@@ -38,9 +40,12 @@ import { toTitleCase } from "@/utils/format";
 export function ManagedOfficeDetailPage({
   office,
   similarOffices = [],
+  building = null,
 }: {
   office: ManagedOfficeModel.ManagedOffice;
   similarOffices?: ManagedOfficeModel.ManagedOffice[];
+  /** The office building this office is in, when it has a building page. */
+  building?: Building | null;
 }) {
   const title = managedOfficeTitle(office);
   const locality = managedOfficeLocality(office);
@@ -108,6 +113,7 @@ export function ManagedOfficeDetailPage({
           </div>
         </Container>
 
+        <InThisBuilding building={building} />
         {similarOffices.length > 0 ? (
           <section id="similar" className="border-t border-[#E7E9E6] pt-8 pb-5 sm:pt-11 sm:pb-6">
             <Container className="max-w-[1280px]">

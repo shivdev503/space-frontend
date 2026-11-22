@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { VerticalCityPage } from "@/modules/city-pages/vertical-city-page";
 import { CoworkingDetailPage } from "@/modules/coworking/coworking-detail-page";
+import { buildingForListing } from "@/services/building-api";
 import { getVerticalCityPageContent } from "@/services/cities";
 import {
   loadCoworkingWorkspaceDetail,
@@ -124,9 +125,10 @@ export default async function CoworkingSegmentPage({
   if (!workspace) notFound();
 
   const cityId = workspace.location?.city?.id?.trim();
-  const [list, brandMore] = await Promise.all([
+  const [list, brandMore, building] = await Promise.all([
     cityId ? loadCoworkingWorkspacesList(cityId, 16) : Promise.resolve(null),
     loadBrandMore(workspace),
+    buildingForListing("coworking", workspace.slug),
   ]);
   // Centres already shown under "Explore more from {brand}" aren't repeated as similar spaces.
   const brandIds = new Set((brandMore?.inCity ?? []).map((w) => w.id));
@@ -135,6 +137,11 @@ export default async function CoworkingSegmentPage({
     .slice(0, 6);
 
   return (
-    <CoworkingDetailPage workspace={workspace} similarWorkspaces={similarWorkspaces} brandMore={brandMore} />
+    <CoworkingDetailPage
+      workspace={workspace}
+      similarWorkspaces={similarWorkspaces}
+      brandMore={brandMore}
+      building={building}
+    />
   );
 }

@@ -3,6 +3,7 @@ import type { SitemapIndexEntry, SitemapUrlEntry } from "@/lib/sitemap-xml";
 import { slugifyPgName } from "@/lib/pg-slug";
 import { verticalPath } from "@/lib/vertical-path";
 import { NON_OPERATOR_BRAND_SLUGS } from "@/services/brand-api";
+import { loadBuildings } from "@/services/building-api";
 import { canonicalCoworkingCitySlug } from "@/services/catalog-city-id";
 import { AVAILABLE_CITY_VIRTUAL_OFFICE } from "@/services/cities-data";
 import { resolveAppUrl } from "@/services/env-config";
@@ -110,6 +111,7 @@ export function buildRootSitemapIndexEntries(): SitemapIndexEntry[] {
     { loc: `${b}/sitemap/virtual-office-spaces-sitemap.xml` },
     { loc: `${b}/sitemap/office-space-sitemap.xml` },
     { loc: `${b}/sitemap/coliving-spaces-sitemap.xml` },
+    { loc: `${b}/sitemap/building-pages-sitemap.xml` },
   ];
 }
 
@@ -317,4 +319,14 @@ export function isIndexablePg(item: Pick<InventorySpace, "indexable" | "cityId" 
   if (item.indexable === false) return false;
   const city = citySlugOf(item as InventorySpace);
   return city != null && isCityPage("coliving", city);
+}
+
+/** `/building/{slug}` for every office building with 2+ live coworking centres or managed offices. */
+export async function collectBuildingPagesSitemapEntries(): Promise<SitemapUrlEntry[]> {
+  return sortByLoc(
+    (await loadBuildings()).map((building) => ({
+      loc: toAbsoluteUrl(`/building/${encodeURIComponent(building.slug)}`),
+      lastmod: building.updatedAt,
+    })),
+  );
 }

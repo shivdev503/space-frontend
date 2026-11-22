@@ -68,6 +68,36 @@ export async function CityDirectorySection({ vertical, citySlug, cityName }: Cit
           </div>
         ) : null}
 
+        {dir.buildings.length > 0 ? (
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+              Popular office buildings in {cityName}
+            </h2>
+            <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {dir.buildings.map((b) => (
+                <li key={b.href}>
+                  <Link
+                    href={b.href}
+                    prefetch={false}
+                    className="group flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 transition hover:border-slate-300 hover:shadow-sm"
+                  >
+                    <span className="min-w-0">
+                      <span className="flex items-center gap-1.5 truncate text-sm font-medium text-ink">
+                        <Building2 className="h-3.5 w-3.5 shrink-0 text-slate-400" aria-hidden />
+                        <span className="truncate">{b.name}</span>
+                      </span>
+                      <span className="mt-0.5 block text-xs text-muted">
+                        {b.count} centres{b.area ? ` · ${b.area}` : ""}
+                      </span>
+                    </span>
+                    <ArrowUpRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-slate-900" aria-hidden />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
         {dir.brands.length > 0 ? (
           <div>
             <h2 className="text-xl font-semibold tracking-tight text-ink sm:text-2xl">

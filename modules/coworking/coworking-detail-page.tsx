@@ -1,5 +1,7 @@
 import { WorkspacePlaceJsonLd } from "@/components/seo/listing-json-ld";
 import { Container } from "@/components/ui/container";
+import { InThisBuilding } from "@/modules/building/in-this-building";
+import type { Building } from "@/services/building-api";
 import { listingAltBase } from "@/lib/image-alt";
 import { CoworkingDetailAbout } from "@/modules/coworking/components/coworking-detail/coworking-detail-about";
 import { CoworkingDetailAmenities } from "@/modules/coworking/components/coworking-detail/coworking-detail-amenities";
@@ -60,10 +62,13 @@ export function CoworkingDetailPage({
   workspace,
   similarWorkspaces,
   brandMore = null,
+  building = null,
 }: {
   workspace: CoworkingModel.WorkSpace;
   similarWorkspaces: CoworkingModel.WorkSpace[];
   brandMore?: BrandMore | null;
+  /** The office building this centre is in, when it has a building page. */
+  building?: Building | null;
 }) {
   const images = workspaceImages(workspace);
   const cityName = displayCityName(workspace.location?.city?.name) || "city";
@@ -125,6 +130,7 @@ export function CoworkingDetailPage({
         </div>
       </Container>
 
+      <InThisBuilding building={building} />
       <CoworkingDetailBrandMore more={brandMore} />
 
       {similarWorkspaces.length > 0 ? (

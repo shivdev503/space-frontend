@@ -1,5 +1,6 @@
 import { loadBlogPostBySlug } from "@/services/blog-api";
 import { loadBrandPageData } from "@/services/brand-api";
+import { loadBuilding } from "@/services/building-api";
 import { getVerticalCityPageContent } from "@/services/cities";
 import { colivingLocalityExists } from "@/services/coliving-location";
 import { getVerticalLocationPageContent, loadCoworkingWorkspaceDetail } from "@/services/coworking-api";
@@ -49,6 +50,7 @@ export async function publicRouteExists(pathname: string): Promise<boolean> {
 
   if (root === "blog" && !second) return (await loadBlogPostBySlug(first)) != null;
   if (root === "brand" && !second) return (await loadBrandPageData(first)) != null;
+  if (root === "building" && !second) return (await loadBuilding(first)) != null;
   if (root === "coworking" && (first === "compare" || first === "shortlist") && !second) return true;
 
   const vertical = VERTICAL_BY_ROOT[root];

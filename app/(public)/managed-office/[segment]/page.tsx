@@ -12,6 +12,7 @@ import { seoPageTitleOrFallback } from "@/lib/seo-page-title";
 import { managedOfficeCitySeo, managedOfficeListingSeo } from "@/lib/seo-templates";
 import { VerticalCityPage } from "@/modules/city-pages/vertical-city-page";
 import { ManagedOfficeDetailPage } from "@/modules/managed-office/managed-office-detail-page";
+import { buildingForListing } from "@/services/building-api";
 import { getVerticalCityPageContent } from "@/services/cities";
 import { MANAGED_OFFICE_PAGE_SIZE, managedOfficeCardRow } from "@/modules/managed-office/managed-office-format";
 import { loadManagedOfficeDetail, managedOfficesByCity } from "@/services/managed-office-api";
@@ -98,9 +99,11 @@ export default async function OfficeSpaceSegmentPage({
   if (!office) notFound();
 
   const cityId = office.location?.city?.id?.trim();
-  const similarOffices = cityId
-    ? ((await managedOfficesByCity(cityId, 12)) ?? []).filter((o) => o.id !== office.id).slice(0, 6)
-    : [];
+  const [cityOffices, building] = await Promise.all([
+    cityId ? managedOfficesByCity(cityId, 12) : Promise.resolve(null),
+    buildingForListing("managed-office", office.slug),
+  ]);
+  const similarOffices = (cityOffices ?? []).filter((o) => o.id !== office.id).slice(0, 6);
 
-  return <ManagedOfficeDetailPage office={office} similarOffices={similarOffices} />;
+  return <ManagedOfficeDetailPage office={office} similarOffices={similarOffices} building={building} />;
 }

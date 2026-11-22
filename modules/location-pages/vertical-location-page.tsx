@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { AreaBuildings } from "@/modules/building/area-buildings";
+
 import { ListingItemListJsonLd } from "@/components/seo/listing-json-ld";
 import { Container } from "@/components/ui/container";
 import { PopularLocalitiesRail } from "@/modules/city-pages/components/popular-localities-rail";
@@ -171,6 +173,10 @@ export function VerticalLocationPage({
       ) : null}
 
       <AreaInsightsSection insights={insights} />
+
+      {data.vertical === "coworking" ? (
+        <AreaBuildings citySlug={data.citySlug} areaSlug={data.locationSlug} areaName={data.locationName} />
+      ) : null}
 
       <FAQSection faqs={data.faqs} locationName={data.locationName} />
 
