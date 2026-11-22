@@ -47,7 +47,7 @@ export function AnimatedCounter({ value, suffix = "" }: AnimatedCounterProps) {
 
   return (
     <span ref={ref}>
-      {count}
+      {count.toLocaleString("en-IN")}
       {suffix}
     </span>
   );

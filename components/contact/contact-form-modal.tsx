@@ -330,10 +330,6 @@ export function ContactFormModal({
                     <ShieldCheck className="h-4 w-4 text-[#4CAF50]" />
                     No spam. Only genuine leads.
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-600">
-                    <BadgeCheck className="h-4 w-4 text-[#4CAF50]" />
-                    1000+ people booked this space
-                  </div>
                 </div>
               </div>
 

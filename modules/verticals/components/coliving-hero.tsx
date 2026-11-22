@@ -19,7 +19,7 @@ const TRUSTED_CITIES = [
 ] as const;
 
 const FEATURE_PILLS = [
-  { dot: "bg-blue-600", text: "10000+ coliving & PG options" },
+  { dot: "bg-blue-600", text: "2,800+ coliving & PG options" },
   { dot: "bg-amber-500", text: "Move-in in 48 hours" },
   { dot: "bg-emerald-600/90", text: "Zero brokerage" },
 ] as const;

@@ -741,8 +741,8 @@ const seedCities: City[] = [
 ];
 
 const trustMetrics: TrustMetric[] = [
-  { id: "metric_001", value: 1000, suffix: "+", label: "Coworking spaces" },
-  { id: "metric_004", value: 10000, suffix: "+", label: "Coliving & PG options" },
+  { id: "metric_001", value: 750, suffix: "+", label: "Coworking spaces" },
+  { id: "metric_004", value: 2800, suffix: "+", label: "Coliving & PG options" },
   { id: "metric_002", value: 11, suffix: "+", label: "top cities covered" },
   { id: "metric_003", value: 250, suffix: "+", label: "startup and enterprise clients served" },
 ];
@@ -2052,9 +2052,9 @@ export function getVerticalLandingData(vertical: SpaceVertical): VerticalLanding
           "https://img.spacewallah.com/images/latest_images_2024/1be87877ad43a0a7666804cd6c1052a99b22488d.webp",
         imageLabel: "Modern open-plan workspace",
         badges: [
-          "10,000+ businesses served",
-          "50+ cities across India",
-          "500+ verified providers",
+          "1,000+ businesses served",
+          "12+ cities across India",
+          "200+ providers",
           "100% GST-approved addresses",
         ],
       },
