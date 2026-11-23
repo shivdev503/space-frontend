@@ -9,6 +9,7 @@ import { AVAILABLE_CITY_VIRTUAL_OFFICE } from "@/services/cities-data";
 import { resolveAppUrl } from "@/services/env-config";
 import { getColivingLocationPageContent, loadColivingLocalityPgs } from "@/services/coliving-location";
 import { getVerticalLocationPageContent } from "@/services/coworking-api";
+import { colivingLocalityInIndex, coworkingLocalityInIndex } from "@/services/locality-index-check";
 import { slugifyMicroLocationName } from "@/services/location-api";
 import { EMPTY_CITY_PAGE_FILTERS, getCityPageData } from "@/services/mock-db";
 import {
@@ -171,12 +172,15 @@ type LocalityCandidate = Pick<LocalityPage, "vertical" | "city" | "locality">;
  */
 async function localityPageHasListings(c: LocalityCandidate): Promise<boolean> {
   try {
+    // The listing index answers most checks without loading the page's listings from the API.
     if (c.vertical === "coliving") {
       const page = await getColivingLocationPageContent(c.city, c.locality);
       if (!page) return false;
+      if (await colivingLocalityInIndex(page)) return true;
       return (await loadColivingLocalityPgs(page)).totalRecords > 0;
     }
     if (c.vertical === "coworking") {
+      if (await coworkingLocalityInIndex(c.city, c.locality)) return true;
       const page = await getVerticalLocationPageContent("coworking", c.city, c.locality);
       return Boolean(page && page.totalSpaces > 0);
     }
@@ -276,7 +280,7 @@ export const collectLocalityPages = cachedLoader(async (): Promise<LocalityPage[
   }
 
   return filterWithLimit(candidates, 6, localityPageHasListings);
-});
+}, undefined, "locality-pages");
 
 export async function collectLocalityPagesSitemapEntries(): Promise<SitemapUrlEntry[]> {
   return sortByLoc((await collectLocalityPages()).map((c) => c.entry));

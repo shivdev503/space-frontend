@@ -6,7 +6,6 @@
 
 import { cache } from "react";
 
-import { cachedLoader } from "@/lib/cached-loader";
 import { pgApiCityName } from "@/lib/pg-list-priority";
 import { canonicalCoworkingCitySlug } from "@/services/catalog-city-id";
 import {
@@ -15,7 +14,7 @@ import {
 } from "@/services/coworking-workspace-mapper";
 import { slugifyMicroLocationName } from "@/services/location-api";
 import { fetchPgList } from "@/services/pg-api";
-import { loadCoworkingWorkspaceRows } from "@/services/sitemap-inventory";
+import { fromIndex } from "@/services/sitemap-inventory";
 
 export type MarketStats = {
   count: number;
@@ -23,10 +22,8 @@ export type MarketStats = {
   minPrice: number | null;
 };
 
-/** Workspaces with `starting_price` resolved the same way as listing cards. */
-export const loadCoworkingCards = cachedLoader(async () =>
-  normalizeCoworkingWorkspacesPayload({ data: await loadCoworkingWorkspaceRows() }).data,
-);
+/** Workspaces with `starting_price` resolved the same way as listing cards (from the listing index). */
+export const loadCoworkingCards = fromIndex((index) => normalizeCoworkingWorkspacesPayload({ data: index.coworking }).data);
 
 function normalizeSegment(segment: string): string {
   let value = segment.trim();

@@ -1,0 +1,8 @@
+# /etc/nginx/conf.d/spacewallah-refresh-key.conf  (http level; keep it out of git)
+# Requests from /api/cache-refresh carry this key in `x-sw-refresh`; nginx then rebuilds the page
+# instead of serving its stored copy. Use the same long random key as PAGE_REFRESH_KEY in the
+# website's .env.production and the backend's .env, e.g. from: openssl rand -hex 32
+map $http_x_sw_refresh $sw_refresh {
+    default                         0;
+    "REPLACE_WITH_PAGE_REFRESH_KEY" 1;
+}

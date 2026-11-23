@@ -26,12 +26,12 @@ const loadCityPages = cachedLoader(async (): Promise<Record<string, string[]>> =
     (out[segment] ??= []).push(decodeURIComponent(city));
   }
   return out;
-});
+}, undefined, "footer-city-pages");
 
 const loadHasBlog = cachedLoader(async (): Promise<boolean> => {
   const [posts, news] = await Promise.all([fetchBlogList(), fetchBlogNewsList()]);
   return posts.length > 0 || news.length > 0;
-});
+}, undefined, "footer-has-blog");
 
 function within<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
   return Promise.race([

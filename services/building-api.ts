@@ -99,7 +99,7 @@ export const loadBuildings = cachedLoader(async (): Promise<Building[]> => {
     if (axios.isAxiosError(error) && error.response?.status === 404) return [];
     throw error;
   }
-});
+}, undefined, "buildings");
 
 /** Buildings, or [] when they can't be loaded: for optional links that must never break a page. */
 export async function loadBuildingsOrEmpty(): Promise<Building[]> {

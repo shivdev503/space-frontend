@@ -8,6 +8,11 @@ import type { SeoContent } from "@/types/seo.model";
 
 const SEO_REVALIDATE_SECONDS = 300;
 
+/** Next.js data-cache tag of one CMS entry (by its slug, e.g. `coworking-gurgaon`). */
+export function seoCacheTag(slug: string): string {
+  return `seo:${slug}`;
+}
+
 async function fetchSeoBySlugInternal(slug: string): Promise<SeoContent | null> {
   if (!slug) return null;
 
@@ -18,7 +23,8 @@ async function fetchSeoBySlugInternal(slug: string): Promise<SeoContent | null> 
     // Network failures (API down, DNS, timeout) fall back to static SEO instead of erroring the page.
     const res = await fetch(url, {
       // Five minutes: SEO text changes rarely and is read on every page view.
-      next: { revalidate: SEO_REVALIDATE_SECONDS },
+      // Tagged so a CMS save can refresh this entry at once (`/api/cache-refresh`).
+      next: { revalidate: SEO_REVALIDATE_SECONDS, tags: [seoCacheTag(slug)] },
       headers: buildApiClientHeaders(),
     }).catch(() => null);
     if (!res?.ok) return null;

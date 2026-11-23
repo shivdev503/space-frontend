@@ -35,9 +35,18 @@ type Entry = {
 
 type Loaded = { res: AxiosResponse; entry: Entry | null };
 
-const store = new Map<string, Entry>();
-const inflight = new Map<string, Promise<Loaded>>();
-let totalBytes = 0;
+/**
+ * One cache for the whole server process: Next.js bundles pages and route handlers separately, and
+ * each bundle would otherwise keep (and fill) its own copy.
+ */
+type CacheState = { store: Map<string, Entry>; inflight: Map<string, Promise<Loaded>>; bytes: { total: number } };
+const STATE_KEY = Symbol.for("spacewallah.apiResponseCache");
+const state: CacheState = ((globalThis as Record<symbol, CacheState | undefined>)[STATE_KEY] ??= {
+  store: new Map(),
+  inflight: new Map(),
+  bytes: { total: 0 },
+});
+const { store, inflight } = state;
 
 const baseAdapter: AxiosAdapter = getAdapter(axios.defaults.adapter);
 
@@ -65,7 +74,7 @@ function cacheKey(config: InternalAxiosRequestConfig): string | null {
 function remove(key: string) {
   const e = store.get(key);
   if (!e) return;
-  totalBytes -= e.bytes;
+  state.bytes.total -= e.bytes;
   store.delete(key);
 }
 
@@ -82,10 +91,10 @@ function save(key: string, res: AxiosResponse): Entry | null {
   const entry: Entry = { at: Date.now(), bytes, status: res.status, statusText: res.statusText, headers: res.headers, body };
   remove(key);
   store.set(key, entry);
-  totalBytes += bytes;
+  state.bytes.total += bytes;
   // Map keeps insertion order: the first keys are the least recently used.
   for (const k of store.keys()) {
-    if (totalBytes <= MAX_BYTES) break;
+    if (state.bytes.total <= MAX_BYTES) break;
     remove(k);
   }
   return entry;
@@ -139,5 +148,17 @@ export const cachingAdapter: AxiosAdapter = async (config) => {
 };
 
 export function apiCacheStats() {
-  return { entries: store.size, megabytes: Math.round((totalBytes / 1024 / 1024) * 10) / 10, inflight: inflight.size };
+  return { entries: store.size, megabytes: Math.round((state.bytes.total / 1024 / 1024) * 10) / 10, inflight: inflight.size };
+}
+
+/** Forget cached responses whose request URL contains `fragment` (e.g. "/blog"), so the next read is fresh. */
+export function forgetApiResponses(fragment: string): number {
+  let removed = 0;
+  for (const key of Array.from(store.keys())) {
+    if (key.includes(fragment)) {
+      remove(key);
+      removed += 1;
+    }
+  }
+  return removed;
 }
