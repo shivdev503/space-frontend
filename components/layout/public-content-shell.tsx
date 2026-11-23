@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 
+import { NavigationFeedback } from "@/components/layout/navigation-feedback";
 import { isSiteHeaderHidden } from "@/lib/header-visibility";
 import { cn } from "@/utils/cn";
 
@@ -10,7 +11,7 @@ import { cn } from "@/utils/cn";
  * Offset page content below the fixed header (h-20). Homepage hero sits under
  * the transparent header instead, and pages without the site header need no offset.
  */
-export function PublicContentShell({ children }: { children: ReactNode }) {
+export function PublicContentShell({ children, citySlugs }: { children: ReactNode; citySlugs: string[] }) {
   const pathname = usePathname();
   const noOffset = pathname === "/" || isSiteHeaderHidden(pathname);
 
@@ -22,7 +23,7 @@ export function PublicContentShell({ children }: { children: ReactNode }) {
         !noOffset && "pt-20",
       )}
     >
-      {children}
+      <NavigationFeedback citySlugs={citySlugs}>{children}</NavigationFeedback>
     </div>
   );
 }

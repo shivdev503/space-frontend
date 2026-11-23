@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/header";
 import { PublicContentShell } from "@/components/layout/public-content-shell";
 import { CompareTray } from "@/modules/compare/compare-tray";
 import { ShortlistToast } from "@/modules/shortlist/shortlist-toast";
+import { listCityRouteSlugs } from "@/lib/city-route-slugs";
 import { publicRouteExists, retiredAreaRedirect } from "@/lib/public-route-exists";
 
 export default async function PublicLayout({ children }: { children: ReactNode }) {
@@ -17,7 +18,7 @@ export default async function PublicLayout({ children }: { children: ReactNode }
   return (
     <>
       <Header />
-      <PublicContentShell>{children}</PublicContentShell>
+      <PublicContentShell citySlugs={listCityRouteSlugs()}>{children}</PublicContentShell>
       <CompareTray />
       <ShortlistToast />
     </>
