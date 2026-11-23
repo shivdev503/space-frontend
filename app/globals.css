@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Screen-reader-only text is absolutely positioned. Inside a sideways slider with no positioned
+ * parent it would sit at its spot far to the right, outside the slider, and make the whole page
+ * wider than the phone (the browser then zooms out). Pin it to its containing block's corner.
+ */
+.sr-only {
+  left: 0;
+  top: 0;
+}
+
 :root {
   --color-page-bg: #fafaf8;
   --color-background: #fafaf8;
